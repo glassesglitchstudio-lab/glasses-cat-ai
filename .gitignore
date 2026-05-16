@@ -52,3 +52,9 @@ test_report.py
 
 # Zip files
 *.zip
+
+# Notes (personal memory files)
+notes/
+
+# Test files
+test_*.py
