@@ -1,7 +1,7 @@
 # 🐱 GlassesCat AI
-### 🎮 by GGS - GlassesGlich Studio
+### 🎮 by Niko Software | Arda Burak Çetiner
 
-GlassesCat, Ollama modellerini kullanan ve Kali Linux pentest araçlarıyla entegre çalışan bir AI asistanıdır.
+GlassesCat, Ollama modellerini kullanan ve Kali Linux pentest araçlarıyla entegre çalışan bir AI asistanıdır. Yapay zeka mühendisliği ve yazılım mühendisliği alanlarında eğitim ve geliştirme amaçlı tasarlanmıştır.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)
@@ -9,108 +9,143 @@ GlassesCat, Ollama modellerini kullanan ve Kali Linux pentest araçlarıyla ente
 
 ## 🚀 Özellikler
 
-- 💬 **AI Sohbet** - llama3.1 ve qwen2.5-coder modelleri
+- 💬 **AI Sohbet** - GulmezCetinerMax, llama3.1, qwen2.5-coder modelleri
 - 🔐 **Kali Linux Entegrasyonu** - SSH üzerinden pentest araçları
-- 🔴 **ROOT Süper Mod** - Gizli komutlar ve sınırsız çıktı
 - 🌐 **Web Arayüzü** - Modern ve responsive tasarım
-- 😺 **Dalgalayan Orb** - İnteraktif animasyon
-
-## 🛠️ Kali Komutları
-
-### Normal Mod
-```bash
-kali bağlan 192.168.1.100 kali toor    # SSH bağlantısı
-kali nmap 192.168.1.1                   # Port taraması
-kali sqlmap http://hedef.com?id=1       # SQL injection
-kali nikto http://hedef.com             # Web taraması
-kali hydra 192.168.1.1 ssh admin        # Brute force
-kali komut whoami                       # Özel komut
-kali bağlantı kes                       # SSH'dan çık
-```
-
-### ROOT Mod Komutları
-Sohbette `root` yazarak aktif edin:
-```bash
-kali metasploit                         # Metasploit Framework
-kali aircrack dosya.cap                 # WiFi cracking
-kali hashcat -m 0 hash.txt              # Password cracking
-kali burp                               # Burp Suite
-kali wireshark                          # Wireshark
-kali beef                               # BeEF XSS Framework
-```
+- 🧠 **Obsidian Hafıza** - Sınırsız .md hafıza sistemi
+- 🤖 **Otonom Ajan** - ReAct: Düşün + Karar Ver + Uygula
+- 📋 **Görev Planlama** - Çok adımlı otonom görevler
+- 🔍 **RAG Sistemi** - Bilgi geri kazanımı
 
 ## 📦 Kurulum
 
-### Gereksinimler
-- Python 3.8+
-- Ollama (localhost:11434)
-- Kali Linux VM (SSH ile)
+### 1. Ollama Kurulumu
 
-### 1. Repoyu Klonla
+**Windows:**
+1. https://ollama.com/download adresine git
+2. Windows installer'ı indir ve çalıştır
+3. Kurulum tamamlandıktan sonra terminalde doğrula:
+   ```bash
+   ollama --version
+   ```
+
+**Linux/Mac:**
 ```bash
-git clone https://github.com/yourusername/glassescat-ai.git
-cd glassescat-ai
+curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### 2. Bağımlılıkları Yükle
+### 2. AI Modelini İndir
+
+GlassesCat'in özel modeli **GulmezCetinerMax**'i Ollama Library'den indirin:
+
+```bash
+ollama pull glassesglitchstudio/GulmezCetinerMax:latest
+```
+
+> **Model:** 9.0 GB | **Namespace:** glassesglitchstudio
+> Profil: https://ollama.com/glassesglitchstudio
+
+### 3. Repoyu Klonla
+
+```bash
+git clone https://github.com/glassesglitchstudio-lab/glasses-cat-ai.git
+cd glasses-cat-ai
+```
+
+### 4. Bağımlılıkları Yükle
+
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 3. Ollama'yı Başlat
+### 5. Ollama'yı Başlat
+
 ```bash
 ollama serve
 ```
 
-### 4. Web Uygulamasını Çalıştır
+### 6. Web Uygulamasını Çalıştır
+
 ```bash
-cd web
-python app.py
+python web/app.py
 ```
 
-### 5. Tarayıcıda Aç
+### 7. Tarayıcıda Aç
+
 ```
 http://localhost:5000
 ```
 
 ## 🎯 Kullanım
 
-1. **Ollama'yı başlatın**: `ollama serve`
-2. **Web sunucusunu başlatın**: `python web/app.py`
-3. **Kali Linux VM'nizi hazırlayın**: SSH aktif ve bridged network
-4. **GlassesCat'e bağlanın**: "kali bağlan IP kullanıcı şifre"
+### CLI Modu
+```bash
+python glassescat_agent.py
+```
 
-## 💻 Yerel Agent Modu
+### Web Modu
+```bash
+python web/app.py
+```
 
-- `niko_agent.py` çalıştırıldığında `agent_status.log` dosyasına dosya sistemi olayları ve komut çıktıları yazılır; programla birlikte otomatik olarak izlenen klasörler: proje kökü, Masaüstü, Belgeler ve İndirilenler.
-- `agent_queue.txt` dosyasına her satıra bir Windows komutu yazın; ajan bu dosyayı belirli aralıklarla kontrol edip yeni komutları sırayla çalıştırır ve sonrasında kuyruk dosyasını temizleyip tekrar başlık ekler.
-- `agent_status.log` içinden son olayları takip edebilir, `agent_queue.txt`’ye yorum satırı olarak açıklama ekleyebilirsiniz (satırlar `#` ile başlıyorsa çalıştırılmaz).
+### Kali Linux Bağlantısı
+```
+kali bağlan 192.168.1.100 kali toor    # SSH bağlantısı
+kali nmap 192.168.1.1                   # Port taraması
+kali sqlmap http://hedef.com?id=1       # SQL injection
+kali nikto http://hedef.com             # Web taraması
+kali komut whoami                       # Özel komut
+kali bağlantı kes                       # SSH'dan çık
+```
+
+### Komutlar
+| Komut | Açıklama |
+|-------|----------|
+| `yardim` | Yardım menüsü |
+| `durum` | Sistem durumu |
+| `istatistik` | Performans istatistikleri |
+| `planla <görev>` | Çok adımlı görev |
+| `ara <sorgu>` | Web'de ara |
+| `hafizada ara <s>` | Hafızada ara |
+| `ogren` | AI öğrenme istatistikleri |
 
 ## 🏗️ Proje Yapısı
 
 ```
-niko_ai/
-├── main.py              # Kivy masaüstü versiyonu
-├── glassescat.kv        # Kivy UI tanımları
-├── requirements.txt     # Python bağımlılıkları
-└── web/
-    ├── app.py           # Flask sunucu
-    └── templates/
-        └── index.html   # Web arayüzü
+glasses-cat-ai/
+├── glassescat_core.py           # Ana motor
+├── glassescat_agent_loop.py     # ReAct ajan döngüsü
+├── glassescat_task_planner.py   # Görev planlama
+├── glassescat_state_manager.py  # Durum yönetimi
+├── glassescat_web_agent.py      # Otonom web ajanı
+├── glassescat_feedback.py       # Öğrenme ve hata analizi
+├── model_router.py              # Akıllı model seçimi
+├── rag_system.py                # RAG bilgi geri kazanımı
+├── toolformer.py                # 24 araçlı fonksiyon çağırma
+├── obsidian_memory.py           # Sınırsız .md hafıza
+├── gulmzcetiner/                # GulmezCetinerMax model dosyaları
+│   ├── Modelfile
+│   └── setup_ollama.py
+├── web/                         # Web arayüzü
+│   ├── app.py
+│   └── templates/
+├── skills/                      # Yetenek sistemi
+└── plugins/                     # Eklenti sistemi
 ```
 
 ## ⚠️ Güvenlik Uyarısı
 
-- ROOT mod sadece yetkili kullanıcılar için tasarlanmıştır
 - Pentest araçları yasal sınırlar içinde kullanılmalıdır
-- GlassesGlich Studio herhangi bir kötüye kullanımdan sorumlu değildir
+- Yetkisiz sistemlere erişim yasa dışıdır
+- Niko Software herhangi bir kötüye kullanımdan sorumlu değildir
 
-## 👥 GlassesGlich Studio Hakkında
+## 👥 Niko Software Hakkında
 
-**GGS - GlassesGlich Studio**, AI ve siber güvenlik alanlarında yenilikçi projeler üreten bağımsız bir geliştirici stüdyosudur.
+**Niko Software**, Arda Burak Çetiner tarafından kurulan; yapay zeka mühendisliği, yazılım mühendisliği ve siber güvenlik alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
 
 🎮 **Misyon**: Teknolojiyi eğlenceli ve erişilebilir kılmak
 🔒 **Vizyon**: Etik hackerlik ve AI eğitiminde öncü olmak
+💻 **Alanlar**: Yapay zeka mühendisliği, yazılım mühendisliği
 
 ## 🤝 Katkıda Bulunma
 
@@ -126,6 +161,6 @@ Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 ---
 
 <p align="center">
-  <b>🎮 GGS - GlassesGlich Studio 🎮</b><br>
-  <i>"Kod yaz, hack öğren, eğlen!"</i>
+  <b>🎮 Niko Software - Arda Burak Çetiner 🎮</b><br>
+  <i>"Kod yaz, AI öğren, geleceği inşa et!"</i>
 </p>
