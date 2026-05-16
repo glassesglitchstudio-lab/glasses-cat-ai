@@ -1,7 +1,7 @@
 # 🐱 GlassesCat AI
 ### 🎮 by Niko Software | Arda Burak Çetiner
 
-GlassesCat, Ollama modellerini kullanan ve Kali Linux pentest araçlarıyla entegre çalışan bir AI asistanıdır. Yapay zeka mühendisliği ve yazılım mühendisliği alanlarında eğitim ve geliştirme amaçlı tasarlanmıştır.
+GlassesCat, Ollama modellerini kullanan ve yapay zeka mühendisliği ile yazılım mühendisliği alanlarında eğitim ve geliştirme amaçlı tasarlanmış bir AI asistanıdır.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)
@@ -10,7 +10,6 @@ GlassesCat, Ollama modellerini kullanan ve Kali Linux pentest araçlarıyla ente
 ## 🚀 Özellikler
 
 - 💬 **AI Sohbet** - GulmezCetinerMax, llama3.1, qwen2.5-coder modelleri
-- 🔐 **Kali Linux Entegrasyonu** - SSH üzerinden pentest araçları
 - 🌐 **Web Arayüzü** - Modern ve responsive tasarım
 - 🧠 **Obsidian Hafıza** - Sınırsız .md hafıza sistemi
 - 🤖 **Otonom Ajan** - ReAct: Düşün + Karar Ver + Uygula
@@ -45,23 +44,23 @@ ollama pull glassesglitchstudio/GulmezCetinerMax:latest
 > **Model:** 9.0 GB | **Namespace:** glassesglitchstudio
 > Profil: https://ollama.com/glassesglitchstudio
 
-### 3. Repoyu Klonla
+### 3. Modeli Çalıştır
+
+```bash
+ollama run glassesglitchstudio/GulmezCetinerMax
+```
+
+### 4. Repoyu Klonla
 
 ```bash
 git clone https://github.com/glassesglitchstudio-lab/glasses-cat-ai.git
 cd glasses-cat-ai
 ```
 
-### 4. Bağımlılıkları Yükle
+### 5. Bağımlılıkları Yükle
 
 ```bash
 python -m pip install -r requirements.txt
-```
-
-### 5. Ollama'yı Başlat
-
-```bash
-ollama serve
 ```
 
 ### 6. Web Uygulamasını Çalıştır
@@ -88,14 +87,9 @@ python glassescat_agent.py
 python web/app.py
 ```
 
-### Kali Linux Bağlantısı
-```
-kali bağlan 192.168.1.100 kali toor    # SSH bağlantısı
-kali nmap 192.168.1.1                   # Port taraması
-kali sqlmap http://hedef.com?id=1       # SQL injection
-kali nikto http://hedef.com             # Web taraması
-kali komut whoami                       # Özel komut
-kali bağlantı kes                       # SSH'dan çık
+### Doğrudan Ollama ile
+```bash
+ollama run glassesglitchstudio/GulmezCetinerMax
 ```
 
 ### Komutlar
@@ -133,18 +127,12 @@ glasses-cat-ai/
 └── plugins/                     # Eklenti sistemi
 ```
 
-## ⚠️ Güvenlik Uyarısı
-
-- Pentest araçları yasal sınırlar içinde kullanılmalıdır
-- Yetkisiz sistemlere erişim yasa dışıdır
-- Niko Software herhangi bir kötüye kullanımdan sorumlu değildir
-
 ## 👥 Niko Software Hakkında
 
-**Niko Software**, Arda Burak Çetiner tarafından kurulan; yapay zeka mühendisliği, yazılım mühendisliği ve siber güvenlik alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
+**Niko Software**, Arda Burak Çetiner tarafından kurulan; yapay zeka mühendisliği ve yazılım mühendisliği alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
 
 🎮 **Misyon**: Teknolojiyi eğlenceli ve erişilebilir kılmak
-🔒 **Vizyon**: Etik hackerlik ve AI eğitiminde öncü olmak
+🚀 **Vizyon**: Yapay zeka ve yazılım mühendisliğinde öncü olmak
 💻 **Alanlar**: Yapay zeka mühendisliği, yazılım mühendisliği
 
 ## 🤝 Katkıda Bulunma
