@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Secrets
+.env
+.aider*
+
+# Logs
+*.log
+preview_*.log
+
+# Temporary
+temp_*.txt
+test_write.txt
+
+# Backups
+backups/
+
+# Storage (large files)
+storage/
+
+# Models (large files)
+models/
+
+# Screenshots
+screenshot_*.png
+
+# Test reports
+test_report.py
+
+# Zip files
+*.zip

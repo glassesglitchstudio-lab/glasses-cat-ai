@@ -1,0 +1,66 @@
+[
+    {
+        "name": "create_game_project",
+        "description": "Yeni bir oyun projesi iskeleti oluşturur",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "description": "Oyun adı"},
+                "engine": {"type": "string", "enum": ["pygame", "tkinter", "godot"], "default": "pygame"},
+                "genre": {"type": "string", "description": "Oyun türü (platformer, shooter, puzzle, rpg)"},
+                "window_size": {"type": "array", "items": {"type": "integer"}, "default": [800, 600]},
+                "fps": {"type": "integer", "default": 60}
+            },
+            "required": ["name", "genre"]
+        }
+    },
+    {
+        "name": "add_sprite",
+        "description": "Oyuna yeni bir sprite (karakter/nesne) ekler",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "description": "Sprite adı"},
+                "image_path": {"type": "string", "description": "Görsel dosya yolu (opsiyonel)"},
+                "width": {"type": "integer", "default": 32},
+                "height": {"type": "integer", "default": 32},
+                "color": {"type": "string", "description": "Renk (görsel yoksa varsayılan)"},
+                "speed": {"type": "number", "default": 5},
+                "behavior": {"type": "string", "enum": ["player", "enemy", "npc", "collectible", "obstacle"]}
+            },
+            "required": ["name", "behavior"]
+        }
+    },
+    {
+        "name": "add_level",
+        "description": "Oyuna yeni bir seviye/harita ekler",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "level_num": {"type": "integer", "description": "Seviye numarası"},
+                "width": {"type": "integer", "default": 20},
+                "height": {"type": "integer", "default": 15},
+                "tile_size": {"type": "integer", "default": 32},
+                "tile_map": {"type": "array", "description": "2D döşeme haritası"},
+                "background_color": {"type": "string", "default": "#87CEEB"},
+                "music": {"type": "string", "description": "Arka plan müziği dosyası"}
+            },
+            "required": ["level_num"]
+        }
+    },
+    {
+        "name": "add_enemy_ai",
+        "description": "Düşman yapay zekası ekler (state machine tabanlı)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "enemy_name": {"type": "string", "description": "Düşman adı"},
+                "behavior_type": {"type": "string", "enum": ["patrol", "chase", "random", "pattern", "defend"]},
+                "detection_range": {"type": "integer", "default": 200},
+                "patrol_path": {"type": "array", "description": "Devriye noktaları"},
+                "speed": {"type": "number", "default": 3}
+            },
+            "required": ["enemy_name", "behavior_type"]
+        }
+    }
+]

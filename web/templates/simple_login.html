@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat - Giriş</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            padding: 40px; width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .orb {
+            width: 80px; height: 80px; margin: 0 auto 20px;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf); border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% { transform:scale(1); opacity:0.8; } 50% { transform:scale(1.05); opacity:1; } }
+        h1 { font-size: 2rem; background: linear-gradient(45deg, #00d4ff, #7b2cbf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        p { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 25px; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; color: rgba(255,255,255,0.8); font-size: 0.85rem; }
+        .input-group input {
+            width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff;
+            font-size: 1rem; transition: all 0.3s;
+        }
+        .input-group input:focus { outline: none; border-color: #00d4ff; background: rgba(255,255,255,0.15); }
+        .btn-login {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            border: none; border-radius: 10px; color: #fff; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; margin-top: 5px;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,212,255,0.4); }
+        .error-msg { background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); color: #ff6b6b; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; font-size: 0.9rem; }
+        .dev-toggle { margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .dev-btn { background: transparent; border: 1px dashed #667eea; color: #667eea; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; width: 100%; }
+        .dev-section { display: none; margin-top: 12px; padding: 12px; background: rgba(102,126,234,0.1); border-radius: 8px; }
+        .dev-section input { margin-bottom: 8px; }
+        .admin-link { margin-top: 15px; }
+        .admin-link a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem; }
+        .admin-link a:hover { color: #00d4ff; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="orb"></div>
+        <h1>GlassesCat</h1>
+        <p>Email ve şifrenizle giriş yapın</p>
+        <div id="errorMsg" class="error-msg"></div>
+        <form id="loginForm">
+            <div class="input-group">
+                <label>E-posta</label>
+                <input type="email" id="email" placeholder="ornek@email.com" required>
+            </div>
+            <div class="input-group">
+                <label>Şifre</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-login">🚀 Giriş Yap</button>
+        </form>
+        <div class="dev-toggle">
+            <button class="dev-btn" onclick="toggleDevLogin()">👨‍💻 Geliştirici Girişi</button>
+            <div id="devSection" class="dev-section">
+                <input type="text" id="devName" placeholder="İsim" style="width:100%;padding:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;">
+                <input type="password" id="devPassword" placeholder="Geliştirici Şifresi" style="width:100%;padding:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;">
+                <button onclick="handleDevLogin()" style="width:100%;padding:10px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:8px;color:#fff;cursor:pointer;font-weight:600;">Giriş</button>
+            </div>
+        </div>
+        <div class="admin-link"><a href="/admin">🔑 Admin Paneli</a></div>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.style.display = 'none';
+            if (!email || !password) { errorEl.textContent = '❌ Email ve şifre girin!'; errorEl.style.display = 'block'; return; }
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({email, password})
+                });
+                const data = await res.json();
+                if (data.success) { window.location.href = '/'; }
+                else { errorEl.textContent = '❌ ' + (data.error || 'Giriş başarısız'); errorEl.style.display = 'block'; }
+            } catch(e) { errorEl.textContent = '❌ Bağlantı hatası'; errorEl.style.display = 'block'; }
+        });
+
+        document.getElementById('devPassword').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleDevLogin(); });
+        document.getElementById('password').addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('loginForm').dispatchEvent(new Event('submit')); });
+
+        function toggleDevLogin() {
+            const s = document.getElementById('devSection');
+            s.style.display = s.style.display === 'block' ? 'none' : 'block';
+        }
+        async function handleDevLogin() {
+            const name = document.getElementById('devName').value.trim() || 'Geliştirici';
+            const password = document.getElementById('devPassword').value;
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.style.display = 'none';
+            if (!password) { errorEl.textContent = '❌ Şifre gerekli'; errorEl.style.display = 'block'; return; }
+            try {
+                const res = await fetch('/dev-login-simple', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({name, password})
+                });
+                const data = await res.json();
+                if (data.success) { window.location.href = '/'; }
+                else { errorEl.textContent = '❌ ' + (data.error || 'Giriş başarısız'); errorEl.style.display = 'block'; }
+            } catch(e) { errorEl.textContent = '❌ Bağlantı hatası'; errorEl.style.display = 'block'; }
+        }
+    </script>
+</body>
+</html>

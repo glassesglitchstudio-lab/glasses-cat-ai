@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat - Giriş / Kayıt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #00d4ff;
+            border-bottom-color: #00d4ff;
+        }
+
+        .tab:hover {
+            color: #fff;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+            width: auto;
+        }
+
+        .checkbox-group label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #51cf66;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .forgot-password a:hover {
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <h1>🔐 GlassesCat</h1>
+            <p>Güvenli Giriş Sistemi</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Giriş Yap</div>
+            <div class="tab" onclick="switchTab('register')">Kayıt Ol</div>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <!-- GİRİŞ FORMU -->
+        <div id="loginSection" class="form-section active">
+            <div class="input-group">
+                <label for="loginEmail">E-posta Adresi</label>
+                <input type="email" id="loginEmail" placeholder="ornek@email.com">
+            </div>
+
+            <div class="input-group">
+                <label for="loginPassword">Şifre</label>
+                <input type="password" id="loginPassword" placeholder="••••••">
+            </div>
+
+            <div class="input-group">
+                <label for="loginBetaKey">Beta Key</label>
+                <input type="text" id="loginBetaKey" placeholder="XXXX-XXXX-XXXX" style="text-transform: uppercase;">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Beni hatırla</label>
+            </div>
+
+            <button class="btn-submit" onclick="handleLogin()">Giriş Yap</button>
+            <div id="loginLoading" class="loading">Giriş yapılıyor</div>
+        </div>
+
+        <!-- KAYIT FORMU -->
+        <div id="registerSection" class="form-section">
+            <div class="info-box">
+                ℹ️ Kayıt olmak için geçerli bir Beta Key'e ihtiyacınız var. Yöneticiden temin edin.
+            </div>
+
+            <div class="input-group">
+                <label for="registerName">Ad Soyad</label>
+                <input type="text" id="registerName" placeholder="Ahmet Yılmaz">
+            </div>
+
+            <div class="input-group">
+                <label for="registerEmail">E-posta Adresi</label>
+                <input type="email" id="registerEmail" placeholder="ornek@email.com">
+            </div>
+
+            <div class="input-group">
+                <label for="registerPassword">Şifre (min. 6 karakter)</label>
+                <input type="password" id="registerPassword" placeholder="••••••">
+            </div>
+
+            <div class="input-group">
+                <label for="registerBetaKey">Beta Key</label>
+                <input type="text" id="registerBetaKey" placeholder="XXXX-XXXX-XXXX" style="text-transform: uppercase;">
+            </div>
+
+            <button class="btn-submit" onclick="handleRegister()">Kayıt Ol</button>
+            <div id="registerLoading" class="loading">Kayıt yapılıyor</div>
+        </div>
+
+        <!-- GELİŞTİRİCİ MODU -->
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <button onclick="toggleDevMode()" style="background: transparent; border: 1px dashed #667eea; color: #667eea; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; width: 100%;">
+                👨‍💻 Geliştirici Modu (Beta Key Gerektirmez)
+            </button>
+            
+            <div id="devModeSection" style="display: none; margin-top: 15px;">
+                <div class="info-box" style="background: rgba(102, 126, 234, 0.1); border-color: #667eea;">
+                    ℹ️ Sadece localhost'tan erişilebilir. Hızlı test için ideal.
+                </div>
+                
+                <div class="input-group">
+                    <label for="devName">Geliştirici Adı</label>
+                    <input type="text" id="devName" placeholder="Adınız">
+                </div>
+                
+                <div class="input-group">
+                    <label for="devKey">Geliştirici Anahtarı</label>
+                    <input type="password" id="devKey" placeholder="••••••••">
+                </div>
+                
+                <button class="btn-submit" onclick="handleDevLogin()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    Geliştirici Olarak Giriş Yap
+                </button>
+                <div id="devLoading" class="loading">Giriş yapılıyor</div>
+            </div>
+        </div>
+
+        <div class="forgot-password">
+            <a href="/admin">🔑 Admin Paneli</a>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('loginSection').classList.add('active');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('registerSection').classList.add('active');
+            }
+            
+            hideMessages();
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = '❌ ' + msg;
+            el.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = '✅ ' + msg;
+            el.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Login handler
+        async function handleLogin() {
+            hideMessages();
+            
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+            const betaKey = document.getElementById('loginBetaKey').value.trim().toUpperCase();
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Validasyon
+            if (!email || !password || !betaKey) {
+                showError('Tüm alanları doldurun!');
+                return;
+            }
+
+            // Loading göster
+            document.querySelector('#loginSection .btn-submit').style.display = 'none';
+            document.getElementById('loginLoading').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email, 
+                        password, 
+                        beta_key: betaKey,
+                        remember: rememberMe 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    localStorage.setItem('glassescat_user', JSON.stringify({
+                        name: data.name,
+                        email: data.email
+                    }));
+                    
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/dashboard';
+                    }, 1000);
+                } else {
+                    showError(data.error || 'Giriş başarısız!');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Bağlantı hatası! Sunucu kapalı olabilir.');
+            } finally {
+                document.querySelector('#loginSection .btn-submit').style.display = 'block';
+                document.getElementById('loginLoading').style.display = 'none';
+            }
+        }
+
+        // Register handler
+        async function handleRegister() {
+            hideMessages();
+            
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('registerPassword').value;
+            const betaKey = document.getElementById('registerBetaKey').value.trim().toUpperCase();
+
+            // Validasyon
+            if (!name || !email || !password || !betaKey) {
+                showError('Tüm alanları doldurun!');
+                return;
+            }
+
+            if (name.length < 2) {
+                showError('Ad en az 2 karakter olmalı!');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Şifre en az 6 karakter olmalı!');
+                return;
+            }
+
+            // Email format kontrolü
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Geçersiz e-posta formatı!');
+                return;
+            }
+
+            // Loading göster
+            document.querySelector('#registerSection .btn-submit').style.display = 'none';
+            document.getElementById('registerLoading').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        name, 
+                        email, 
+                        password, 
+                        beta_key: betaKey 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message + ' Giriş yapabilirsiniz.');
+                    
+                    // Form temizle
+                    document.getElementById('registerName').value = '';
+                    document.getElementById('registerEmail').value = '';
+                    document.getElementById('registerPassword').value = '';
+                    document.getElementById('registerBetaKey').value = '';
+                    
+                    // Login tab'a geç
+                    setTimeout(() => switchTab('login'), 1500);
+                } else {
+                    showError(data.error || 'Kayıt başarısız!');
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                showError('Bağlantı hatası! Sunucu kapalı olabilir.');
+            } finally {
+                document.querySelector('#registerSection .btn-submit').style.display = 'block';
+                document.getElementById('registerLoading').style.display = 'none';
+            }
+        }
+
+        // Enter key desteği
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const activeSection = document.querySelector('.form-section.active');
+                        if (activeSection) {
+                            if (activeSection.id === 'loginSection') {
+                                handleLogin();
+                            } else {
+                                handleRegister();
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Geliştirici modu enter desteği
+            document.getElementById('devKey').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleDevLogin();
+            });
+        });
+
+        // Geliştirici modu toggle
+        function toggleDevMode() {
+            const section = document.getElementById('devModeSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Geliştirici modu giriş
+        async function handleDevLogin() {
+            hideMessages();
+            
+            const name = document.getElementById('devName').value.trim() || 'Geliştirici';
+            const devKey = document.getElementById('devKey').value.trim();
+
+            if (!devKey) {
+                showError('Geliştirici anahtarı gerekli!');
+                return;
+            }
+
+            // Loading göster
+            document.querySelector('#devModeSection .btn-submit').style.display = 'none';
+            document.getElementById('devLoading').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/auth/dev-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        dev_key: devKey,
+                        name: name
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    localStorage.setItem('glassescat_user', JSON.stringify({
+                        name: data.name,
+                        email: data.email,
+                        mode: 'developer'
+                    }));
+                    
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/dashboard';
+                    }, 1000);
+                } else {
+                    showError(data.error || 'Giriş başarısız!');
+                }
+            } catch (error) {
+                console.error('Dev login error:', error);
+                showError('Bağlantı hatası! Sadece localhost\'tan erişilebilir.');
+            } finally {
+                document.querySelector('#devModeSection .btn-submit').style.display = 'block';
+                document.getElementById('devLoading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+[
+    {
+        "name": "scan_web_vulnerabilities",
+        "description": "Web uygulamasında OWASP Top 10 zafiyet taraması yapar",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url": {"type": "string", "description": "Hedef URL"},
+                "scan_depth": {"type": "string", "enum": ["quick", "normal", "deep"], "default": "normal"},
+                "test_types": {"type": "array", "items": {"type": "string"}, "default": ["xss", "sqli", "csrf"]},
+                "auth_token": {"type": "string", "description": "Gerekliyse auth token"},
+                "crawl": {"type": "boolean", "default": true}
+            },
+            "required": ["url"]
+        }
+    },
+    {
+        "name": "analyze_headers",
+        "description": "HTTP güvenlik başlıklarını analiz eder",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url": {"type": "string", "description": "Hedef URL"},
+                "full_report": {"type": "boolean", "default": false}
+            },
+            "required": ["url"]
+        }
+    },
+    {
+        "name": "check_ssl_tls",
+        "description": "SSL/TLS sertifika ve yapılandırma kontrolü yapar",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "hostname": {"type": "string", "description": "Hedef hostname"},
+                "port": {"type": "integer", "default": 443},
+                "check_cert_chain": {"type": "boolean", "default": true}
+            },
+            "required": ["hostname"]
+        }
+    },
+    {
+        "name": "generate_security_report",
+        "description": "Güvenlik tarama sonuçlarından rapor oluşturur",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "findings": {"type": "array", "description": "Bulgu listesi"},
+                "format": {"type": "string", "enum": ["markdown", "pdf", "html"], "default": "markdown"},
+                "include_remediation": {"type": "boolean", "default": true}
+            },
+            "required": ["findings"]
+        }
+    }
+]

@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Temel Web Scraping",
+        "user": "https://ornek.com/haberler sayfasındaki tüm haber başlıklarını çek",
+        "assistant": "Sayfayı analiz ediyorum ve haber başlıklarını çıkarıyorum...\n\nSayfa yapısı:\n- Haber başlıkları: div.haber-basligi > h2 > a\n- Tarih: span.tarih\n- Özet: p.ozet\n\nToplam 15 haber bulundu. İşte sonuçlar:\n\n```json\n[\n  {\"baslik\": \"Yapay Zeka Devrimi\", \"tarih\": \"2025-05-14\", \"ozet\": \"...\"},\n  {\"baslik\": \"Yeni Teknoloji Hamlesi\", \"tarih\": \"2025-05-13\", \"ozet\": \"...\"}\n]\n```"
+    },
+    {
+        "title": "Çok Sayfalı Scraping",
+        "user": "ekitap.com'daki tüm kitapları 10 sayfa boyunca çek. Sayfa parametresi 'page'",
+        "assistant": "Çok sayfalı scraping başlatılıyor...\n\n- Base URL: https://ekitap.com/kitaplar\n- Sayfa parametresi: page\n- Selector: div.kitap-karti\n- 1 sn bekleme ile polite scraping\n\nSayfa 1/10: 20 kitap çekildi\nSayfa 2/10: 20 kitap çekildi\nSayfa 3/10: 18 kitap çekildi\n...\n\nToplam 195 kitap başarıyla çekildi."
+    }
+]

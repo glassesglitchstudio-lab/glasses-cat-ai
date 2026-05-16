@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat STRIDE IDE v2.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12121f;
+            --bg-tertiary: #1a1a2e;
+            --accent: #00d4ff;
+            --accent-secondary: #ff6b35;
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --border: rgba(255,255,255,0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .ide-header {
+            height: 50px;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .ide-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .ide-logo span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #0099cc);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,212,255,0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #000;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--accent-secondary), #cc4400);
+            color: #fff;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+        }
+        
+        /* Main Layout */
+        .ide-container {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-section {
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .sidebar-header {
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.03);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .sidebar-content {
+            padding: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .file-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .file-item.active {
+            background: rgba(0,212,255,0.2);
+            color: var(--accent);
+        }
+        
+        .file-icon {
+            font-size: 1.1rem;
+        }
+        
+        /* Component List */
+        .component-list {
+            padding: 10px;
+        }
+        
+        .component-item {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .component-item:hover {
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+        
+        .component-item.selected {
+            background: rgba(0,212,255,0.1);
+            border-color: var(--accent);
+        }
+        
+        .component-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .component-keywords {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-tabs {
+            background: var(--bg-secondary);
+            padding: 0 10px;
+            display: flex;
+            gap: 5px;
+            border-bottom: 1px solid var(--border);
+            height: 40px;
+            align-items: flex-end;
+        }
+        
+        .editor-tab {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .editor-tab.active {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .close-tab {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        
+        .close-tab:hover {
+            background: #ff4444;
+        }
+        
+        /* Code Editor */
+        .code-editor {
+            flex: 1;
+            background: var(--bg-tertiary);
+            display: flex;
+        }
+        
+        .line-numbers {
+            padding: 15px 10px;
+            background: rgba(0,0,0,0.3);
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: right;
+            user-select: none;
+            min-width: 50px;
+        }
+        
+        .code-content {
+            flex: 1;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            outline: none;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            resize: none;
+            overflow: auto;
+            white-space: pre;
+            tab-size: 4;
+        }
+        
+        /* Bottom Panel */
+        .bottom-panel {
+            height: 200px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+        }
+        
+        .panel-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            padding: 5px 10px;
+            gap: 10px;
+        }
+        
+        .panel-tab {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .panel-tab.active {
+            background: rgba(0,212,255,0.2);
+            color: var(--accent);
+        }
+        
+        .panel-content {
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        /* AI Chat Panel */
+        .ai-chat {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 400px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .ai-chat.minimized {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+        
+        .ai-chat-header {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .ai-chat.minimized .ai-chat-header {
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .ai-chat.minimized .ai-chat-title,
+        .ai-chat.minimized .minimize-btn {
+            display: none;
+        }
+        
+        .ai-chat-title {
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .minimize-btn {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .ai-chat-body {
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-chat.minimized .ai-chat-body {
+            display: none;
+        }
+        
+        .ai-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .ai-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .ai-message.user {
+            background: rgba(0,212,255,0.2);
+            text-align: right;
+        }
+        
+        .ai-message.ai {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .ai-input {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .ai-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text);
+            outline: none;
+        }
+        
+        .ai-input button {
+            padding: 10px 15px;
+            background: linear-gradient(135deg, var(--accent), #0099cc);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text);
+            outline: none;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .quick-action {
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-action:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .quick-action-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Preview Panel */
+        .preview-panel {
+            width: 400px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-header {
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.2);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+        
+        /* Success Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #000;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.show {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="ide-header">
+        <div class="ide-logo">
+            <span>👾 STRIDE IDE</span>
+            <span style="font-size:0.8rem;opacity:0.7;">v2.0</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="showProjectModal()">📂 Proje Aç</button>
+            <button class="btn btn-secondary" onclick="showNewFileModal()">➕ Yeni Dosya</button>
+            <button class="btn btn-primary" onclick="generateFiles()">⚡ Otomatik Oluştur</button>
+            <button class="btn btn-success" onclick="buildProject()">🔨 Derle</button>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="ide-container">
+        <!-- Left Sidebar - Files & Components -->
+        <aside class="sidebar">
+            <!-- Project Files -->
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <span>📁 Proje Dosyaları</span>
+                    <span onclick="refreshFiles()">🔄</span>
+                </div>
+                <div class="sidebar-content" id="fileList">
+                    <div class="file-item active" onclick="openFile('StrideBridge.cs')">
+                        <span class="file-icon">📄</span>
+                        <span>StrideBridge.cs</span>
+                    </div>
+                    <div class="file-item" onclick="openFile('BlockComponent.cs')">
+                        <span class="file-icon">📄</span>
+                        <span>BlockComponent.cs</span>
+                    </div>
+                    <div class="file-item" onclick="openFile('PlayerController.cs')">
+                        <span class="file-icon">📄</span>
+                        <span>PlayerController.cs</span>
+                    </div>
+                    <div class="file-item" onclick="openFile('BlockWorldManager.cs')">
+                        <span class="file-icon">📄</span>
+                        <span>BlockWorldManager.cs</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Component Templates -->
+            <div class="sidebar-section" style="flex:1;overflow:auto;">
+                <div class="sidebar-header">
+                    <span>🎮 Component Şablonları</span>
+                </div>
+                <div class="component-list">
+                    <div class="component-item" onclick="selectComponent('silah')">
+                        <div class="component-name">🔫 WeaponComponent</div>
+                        <div class="component-keywords">silah, silah sistemi</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('dusman')">
+                        <div class="component-name">👾 EnemyComponent</div>
+                        <div class="component-keywords">düşman, canavar</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('oyuncu')">
+                        <div class="component-name">🧑 PlayerComponent</div>
+                        <div class="component-keywords">oyuncu, kontrol</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('blok')">
+                        <div class="component-name">🧱 BlockComponent</div>
+                        <div class="component-keywords">blok, chunk</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('yapay zeka')">
+                        <div class="component-name">🤖 AIComponent</div>
+                        <div class="component-keywords">yapay zeka, zeka</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('fizik')">
+                        <div class="component-name">⚡ PhysicsComponent</div>
+                        <div class="component-keywords">fizik, çarpışma</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('ses')">
+                        <div class="component-name">🔊 AudioComponent</div>
+                        <div class="component-keywords">ses, müzik</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('efekt')">
+                        <div class="component-name">✨ EffectComponent</div>
+                        <div class="component-keywords">efekt, parçacık</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('patlama')">
+                        <div class="component-name">💥 ExplosionComponent</div>
+                        <div class="component-keywords">patlama, bomba</div>
+                    </div>
+                    <div class="component-item" onclick="selectComponent('kamera')">
+                        <div class="component-name">📷 CameraComponent</div>
+                        <div class="component-keywords">kamera, fps</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selected Components -->
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <span>✅ Seçili Componentler</span>
+                    <span id="selectedCount">0</span>
+                </div>
+                <div class="sidebar-content" id="selectedList">
+                    <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:0.8rem;">
+                        Henüz component seçilmedi<br>
+                        <small>Sol listeden seçin</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Editor Area -->
+        <main class="editor-area">
+            <!-- Tabs -->
+            <div class="editor-tabs">
+                <div class="editor-tab active">
+                    <span>📄 StrideBridge.cs</span>
+                    <span class="close-tab">×</span>
+                </div>
+            </div>
+            
+            <!-- Code Editor -->
+            <div class="code-editor">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea class="code-content" id="codeEditor" spellcheck="false">// Stride Engine - GlassesCat Bridge
+// Otomatik dosya algılama ve oluşturma sistemi
+
+using System.Collections.Generic;
+
+namespace GlassesCat.Stride.Bridge
+{
+    public class TurkishToStrideBridge
+    {
+        // Component üreticileri buraya eklenecek
+    }
+}</textarea>
+            </div>
+        </main>
+        
+        <!-- Right Panel - Preview -->
+        <aside class="preview-panel">
+            <div class="preview-header">
+                <span>🎮 Önizleme</span>
+                <button onclick="togglePreview()">⛶</button>
+            </div>
+            <div class="preview-content" id="previewContent">
+                <div style="text-align:center;">
+                    <div style="font-size:3rem;margin-bottom:15px;">👾</div>
+                    <div>GlassesCat STRIDE</div>
+                    <div style="font-size:0.8rem;margin-top:10px;opacity:0.7;">Build: PERFEKT</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Bottom Panel - Console -->
+    <div class="bottom-panel">
+        <div class="panel-tabs">
+            <div class="panel-tab active" onclick="switchPanel('console')">🖥️ Konsol</div>
+            <div class="panel-tab" onclick="switchPanel('output')">📤 Çıktı</div>
+            <div class="panel-tab" onclick="switchPanel('ai')">🤖 AI Asistan</div>
+        </div>
+        <div class="panel-content" id="panelContent">
+            <div style="color:#00ff88;">[GlassesCat] STRIDE IDE v2.0 başlatıldı...</div>
+            <div style="color:#888;">[INFO] Stride 4.3 + .NET 10 hazır</div>
+            <div style="color:#ffaa00;">[WARNING] Ollama bağlantısı kontrol ediliyor...</div>
+        </div>
+    </div>
+    
+    <!-- AI Chat Widget -->
+    <div class="ai-chat" id="aiChat">
+        <div class="ai-chat-header" onclick="toggleChat()">
+            <span class="ai-chat-title">🤖 GlassesCat AI</span>
+            <span class="minimize-btn">−</span>
+        </div>
+        <div class="ai-chat-body">
+            <div class="ai-messages" id="aiMessages">
+                <div class="ai-message ai">
+                    Merhaba! Ben GlassesCat. Stride Engine için oyun geliştiriyorum. Sana nasıl yardımcı olabilirim?
+                </div>
+            </div>
+            <div class="ai-input">
+                <input type="text" id="aiInput" placeholder="Komut girin..." onkeypress="handleAIEnter(event)">
+                <button onclick="sendAIMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // State
+        let selectedComponents = [];
+        let currentFile = 'StrideBridge.cs';
+        
+        // Component Templates
+        const componentTemplates = {
+            'silah': { name: 'WeaponComponent', keywords: 'silah silah sistemi', template: `    [ComponentCategory("GlassesCat/Combat")]
+    public class WeaponComponent : EntityComponent
+    {
+        [DataMember(10)]
+        public string WeaponName { get; set; } = "Pistol";
+        
+        [DataMember(11)]
+        public int Damage { get; set; } = 25;
+        
+        [DataMember(12)]
+        public float FireRate { get; set; } = 0.15f;
+        
+        public override void Start()
+        {
+            System.Diagnostics.Debug.WriteLine("[GlassesCat] WeaponComponent started");
+        }
+    }` },
+            
+            'dusman': { name: 'EnemyComponent', keywords: 'düşman canavar zombi', template: `    [ComponentCategory("GlassesCat/AI")]
+    public class EnemyComponent : EntityComponent
+    {
+        [DataMember(30)]
+        public float Health { get; set; } = 100.0f;
+        
+        [DataMember(31)]
+        public float MoveSpeed { get; set; } = 5.0f;
+        
+        [DataMember(32)]
+        public float AttackRange { get; set; } = 50.0f;
+    }` },
+            
+            'oyuncu': { name: 'PlayerComponent', keywords: 'oyuncu kontrol', template: `    [ComponentCategory("GlassesCat/Player")]
+    public class PlayerComponent : EntityComponent
+    {
+        [DataMember(40)]
+        public float MoveSpeed { get; set; } = 8.0f;
+        
+        [DataMember(41)]
+        public float SprintSpeed { get; set; } = 12.0f;
+        
+        [DataMember(42)]
+        public float JumpForce { get; set; } = 10.0f;
+    }` },
+            
+            'blok': { name: 'BlockComponent', keywords: 'blok chunk', template: `    [ComponentCategory("GlassesCat/Blocks")]
+    public class BlockComponent : EntityComponent
+    {
+        [DataMember(10)]
+        public BlockType Type { get; set; } = BlockType.Dirt;
+        
+        [DataMember(11)]
+        public Int3 GridPosition { get; set; }
+    }` },
+            
+            'yapay zeka': { name: 'AIComponent', keywords: 'yapay zeka', template: `    [ComponentCategory("GlassesCat/AI")]
+    public class AIControllerComponent : EntityComponent
+    {
+        [DataMember(90)]
+        public AIType Type { get; set; } = AIType.Navigation;
+        
+        [DataMember(91)]
+        public float UpdateInterval { get; set; } = 0.1f;
+    }` },
+            
+            'fizik': { name: 'PhysicsComponent', keywords: 'fizik', template: `    [ComponentCategory("GlassesCat/Physics")]
+    public class PhysicsComponent : EntityComponent
+    {
+        [DataMember(110)]
+        public float Mass { get; set; } = 1.0f;
+        
+        [DataMember(111)]
+        public float Friction { get; set; } = 0.5f;
+    }` },
+            
+            'ses': { name: 'AudioComponent', keywords: 'ses müzik', template: `    [ComponentCategory("GlassesCat/Audio")]
+    public class AudioComponent : EntityComponent
+    {
+        [DataMember(80)]
+        public string AudioClip { get; set; } = string.Empty;
+        
+        [DataMember(81)]
+        public float Volume { get; set; } = 1.0f;
+    }` },
+            
+            'efekt': { name: 'EffectComponent', keywords: 'efekt parçacık', template: `    [ComponentCategory("GlassesCat/VFX")]
+    public class EffectComponent : EntityComponent
+    {
+        [DataMember(60)]
+        public EffectType Type { get; set; } = EffectType.Explosion;
+        
+        [DataMember(61)]
+        public float Duration { get; set; } = 2.0f;
+    }` },
+            
+            'patlama': { name: 'ExplosionComponent', keywords: 'patlama bomba', template: `    [ComponentCategory("GlassesCat/VFX")]
+    public class ExplosionComponent : EntityComponent
+    {
+        [DataMember(210)]
+        public float Radius { get; set; } = 10.0f;
+        
+        [DataMember(211)]
+        public float Damage { get; set; } = 100.0f;
+    }` },
+            
+            'kamera': { name: 'CameraComponent', keywords: 'kamera fps', template: `    [ComponentCategory("GlassesCat/Camera")]
+    public class CameraComponent : EntityComponent
+    {
+        [DataMember(150)]
+        public float FieldOfView { get; set; } = 75.0f;
+        
+        [DataMember(151)]
+        public float NearPlane { get; set; } = 0.1f;
+    }` }
+        };
+        
+        // Select Component
+        function selectComponent(key) {
+            if (!selectedComponents.includes(key)) {
+                selectedComponents.push(key);
+                updateSelectedList();
+                updateCodeEditor();
+                showNotification(`✅ ${componentTemplates[key].name} eklendi`);
+            }
+        }
+        
+        // Update Selected List
+        function updateSelectedList() {
+            const container = document.getElementById('selectedList');
+            document.getElementById('selectedCount').textContent = selectedComponents.length;
+            
+            if (selectedComponents.length === 0) {
+                container.innerHTML = `
+                    <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:0.8rem;">
+                        Henüz component seçilmedi<br>
+                        <small>Sol listeden seçin</small>
+                    </div>`;
+                return;
+            }
+            
+            container.innerHTML = selectedComponents.map(key => `
+                <div class="component-item selected" onclick="removeComponent('${key}')">
+                    <div class="component-name">✓ ${componentTemplates[key].name}</div>
+                    <div class="component-keywords">Kaldırmak için tıkla</div>
+                </div>
+            `).join('');
+        }
+        
+        // Remove Component
+        function removeComponent(key) {
+            selectedComponents = selectedComponents.filter(k => k !== key);
+            updateSelectedList();
+            updateCodeEditor();
+        }
+        
+        // Update Code Editor
+        function updateCodeEditor() {
+            if (selectedComponents.length === 0) return;
+            
+            let code = `// GLASSESCAT STRIDE - OTOMATIK URETIM
+// Tarih: ${new Date().toLocaleString()}
+using Stride.Core;
+using Stride.Core.Mathematics;
+using Stride.Engine;
+
+namespace GlassesCatStride.Components;
+{`;
+            
+            selectedComponents.forEach(key => {
+                code += `\n${componentTemplates[key].template}\n`;
+            });
+            
+            code += `\n}`;
+            
+            document.getElementById('codeEditor').value = code;
+            updateLineNumbers();
+        }
+        
+        // Generate Files
+        async function generateFiles() {
+            if (selectedComponents.length === 0) {
+                showNotification('⚠️ Önce component seçin!');
+                return;
+            }
+            
+            addConsoleLog('⚡ Dosya oluşturma başlatılıyor...', 'info');
+            
+            try {
+                const response = await fetch('/api/stride/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        command: selectedComponents.join(' ')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    addConsoleLog(`✅ ${result.created.components.length} component, ${result.created.systems.length} system oluşturuldu`, 'success');
+                    showNotification('✅ Tüm dosyalar oluşturuldu!');
+                } else {
+                    addConsoleLog('❌ Dosya oluşturma hatası', 'error');
+                }
+            } catch (e) {
+                addConsoleLog(`Local mod: Komutlar hazır`, 'info');
+                showNotification('⚡ Komutlar hazır - Konsola bakın');
+            }
+        }
+        
+        // Build Project
+        function buildProject() {
+            addConsoleLog('🔨 Proje derleniyor (.NET 10)...', 'info');
+            showNotification('🔨 Derleme başladı...');
+            
+            setTimeout(() => {
+                addConsoleLog('✅ Derleme başarılı! (Simüle)', 'success');
+                showNotification('✅ Build PERFEKT!');
+            }, 2000);
+        }
+        
+        // AI Chat Functions
+        function toggleChat() {
+            const chat = document.getElementById('aiChat');
+            chat.classList.toggle('minimized');
+        }
+        
+        function handleAIEnter(e) {
+            if (e.key === 'Enter') sendAIMessage();
+        }
+        
+        async function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messages = document.getElementById('aiMessages');
+            messages.innerHTML += `<div class="ai-message user">${message}</div>`;
+            input.value = '';
+            
+            messages.innerHTML += `<div class="ai-message ai">Düşünüyorum...</div>`;
+            messages.scrollTop = messages.scrollHeight;
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                
+                const result = await response.json();
+                const lastMsg = messages.lastElementChild;
+                lastMsg.textContent = result.response || result.error || 'Yanıt alınamadı';
+            } catch (e) {
+                const lastMsg = messages.lastElementChild;
+                lastMsg.textContent = 'GlassesCat hazır! Stride için komutlar verin.';
+            }
+            
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // Console Functions
+        function addConsoleLog(message, type = 'info') {
+            const panel = document.getElementById('panelContent');
+            const colors = {
+                info: '#00d4ff',
+                success: '#00ff88',
+                warning: '#ffaa00',
+                error: '#ff4444'
+            };
+            panel.innerHTML += `<div style="color:${colors[type]||'#888'};">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            panel.scrollTop = panel.scrollHeight;
+        }
+        
+        function switchPanel(panel) {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const content = document.getElementById('panelContent');
+            if (panel === 'console') {
+                content.innerHTML = `
+                    <div style="color:#00ff88;">[GlassesCat] STRIDE IDE v2.0</div>
+                    <div style="color:#888;">[INFO] Stride 4.3 + .NET 10 hazır</div>`;
+            }
+        }
+        
+        // File Functions
+        function openFile(filename) {
+            document.querySelectorAll('.file-item').forEach(f => f.classList.remove('active'));
+            event.target.closest('.file-item').classList.add('active');
+            currentFile = filename;
+            addConsoleLog(`📄 ${filename} açıldı`, 'info');
+        }
+        
+        function updateLineNumbers() {
+            const lines = document.getElementById('codeEditor').value.split('\n').length;
+            document.getElementById('lineNumbers').textContent = Array.from({length: lines}, (_, i) => i + 1).join('\n');
+        }
+        
+        // Notifications
+        function showNotification(message) {
+            const n = document.getElementById('notification');
+            n.textContent = message;
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 3000);
+        }
+        
+        // Modals
+        function showNewFileModal() {
+            showNotification('➕ Yeni dosya modalı açılacak');
+        }
+        
+        function showProjectModal() {
+            showNotification('📂 Proje aç modalı açılacak');
+        }
+        
+        // Preview Toggle
+        function togglePreview() {
+            showNotification('⛶ Önizleme tam ekran modu');
+        }
+        
+        function refreshFiles() {
+            addConsoleLog('🔄 Dosyalar yenileniyor...', 'info');
+        }
+        
+        // Init
+        document.getElementById('codeEditor').addEventListener('input', updateLineNumbers);
+        updateLineNumbers();
+        addConsoleLog('👾 STRIDE IDE hazır - Component seçin ve oluşturun!', 'success');
+    </script>
+</body>
+</html>

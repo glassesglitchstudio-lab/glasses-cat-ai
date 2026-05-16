@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Platform Oyunu Başlangıcı",
+        "user": "Pygame ile basit bir platform oyunu yap. Karakter sağa-sola hareket etsin ve zıplasın.",
+        "assistant": "Pygame platform oyunu oluşturuluyor...\n\n```python\nimport pygame\nimport sys\n\npygame.init()\n\n# Sabitler\nWIDTH, HEIGHT = 800, 600\nFPS = 60\nGRAVITY = 0.8\nJUMP_POWER = -15\nMOVE_SPEED = 7\n\n# Renkler\nWHITE = (255, 255, 255)\nBLUE = (50, 50, 255)\nGREEN = (34, 177, 76)\n\nclass Player(pygame.sprite.Sprite):\n    def __init__(self, x, y):\n        super().__init__()\n        self.image = pygame.Surface((32, 48))\n        self.image.fill(BLUE)\n        self.rect = self.image.get_rect(topleft=(x, y))\n        self.vel_x = 0\n        self.vel_y = 0\n        self.on_ground = False\n\n    def update(self):\n        self.vel_y += GRAVITY\n        self.rect.x += self.vel_x\n        self.rect.y += self.vel_y\n```\n\nBu temel yapıyla başlayalım. Platformlar, çarpışma ve kamera sistemi ekleyelim mi?"
+    },
+    {
+        "title": "Düşman AI Ekleme",
+        "user": "Oyuna devriye gezen bir düşman ekle.",
+        "assistant": "State machine tabanlı düşman AI'sı ekleniyor...\n\n```python\nclass EnemyState(Enum):\n    PATROL = \"patrol\"\n    CHASE = \"chase\"\n    ATTACK = \"attack\"\n\nclass Enemy(pygame.sprite.Sprite):\n    def __init__(self, x, y, patrol_range=100):\n        super().__init__()\n        self.image = pygame.Surface((32, 32))\n        self.image.fill((255, 0, 0))\n        self.rect = self.image.get_rect(topleft=(x, y))\n        self.state = EnemyState.PATROL\n        self.patrol_range = patrol_range\n        self.start_x = x\n        self.speed = 2\n        self.detection_range = 200\n\n    def update(self, player_pos):\n        dx = player_pos[0] - self.rect.x\n        dist = abs(dx)\n\n        if dist < self.detection_range:\n            self.state = EnemyState.CHASE\n        elif self.state == EnemyState.CHASE:\n            self.state = EnemyState.PATROL\n\n        if self.state == EnemyState.PATROL:\n            self.rect.x += self.speed\n            if abs(self.rect.x - self.start_x) > self.patrol_range:\n                self.speed *= -1\n        elif self.state == EnemyState.CHASE:\n            self.rect.x += self.speed if dx > 0 else -self.speed\n```"
+    }
+]

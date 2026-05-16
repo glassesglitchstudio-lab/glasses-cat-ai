@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Web Zafiyet Taraması",
+        "user": "https://ornek-sirket.com sitesini güvenlik açıklarına karşı tara.",
+        "assistant": "Güvenlik taraması başlatılıyor...\n\n### Hedef: https://ornek-sirket.com\n### Tarama Türü: Web Uygulama Güvenlik Testi\n### Tarih: 2025-05-14\n\n#### 1. HTTP Güvenlik Başlıkları\n- ❌ Strict-Transport-Security: Eksik\n- ❌ X-Frame-Options: Eksik (Clickjacking riski)\n- ❌ X-Content-Type-Options: Eksik\n- ✅ Content-Security-Policy: Mevcut\n\n#### 2. XSS Testi\n- Reflected XSS bulundu: `/ara?q=<script>alert(1)</script>`\n- Risk: **High** (CVSS: 7.2)\n- Öneri: Çıktıları HTML encode et\n\n#### 3. SQL Injection\n- No SQLi tespit edildi ✅\n\n#### 4. SSL/TLS\n- Sertifika geçerli ✅\n- TLS 1.2 ve 1.3 destekleniyor ✅"
+    },
+    {
+        "title": "Güvenlik Raporu Oluşturma",
+        "user": "Bulduğun zafiyetleri CVSS puanlarıyla raporla.",
+        "assistant": "## Güvenlik Değerlendirme Raporu\n\n| # | Zafiyet | CVSS | Risk | Durum |\n|---|---------|------|------|-------|\n| 1 | Reflected XSS | 7.2 | High | Açık |\n| 2 | Missing HSTS | 4.0 | Medium | Açık |\n| 3 | Missing X-Frame-Options | 4.3 | Medium | Açık |\n| 4 | Weak Password Policy | 5.9 | Medium | Açık |\n\n### Önerilen Aksiyonlar:\n1. **Yüksek Öncelik:** Tüm kullanıcı girdilerini HTML encode et\n2. **Yüksek Öncelik:** HSTS başlığını ekle\n3. **Orta Öncelik:** X-Frame-Options: DENY ekle\n4. **Orta Öncelik:** Parola politikasını güçlendir\n\nToplam: 4 zafiyet (1 High, 3 Medium)"
+    }
+]

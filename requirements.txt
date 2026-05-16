@@ -1,0 +1,37 @@
+# Niko Evrensel Sistem Ajanı - Gerekli Bağımlılıklar
+
+# Web Framework
+flask>=3.0.0
+flask-cors>=4.0.0
+fastapi>=0.104.0
+uvicorn>=0.23.0
+
+# HTTP & API
+requests>=2.31.0
+httpx>=0.24.0
+python-dotenv>=1.0.0
+
+# UI & Console
+colorama>=0.4.6
+rich>=13.0.0
+
+# Masaüstü UI (CustomTkinter)
+customtkinter>=5.2.0
+
+# Bilgisayar Kontrolü
+pyautogui>=0.9.54
+pywin32>=306
+pygetwindow>=0.0.9
+
+# Görüntü İşleme & OCR
+numpy>=1.24.0
+opencv-python>=4.8.0
+pytesseract>=0.3.10
+easyocr>=1.7.0
+
+# Sistem
+psutil>=5.9.0
+paramiko>=3.4.0
+
+# Paketleme (Build için)
+pyinstaller>=6.0.0

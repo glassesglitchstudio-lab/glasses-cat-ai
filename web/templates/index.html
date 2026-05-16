@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='orb-styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07070d;
+            --surface: rgba(139, 92, 246, 0.08);
+            --surface2: rgba(139, 92, 246, 0.14);
+            --border: rgba(139, 92, 246, 0.20);
+            --accent: #8b5cf6;
+            --accent2: #a78bfa;
+            --accent3: #7c3aed;
+            --text: #f1f0ff;
+            --text2: #9492b0;
+            --gradient: linear-gradient(135deg, #8b5cf6, #a78bfa, #7c3aed);
+            --glass: rgba(139, 92, 246, 0.08);
+            --orange: #ff6b00;
+            --orange-glow: rgba(255, 107, 0, 0.35);
+            --purple-dark: rgba(139, 92, 246, 0.12);
+            --purple-heavy: rgba(139, 92, 246, 0.20);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ::selection { background: rgba(139, 92, 246, 0.35); color: #fff; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 0%, rgba(167, 139, 250, 0.05) 0%, transparent 50%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(139, 92, 246, 0.12);
+        }
+        .glass-heavy {
+            background: rgba(139, 92, 246, 0.10);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(139, 92, 246, 0.18);
+        }
+        .glass-purple {
+            background: rgba(139, 92, 246, 0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(139, 92, 246, 0.10);
+        }
+        .glass-orange {
+            background: rgba(255, 107, 0, 0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 107, 0, 0.15);
+        }
+
+        .container {
+            max-width: 860px; margin: 0 auto; padding: 16px;
+            min-height: 100vh; display: flex; flex-direction: column;
+            position: relative; z-index: 2;
+        }
+
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 18px;
+            border-radius: 14px; margin-bottom: 16px;
+            background: rgba(139, 92, 246, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(139, 92, 246, 0.10);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
+        .logo .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--gradient); animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .logo span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        nav { display: flex; gap: 4px; align-items: center; }
+        .theme-selector { display: flex; gap: 3px; margin-left: 6px; padding-left: 6px; border-left: 1px solid rgba(139,92,246,0.15); }
+        .theme-btn {
+            width: 14px; height: 14px; border-radius: 50%; border: 2px solid transparent;
+            cursor: pointer; transition: all 0.3s; padding: 0;
+        }
+        .theme-btn:hover { transform: scale(1.3); }
+        .theme-btn.active { border-color: rgba(255,255,255,0.6); box-shadow: 0 0 8px rgba(255,255,255,0.2); }
+        nav button {
+            padding: 5px 12px; border-radius: 8px; border: 1px solid transparent;
+            background: transparent; color: var(--text2); cursor: pointer;
+            font-size: 12px; transition: all 0.3s; font-family: inherit;
+        }
+        nav button:hover {
+            color: var(--text);
+            background: rgba(139, 92, 246, 0.12);
+            border-color: rgba(139, 92, 246, 0.20);
+        }
+        nav button.active {
+            color: #fff;
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.30);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.10);
+        }
+
+        .orb-hero { text-align: center; padding: 8px 0 4px; position: relative; z-index: 3; }
+        .orb-hero .orb-wrap { display: flex; justify-content: center; margin-bottom: 6px; }
+        .orb-hero .orb-wrap .gemini-orb-large { width: 200px; height: 200px; }
+        .orb-hero h1 { font-size: 20px; font-weight: 600; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .orb-hero p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+        .chips {
+            display: flex; gap: 6px; justify-content: center; padding: 8px 0; flex-wrap: wrap;
+        }
+        .chip {
+            padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255, 107, 0, 0.18);
+            background: rgba(255, 107, 0, 0.06); color: var(--text2); cursor: pointer;
+            font-size: 11px; transition: all 0.3s; font-family: inherit;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .chip:hover {
+            border-color: rgba(255, 107, 0, 0.40);
+            color: var(--text);
+            background: rgba(255, 107, 0, 0.10);
+        }
+        .chip.active {
+            border-color: var(--orange);
+            color: #fff;
+            background: rgba(255, 107, 0, 0.12);
+            box-shadow: 0 0 24px var(--orange-glow), inset 0 0 12px rgba(255, 107, 0, 0.08);
+        }
+
+        .main-box {
+            flex: 1; display: flex; flex-direction: column;
+            border-radius: 14px; overflow: hidden; margin-top: 4px;
+            background: rgba(139, 92, 246, 0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(139, 92, 246, 0.10);
+        }
+        .msgs {
+            flex: 1; overflow-y: auto; padding: 14px;
+            display: flex; flex-direction: column; gap: 8px;
+            min-height: 180px; max-height: 400px;
+        }
+        .msg { display: flex; gap: 8px; max-width: 85%; animation: in 0.2s ease; }
+        .msg.end { align-self: flex-end; flex-direction: row-reverse; }
+        .msg .av {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            overflow: visible;
+            position: relative;
+        }
+        .msg.end .av { box-shadow: 0 0 12px rgba(139, 92, 246, 0.25); }
+        .msg.start .av { box-shadow: 0 0 12px rgba(139, 92, 246, 0.12); }
+        .msg .bub {
+            padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .msg.end .bub {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff;
+            border-bottom-right-radius: 3px; font-weight: 500;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.20);
+        }
+        .msg.start .bub {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-bottom-left-radius: 3px; color: var(--text);
+        }
+        .msg .bub { position: relative; }
+        .msg .copy-btn {
+            position: absolute; top: 4px; right: 4px;
+            padding: 2px 6px; border-radius: 4px; border: none;
+            background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4);
+            font-size: 10px; cursor: pointer; opacity: 0;
+            transition: all 0.3s; font-family: inherit;
+        }
+        .msg .bub:hover .copy-btn { opacity: 1; }
+        .msg .copy-btn:hover { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+        .msg.start .bub code { background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+        .msg-time { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 4px; text-align: right; }
+
+        .inp-row {
+            display: flex; gap: 8px; padding: 10px 14px;
+            border-top: 1px solid rgba(139, 92, 246, 0.12);
+            background: rgba(139, 92, 246, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .inp-row input {
+            flex: 1; padding: 9px 14px; border-radius: 20px; border: 1px solid rgba(139, 92, 246, 0.15);
+            background: rgba(255, 255, 255, 0.04); color: var(--text); font-size: 13px;
+            outline: none; transition: 0.3s; font-family: inherit;
+        }
+        .inp-row input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 24px rgba(139, 92, 246, 0.12), inset 0 0 12px rgba(139, 92, 246, 0.04);
+        }
+        .inp-row input::placeholder { color: var(--text2); }
+        .inp-row button {
+            padding: 9px 18px; border-radius: 20px; border: none;
+            background: var(--gradient); color: #fff; font-weight: 500;
+            cursor: pointer; transition: 0.3s; font-size: 13px; font-family: inherit;
+        }
+        .inp-row button:hover { transform: scale(1.03); box-shadow: 0 4px 24px rgba(139, 92, 246, 0.35); }
+
+        .bar {
+            display: flex; justify-content: center; gap: 16px; padding: 6px 14px;
+            font-size: 11px; color: var(--text2);
+            border-top: 1px solid rgba(139, 92, 246, 0.08);
+            background: rgba(139, 92, 246, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .bar .g { color: #22c55e; }
+        .bar .m { color: var(--accent); }
+
+        .dotz { display: inline-flex; gap: 3px; padding: 3px 0; }
+        .dotz span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: b 1.4s infinite ease-in-out; }
+        .dotz span:nth-child(2) { animation-delay: 0.2s; }
+        .dotz span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes b { 0%,80%,100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+        @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #8b5cf6, #7c3aed);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #a78bfa, #8b5cf6); }
+
+        @media (max-width: 600px) {
+            .container { padding: 10px; }
+            header { flex-direction: column; gap: 6px; padding: 10px; }
+            .msg { max-width: 95%; }
+            .orb-hero .orb-wrap .gemini-orb-large { width: 90px; height: 90px; }
+        }
+
+        /* ========== PANEL SISTEMI ========== */
+        .panel { display: none; flex-direction: column; height: 100%; }
+        .panel.active { display: flex; }
+        .main-box { position: relative; min-height: 340px; overflow: hidden; }
+        .main-box .panel { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+
+        /* ========== KOD TERMINALI ========== */
+        .terminal-header {
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+            border-bottom: 1px solid rgba(139,92,246,0.12);
+            background: rgba(139,92,246,0.05);
+        }
+        .lang-selector { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+        .term-clear-btn {
+            padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(139,92,246,0.15);
+            background: rgba(139,92,246,0.06); cursor: pointer; font-size: 14px;
+            transition: all 0.3s; line-height: 1;
+        }
+        .term-clear-btn:hover {
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.3);
+            transform: scale(1.05);
+        }
+        .lang-selector select {
+            padding: 4px 10px; border-radius: 8px;
+            border: 1px solid rgba(139,92,246,0.2);
+            background: rgba(139,92,246,0.08); color: var(--text);
+            font-size: 12px; font-family: inherit; cursor: pointer;
+            outline: none; transition: all 0.3s;
+        }
+        .lang-selector select:hover {
+            border-color: rgba(139,92,246,0.4);
+            background: rgba(139,92,246,0.12);
+        }
+        .lang-selector select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(139,92,246,0.15);
+        }
+        .lang-selector select option {
+            background: #1a1a2e; color: var(--text);
+        }
+        .terminal-dots { display: flex; gap: 5px; }
+        .terminal-dots span {
+            width: 10px; height: 10px; border-radius: 50%;
+        }
+        .terminal-dots span:nth-child(1) { background: #ff5f56; }
+        .terminal-dots span:nth-child(2) { background: #ffbd2e; }
+        .terminal-dots span:nth-child(3) { background: #27c93f; }
+        .terminal-body {
+            flex: 1; display: flex; flex-direction: column;
+            min-height: 200px;
+        }
+        .terminal-output {
+            flex: 1; padding: 12px 14px; overflow-y: auto;
+            font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 13px;
+            background: rgba(0,0,0,0.25);
+            min-height: 140px; max-height: 260px;
+        }
+        .term-line {
+            padding: 2px 0; color: var(--text2); line-height: 1.5;
+            white-space: pre-wrap; word-break: break-all;
+        }
+        .term-line.error { color: #ff5f56; }
+        .term-line.success { color: #27c93f; }
+        .term-prompt { color: #8b5cf6; font-weight: 600; margin-right: 8px; }
+        .terminal-input-row {
+            display: flex; align-items: stretch; gap: 0;
+            border-top: 1px solid rgba(139,92,246,0.12);
+            background: rgba(0,0,0,0.15);
+        }
+        .terminal-input {
+            flex: 1; padding: 8px 12px;
+            background: transparent; border: none; color: var(--text);
+            font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 13px;
+            outline: none; resize: vertical; min-height: 36px;
+            line-height: 1.5;
+        }
+        .terminal-input::placeholder { color: rgba(255,255,255,0.2); }
+        .term-run-btn {
+            padding: 8px 18px; border: none; 
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff; font-weight: 600; cursor: pointer;
+            font-size: 13px; font-family: inherit;
+            transition: all 0.3s;
+        }
+        .term-run-btn:hover { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+        .terminal-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 6px 14px; font-size: 12px;
+            border-top: 1px solid rgba(139,92,246,0.08);
+            background: rgba(139,92,246,0.04);
+        }
+
+        /* ========== EKLENTILER PANELI ========== */
+        .plugins-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(139,92,246,0.12);
+            background: rgba(139,92,246,0.05);
+            font-size: 14px; font-weight: 500;
+        }
+        .plugin-reload-btn {
+            padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(139,92,246,0.2);
+            background: rgba(139,92,246,0.08); color: var(--text); cursor: pointer;
+            font-size: 12px; font-family: inherit; transition: all 0.3s;
+        }
+        .plugin-reload-btn:hover {
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.35);
+        }
+        .plugins-list {
+            flex: 1; padding: 10px 14px; overflow-y: auto;
+            min-height: 180px; max-height: 360px;
+        }
+        .plugin-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; margin-bottom: 6px;
+            border-radius: 10px;
+            background: rgba(139,92,246,0.06);
+            border: 1px solid rgba(139,92,246,0.10);
+            transition: all 0.3s;
+        }
+        .plugin-item:hover { background: rgba(139,92,246,0.10); }
+        .plugin-item .p-icon { font-size: 20px; width: 32px; text-align: center; }
+        .plugin-item .p-info { flex: 1; }
+        .plugin-item .p-name { font-size: 13px; font-weight: 500; color: var(--text); }
+        .plugin-item .p-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+        .plugin-item .p-status {
+            font-size: 10px; padding: 2px 8px; border-radius: 10px;
+            font-weight: 500;
+        }
+        .p-status.active { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .p-status.inactive { background: rgba(255,107,0,0.15); color: #ff6b00; }
+        .p-status.error { background: rgba(255,95,86,0.15); color: #ff5f56; }
+        .plugin-toggle {
+            padding: 4px 10px; border-radius: 6px; border: none; cursor: pointer;
+            font-size: 11px; font-weight: 500; transition: all 0.3s;
+        }
+        .plugin-toggle.on { background: #22c55e; color: #fff; }
+        .plugin-toggle.on:hover { background: #16a34a; }
+        .plugin-toggle.off { background: rgba(255,255,255,0.1); color: var(--text2); }
+        .plugin-toggle.off:hover { background: rgba(255,107,0,0.3); color: #ff6b00; }
+        .plugin-item.loading {
+            justify-content: center; padding: 20px;
+            background: transparent; border-style: dashed;
+        }
+        .plugin-spin {
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 2px solid rgba(139,92,246,0.2);
+            border-top-color: #8b5cf6;
+            animation: pSpin 0.8s linear infinite;
+        }
+        @keyframes pSpin { to { transform: rotate(360deg); } }
+        .plugins-bar {
+            padding: 6px 14px; text-align: center;
+            border-top: 1px solid rgba(139,92,246,0.08);
+            background: rgba(139,92,246,0.04);
+        }
+
+        /* ========== QWEN 14B ASSISTANT PANELI ========== */
+        .qwen-panel {
+            display: flex; flex-direction: column; height: 100%;
+            background: rgba(106, 90, 205, 0.04);
+        }
+        .qwen-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(106, 90, 205, 0.15);
+            background: rgba(106, 90, 205, 0.06);
+        }
+        .qwen-logo {
+            display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 10px;
+            background: rgba(106, 90, 205, 0.15);
+            flex-shrink: 0;
+        }
+        .qwen-logo svg { width: 22px; height: 22px; }
+        .qwen-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .qwen-badge {
+            font-size: 9px; padding: 2px 8px; border-radius: 10px;
+            background: rgba(106, 90, 205, 0.2);
+            color: #9B8FFF; font-weight: 600; letter-spacing: 0.5px;
+            margin-left: auto;
+        }
+        .qwen-chat {
+            flex: 1; overflow-y: auto; padding: 10px 12px;
+            display: flex; flex-direction: column; gap: 8px;
+            min-height: 150px; max-height: 320px;
+        }
+        .qwen-msg {
+            display: flex; gap: 6px; max-width: 92%;
+            animation: qwenFadeIn 0.25s ease;
+        }
+        .qwen-msg.qwen-user { align-self: flex-end; flex-direction: row-reverse; }
+        .qwen-msg.qwen-ai { align-self: flex-start; }
+        .qwen-msg-icon {
+            width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(106, 90, 205, 0.12);
+        }
+        .qwen-msg.qwen-user .qwen-msg-icon { background: rgba(255, 107, 0, 0.12); }
+        .qwen-msg-bub {
+            padding: 7px 11px; border-radius: 12px; font-size: 12.5px; line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .qwen-msg.qwen-ai .qwen-msg-bub {
+            background: rgba(106, 90, 205, 0.08);
+            border: 1px solid rgba(106, 90, 205, 0.12);
+            color: var(--text);
+            border-bottom-left-radius: 3px;
+        }
+        .qwen-msg.qwen-user .qwen-msg-bub {
+            background: linear-gradient(135deg, #6A5ACD, #7B68EE);
+            color: #fff;
+            border-bottom-right-radius: 3px;
+        }
+        .qwen-msg-time { font-size: 9px; color: rgba(255,255,255,0.25); margin-top: 3px; text-align: right; }
+        .qwen-msg.qwen-ai .qwen-msg-time { color: rgba(255,255,255,0.2); }
+        .qwen-msg-bub code {
+            background: rgba(0,0,0,0.25); padding: 1px 4px; border-radius: 3px;
+            font-size: 11.5px; font-family: 'Cascadia Code', monospace;
+        }
+        .qwen-msg-bub b { color: #B8A8FF; }
+        @keyframes qwenFadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .qwen-input-row {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 12px;
+            border-top: 1px solid rgba(106, 90, 205, 0.1);
+            background: rgba(106, 90, 205, 0.04);
+        }
+        .qwen-tools {
+            display: flex; gap: 3px;
+        }
+        .qwen-tool-btn {
+            width: 26px; height: 26px; border-radius: 6px; border: none;
+            background: rgba(106, 90, 205, 0.08); color: var(--text2);
+            cursor: pointer; font-size: 12px; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qwen-tool-btn:hover {
+            background: rgba(106, 90, 205, 0.2);
+            color: var(--text);
+        }
+        .qwen-input {
+            flex: 1; padding: 7px 12px; border-radius: 16px;
+            border: 1px solid rgba(106, 90, 205, 0.15);
+            background: rgba(255, 255, 255, 0.04); color: var(--text);
+            font-size: 12.5px; outline: none; transition: 0.3s;
+            font-family: inherit;
+        }
+        .qwen-input:focus {
+            border-color: #7B68EE;
+            box-shadow: 0 0 16px rgba(106, 90, 205, 0.15);
+        }
+        .qwen-input::placeholder { color: var(--text2); font-size: 12px; }
+        .qwen-send-btn {
+            width: 30px; height: 30px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #6A5ACD, #7B68EE);
+            color: #fff; cursor: pointer; font-size: 14px;
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .qwen-send-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 2px 12px rgba(106, 90, 205, 0.35);
+        }
+        .qwen-status {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 14px; font-size: 10.5px; color: var(--text2);
+            border-top: 1px solid rgba(106, 90, 205, 0.06);
+            background: rgba(106, 90, 205, 0.03);
+        }
+        .qwen-status-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #22c55e; animation: pulse 2s ease-in-out infinite;
+        }
+        .qwen-dotz {
+            display: inline-flex; gap: 3px; padding: 4px 0;
+        }
+        .qwen-dotz span {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: #9B8FFF; animation: b 1.4s infinite ease-in-out;
+        }
+        .qwen-dotz span:nth-child(2) { animation-delay: 0.2s; }
+        .qwen-dotz span:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="bubble-container">
+        <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+        <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    </div>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="dot"></div>
+                <span>GlassesCat</span>
+                <span style="font-size:10px;color:var(--text2);font-weight:400;">v1.0</span>
+            </div>
+            <nav>
+                <button class="active" onclick="showPanel('chat')">Sohbet</button>
+                <button onclick="showPanel('terminal')">🐍 Kod</button>
+                <button onclick="showPanel('plugins')">🧩 Eklentiler</button>
+                <button onclick="showPanel('qwen')" title="Qwen 14B Asistan" style="font-size:13px;padding:4px 10px;">💠 Qwen</button>
+                <div class="theme-selector">
+                    <button class="theme-btn active" onclick="setTheme('purple')" title="Mor Tema" style="background:#8b5cf6;"></button>
+                    <button class="theme-btn" onclick="setTheme('orange')" title="Turuncu Tema" style="background:#ff6b00;"></button>
+                    <button class="theme-btn" onclick="setTheme('green')" title="Yesil Tema" style="background:#22c55e;"></button>
+                    <button class="theme-btn" onclick="setTheme('blue')" title="Mavi Tema" style="background:#3b82f6;"></button>
+                </div>
+            </nav>
+        </header>
+
+        <div class="orb-hero">
+            <div class="orb-wrap">
+                <div class="gemini-orb-large" id="orb">
+                    <!-- Dış Işın Halesi -->
+                    <div class="orb-halo"></div>
+                    <!-- Ana Küre -->
+                    <div class="orb-glow">
+                        <div class="orb-core"></div>
+                        <div class="orb-inner-ring"></div>
+                        <div class="orb-lens-flare"></div>
+                    </div>
+                    <!-- Dören Halka -->
+                    <div class="orb-ring"></div>
+                    <!-- Uydular -->
+                    <div class="satellite-orbs">
+                        <div class="satellite-orb"></div><div class="satellite-orb"></div>
+                        <div class="satellite-orb"></div><div class="satellite-orb"></div>
+                        <div class="satellite-orb"></div><div class="satellite-orb"></div>
+                        <div class="satellite-orb"></div><div class="satellite-orb"></div>
+                    </div>
+                    <!-- Parçacıklar -->
+                    <div class="orb-fragments-container">
+                        <div class="orb-fragment-piece"></div><div class="orb-fragment-piece"></div>
+                        <div class="orb-fragment-piece"></div><div class="orb-fragment-piece"></div>
+                        <div class="orb-fragment-piece"></div>
+                    </div>
+                    <!-- Kuyruklu Yıldız Efekti -->
+                    <div class="shooting-star"></div>
+                    <div class="shooting-star"></div>
+                    <!-- Parçacık Işıkları -->
+                    <div class="orb-particle"></div><div class="orb-particle"></div>
+                    <div class="orb-particle"></div>
+                </div>
+            </div>
+            <h1>GlassesCat</h1>
+            <p>Merhaba {{ user_name or 'Admin' }}</p>
+            <div id="thinkText" style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:6px;min-height:18px;transition:all 0.3s;">&nbsp;</div>
+        </div>
+
+        <div class="chips" id="modelChips">
+            <button class="chip active" onclick="pick('llama3.2:latest')" data-m="llama3.2:latest">Sohbet</button>
+            <button class="chip" onclick="pick('llama3.1:latest')" data-m="llama3.1:latest">Sert</button>
+            <button class="chip" onclick="pick('qwen2.5-coder:14b')" data-m="qwen2.5-coder:14b">Kod</button>
+            <button class="chip" onclick="pick('deepseek-r1:8b')" data-m="deepseek-r1:8b">Analiz</button>
+        </div>
+
+        <div class="main-box">
+            <!-- SOHBET PANELI -->
+            <div class="panel panel-chat active">
+                <div class="msgs" id="msgs">
+                    <div class="msg start">
+                        <div class="av"><div class="mini-orb ai-orb"><div class="orb-inner-glow"></div></div></div>
+                        <div class="bub">Merhaba! <b>GlassesCat</b> yardima hazir.<div class="msg-time">00:00</div></div>
+                    </div>
+                </div>
+                <div class="inp-row">
+                    <input type="text" id="inp" placeholder="Mesaj yaz..." autofocus>
+                    <button style="padding:9px 12px;font-size:16px;" onclick="document.getElementById('imgInp').click()" title="Gorsel yukle">📷</button>
+                    <input type="file" id="imgInp" accept="image/*" style="display:none" onchange="handleImage(event)">
+                    <button onclick="send()">Gonder</button>
+                </div>
+                <div class="bar">
+                    <span class="g">● aktif</span>
+                    <span class="m" id="mdl">llama3.2:latest</span>
+                </div>
+            </div>
+
+            <!-- KOD TERMINALI -->
+            <div class="panel panel-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dots"><span></span><span></span><span></span></div>
+                    <span style="font-size:12px;color:var(--text2);">💻 Coklu-Dil Terminal</span>
+                    <div class="lang-selector">
+                        <select id="langSelect" onchange="changeLang()">
+                            <option value="python">🐍 Python</option>
+                            <option value="javascript">🟨 JavaScript</option>
+                            <option value="bash">⚡ Bash</option>
+                            <option value="lua">🌙 Lua</option>
+                            <option value="ruby">💎 Ruby</option>
+                            <option value="go">🔷 Go</option>
+                        </select>
+                        <button class="term-clear-btn" onclick="clearTerminal()" title="Temizle">🧹</button>
+                    </div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-output" id="termOutput">
+                        <div class="term-line"><span class="term-prompt">❯</span> GlassesCat kod terminali hazir.</div>
+                        <div class="term-line"><span class="term-prompt">❯</span> Dil sec, kod yaz & Calistir'a bas.</div>
+                    </div>
+                    <div class="terminal-input-row">
+                        <span class="term-prompt" style="padding:8px 0 8px 12px;">❯</span>
+                        <textarea class="terminal-input" id="termInput" placeholder="Python kodu yaz..." rows="3" spellcheck="false"></textarea>
+                        <button class="term-run-btn" onclick="runCode()">▶ Calistir</button>
+                    </div>
+                </div>
+                <div class="terminal-bar">
+                    <span id="termStatus" style="color:#22c55e;">● hazir</span>
+                    <span id="termLang" style="color:var(--text2);font-size:11px;">🐍 Python</span>
+                </div>
+            </div>
+
+            <!-- EKLENTILER PANELI -->
+            <div class="panel panel-plugins">
+                <div class="plugins-header">
+                    <span>🧩 Eklenti Yonetimi</span>
+                    <button class="plugin-reload-btn" onclick="reloadPlugins()">🔄 Yenile</button>
+                </div>
+                <div class="plugins-list" id="pluginsList">
+                    <div class="plugin-item loading">
+                        <div class="plugin-spin"></div>
+                        <span style="color:var(--text2);font-size:13px;">Eklentiler yukleniyor...</span>
+                    </div>
+                </div>
+                <div class="plugins-bar">
+                    <span id="pluginStatus" style="color:var(--text2);font-size:12px;">Sistem: PluginManager v1.0</span>
+                </div>
+            </div>
+
+            <!-- QWEN 14B ASISTAN PANELI -->
+            <div class="panel panel-qwen">
+                <div class="qwen-panel">
+                    <div class="qwen-header">
+                        <div class="qwen-logo">
+                            <svg viewBox="0 0 100 100" fill="none">
+                                <circle cx="50" cy="50" r="45" fill="#6A5ACD" opacity="0.2"/>
+                                <circle cx="50" cy="50" r="30" fill="#6A5ACD" opacity="0.3"/>
+                                <circle cx="50" cy="50" r="20" fill="#7B68EE" opacity="0.5"/>
+                                <text x="50" y="56" text-anchor="middle" fill="white" font-size="22" font-weight="bold" font-family="Arial">Q</text>
+                            </svg>
+                        </div>
+                        <span class="qwen-title">Qwen 14B Assistant</span>
+                        <span class="qwen-badge">14B</span>
+                    </div>
+                    <div class="qwen-chat" id="qwenChat">
+                        <div class="qwen-msg qwen-ai">
+                            <div class="qwen-msg-icon">
+                                <svg width="16" height="16" viewBox="0 0 100 100" fill="none">
+                                    <circle cx="50" cy="50" r="40" fill="#6A5ACD" opacity="0.3"/>
+                                    <text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="Arial">Q</text>
+                                </svg>
+                            </div>
+                            <div class="qwen-msg-bub">
+                                Merhaba! Ben <b>Qwen 14B</b>. Kod yazma, <b>.venv</b> çalıştırma ve yardım için buradayım 👋
+                                <div class="qwen-msg-time">şimdi</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qwen-input-row">
+                        <div class="qwen-tools">
+                            <button class="qwen-tool-btn" onclick="qwenRunCode()" title="Kodu analiz et ve .venv'de çalıştır">▶</button>
+                            <button class="qwen-tool-btn" onclick="qwenClearChat()" title="Sohbeti temizle">🗑</button>
+                        </div>
+                        <input type="text" class="qwen-input" id="qwenInput" placeholder="Qwen 14B'ye soru sor..." onkeydown="if(event.key=='Enter' && !event.shiftKey){event.preventDefault();qwenSend();}">
+                        <button class="qwen-send-btn" onclick="qwenSend()">➤</button>
+                    </div>
+                    <div class="qwen-status">
+                        <span class="qwen-status-dot"></span>
+                        <span id="qwenStatus">Qwen 14B • bağlanıyor...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let model = 'llama3.2:latest';
+        const msgs = document.getElementById('msgs');
+        const inp = document.getElementById('inp');
+        const mdl = document.getElementById('mdl');
+
+        function showPanel(name) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelector('.panel-' + name).classList.add('active');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.querySelector(`nav button[onclick*="'${name}'"]`).classList.add('active');
+            if (name === 'plugins') fetchPlugins();
+        }
+
+        function pick(m) {
+            model = m;
+            document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.chip[data-m="${m}"]`).classList.add('active');
+            mdl.textContent = m;
+        }
+
+        let pendingImage = null;
+
+        function handleImage(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const base64 = ev.target.result;
+                pendingImage = base64.split(',')[1];
+                pick('llava:latest');
+                const d = document.createElement('div');
+                d.className = 'msg end';
+                d.innerHTML = '<div class="av"><div class="mini-orb user-orb"><div class="orb-inner-glow"></div></div></div><div class="bub" style="padding:6px;"><img src="' + base64 + '" style="max-width:180px;max-height:140px;border-radius:10px;display:block;"><div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px;">📷 Gorsel yuKLENDI</div></div>';
+                msgs.appendChild(d);
+                msgs.scrollTop = msgs.scrollHeight;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function send() {
+            const t = inp.value.trim();
+            if (!t && !pendingImage) return;
+            add(t, 'end');
+            inp.value = '';
+            const d = dot();
+            try {
+                const r = await fetch('/chat', {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({message: t || 'Goruntuyu analiz et', model: model, image: pendingImage})
+                });
+                pendingImage = null;
+                const j = await r.json();
+                d.remove();
+                document.getElementById('thinkText').textContent = '\u00A0';
+                if (j.response) {
+                    add(j.response, 'start');
+                    if (j.model) mdl.textContent = j.model;
+                    if (j.theme) { document.body.className = j.theme === 'default' ? '' : 'theme-' + j.theme; }
+                } else if (j.error) {
+                    add('Hata: ' + j.error, 'start');
+                }
+            } catch(e) {
+                d.remove();
+                document.getElementById('thinkText').textContent = '\u00A0';
+                add('Baglanti hatasi.', 'start');
+            }
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function add(t, r) {
+            const d = document.createElement('div');
+            d.className = 'msg ' + r;
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            const content = t.replace(/</g, '&lt;').replace(/\n/g, '<br>');
+            const orbHtml = r === 'end' 
+                ? '<div class="mini-orb user-orb"><div class="orb-inner-glow"></div></div>' 
+                : '<div class="mini-orb ai-orb"><div class="orb-inner-glow"></div></div>';
+            d.innerHTML = '<div class="av">' + orbHtml + '</div><div class="bub"><button class="copy-btn" onclick="copyMsg(this)">📋</button>' + content + '<div class="msg-time">' + timeStr + '</div></div>';
+            msgs.appendChild(d);
+            msgs.scrollTop = msgs.scrollHeight;
+            return d;
+        }
+
+        function dot() {
+            const d = document.createElement('div');
+            d.className = 'msg start';
+            d.innerHTML = '<div class="av"><div class="mini-orb ai-orb thinking"><div class="orb-inner-glow"></div></div></div><div class="bub"><div class="dotz"><span></span><span></span><span></span></div></div>';
+            msgs.appendChild(d);
+            msgs.scrollTop = msgs.scrollHeight;
+            const t = document.getElementById('thinkText');
+            t.textContent = 'dusunuyorum...';
+            t.style.color = 'rgba(255,255,255,0.35)';
+            return d;
+        }
+
+        /* ========== KOPYALA ========== */
+        function copyMsg(btn) {
+            const bub = btn.closest('.bub');
+            const text = bub.textContent.replace('📋', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✅';
+                setTimeout(() => { btn.textContent = '📋'; }, 1500);
+            });
+        }
+
+        /* ========== TEMA SISTEMI ========== */
+        const THEMES = {
+            'purple': { bg:'#07070d', accent:'#8b5cf6', accent2:'#a78bfa', accent3:'#7c3aed', surface:'rgba(139,92,246,0.08)', border:'rgba(139,92,246,0.20)', text:'#f1f0ff', text2:'#9492b0', gradient:'linear-gradient(135deg, #8b5cf6, #a78bfa, #7c3aed)', glass:'rgba(139,92,246,0.08)', orange:'#ff6b00' },
+            'orange': { bg:'#0d0a07', accent:'#ff6b00', accent2:'#ff8c38', accent3:'#e65c00', surface:'rgba(255,107,0,0.08)', border:'rgba(255,107,0,0.20)', text:'#fff0e6', text2:'#b09480', gradient:'linear-gradient(135deg, #ff6b00, #ff8c38, #e65c00)', glass:'rgba(255,107,0,0.08)', orange:'#ff6b00' },
+            'green': { bg:'#070d07', accent:'#22c55e', accent2:'#4ade80', accent3:'#16a34a', surface:'rgba(34,197,94,0.08)', border:'rgba(34,197,94,0.20)', text:'#e6ffe6', text2:'#80b094', gradient:'linear-gradient(135deg, #22c55e, #4ade80, #16a34a)', glass:'rgba(34,197,94,0.08)', orange:'#ff6b00' },
+            'blue': { bg:'#07070d', accent:'#3b82f6', accent2:'#60a5fa', accent3:'#2563eb', surface:'rgba(59,130,246,0.08)', border:'rgba(59,130,246,0.20)', text:'#e6f0ff', text2:'#8098b0', gradient:'linear-gradient(135deg, #3b82f6, #60a5fa, #2563eb)', glass:'rgba(59,130,246,0.08)', orange:'#ff6b00' }
+        };
+
+        function setTheme(name) {
+            const t = THEMES[name];
+            if (!t) return;
+            const r = document.documentElement;
+            r.style.setProperty('--bg', t.bg);
+            r.style.setProperty('--accent', t.accent);
+            r.style.setProperty('--accent2', t.accent2);
+            r.style.setProperty('--accent3', t.accent3);
+            r.style.setProperty('--surface', t.surface);
+            r.style.setProperty('--border', t.border);
+            r.style.setProperty('--text', t.text);
+            r.style.setProperty('--text2', t.text2);
+            r.style.setProperty('--gradient', t.gradient);
+            r.style.setProperty('--glass', t.glass);
+            r.style.setProperty('--orange', t.orange);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.theme-btn[onclick*="'${name}'"]`).classList.add('active');
+        }
+
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+        document.getElementById('orb').onclick = function() {
+            // Sıçrama efekti
+            this.style.transform = 'scale(0.85)';
+            setTimeout(() => { this.style.transform = 'scale(1.05)'; }, 150);
+            setTimeout(() => { this.style.transform = 'scale(1)'; }, 300);
+            // Dalga halkası oluştur
+            const ring = document.createElement('div');
+            ring.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;border:2px solid rgba(139,92,246,0.4);animation:rippleOut 0.8s ease-out forwards;pointer-events:none;z-index:10;';
+            this.appendChild(ring);
+            setTimeout(() => ring.remove(), 800);
+        };
+
+        /* ========== KOD TERMINALI (Coklu Dil) ========== */
+        const LANG_MAP = {
+            'python': { emoji: '🐍', name: 'Python', ext: '.py' },
+            'javascript': { emoji: '🟨', name: 'JavaScript', ext: '.js' },
+            'bash': { emoji: '⚡', name: 'Bash', ext: '.sh' },
+            'lua': { emoji: '🌙', name: 'Lua', ext: '.lua' },
+            'ruby': { emoji: '💎', name: 'Ruby', ext: '.rb' },
+            'go': { emoji: '🔷', name: 'Go', ext: '.go' }
+        };
+
+        function clearTerminal() {
+            document.getElementById('termOutput').innerHTML = 
+                '<div class="term-line"><span class="term-prompt">❯</span> <span style="color:var(--text2);">Terminal temizlendi.</span></div>';
+        }
+
+        function changeLang() {
+            const lang = document.getElementById('langSelect').value;
+            const info = LANG_MAP[lang];
+            document.getElementById('termLang').textContent = info.emoji + ' ' + info.name;
+            document.getElementById('termInput').placeholder = info.name + ' kodu yaz...';
+            document.getElementById('termOutput').innerHTML += 
+                '<div class="term-line"><span class="term-prompt">❯</span> <span style="color:#a78bfa;">Dil degisti: ' + info.emoji + ' ' + info.name + '</span></div>';
+            const out = document.getElementById('termOutput');
+            out.scrollTop = out.scrollHeight;
+        }
+
+        // Son hata alan kodu sakla (Qwen ile duzeltme icin)
+        let lastFailedCode = '';
+        let lastFailedError = '';
+        let lastFailedLang = 'python';
+
+        async function runCode() {
+            const code = document.getElementById('termInput').value.trim();
+            if (!code) return;
+            const lang = document.getElementById('langSelect').value;
+            const info = LANG_MAP[lang];
+            const out = document.getElementById('termOutput');
+            const status = document.getElementById('termStatus');
+            
+            out.innerHTML += '<div class="term-line"><span class="term-prompt">❯</span> <span style="color:#a78bfa;">[' + info.emoji + ' ' + info.name + '] Calistiriliyor...</span></div>';
+            status.textContent = '● calisiyor';
+            status.style.color = '#ffbd2e';
+            
+            try {
+                const r = await fetch('/api/code/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({code: code, language: lang})
+                });
+                const j = await r.json();
+                
+                let lineNum = 1;
+                if (j.success) {
+                    if (j.output) {
+                        const lines = j.output.split('\n').filter(l => l.trim());
+                        lines.forEach(line => {
+                            out.innerHTML += '<div class="term-line success"><span style="color:rgba(139,92,246,0.3);font-size:10px;min-width:24px;display:inline-block;">' + (lineNum++).toString().padStart(2,'0') + '</span> ' + line.replace(/</g, '&lt;') + '</div>';
+                        });
+                        if (!lines.length) {
+                            out.innerHTML += '<div class="term-line success"><span style="color:#27c93f;">✔</span> <span style="color:var(--text2);">Kod basariyla calisti (cikti yok)</span></div>';
+                        }
+                    } else {
+                        out.innerHTML += '<div class="term-line success"><span style="color:#27c93f;">✔</span> <span style="color:var(--text2);">Kod basariyla calisti</span></div>';
+                    }
+                    if (j.error) {
+                        j.error.split('\n').filter(l => l.trim()).forEach(line => {
+                            out.innerHTML += '<div class="term-line error"><span style="color:rgba(139,92,246,0.3);font-size:10px;min-width:24px;display:inline-block;">' + (lineNum++).toString().padStart(2,'0') + '</span> <span style="color:#ff5f56;">✘</span> ' + line.replace(/</g, '&lt;') + '</div>';
+                        });
+                    }
+                    status.textContent = '● tamam';
+                    status.style.color = '#27c93f';
+                    lastFailedCode = ''; // basarili, temizle
+                } else {
+                    // HATA - Qwen duzeltme butonu ekle
+                    const errMsg = (j.error || 'Bilinmeyen hata').replace(/</g, '&lt;');
+                    out.innerHTML += '<div class="term-line error"><span style="color:#ff5f56;">✘</span> Hata: ' + errMsg + '</div>';
+                    out.innerHTML += '<div class="term-line" style="padding:4px 0;">' +
+                        '<button class="qwen-fix-btn" onclick="qwenFixFromTerminal()" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(106,90,205,0.3);background:rgba(106,90,205,0.1);color:#9B8FFF;cursor:pointer;font-size:12px;font-family:inherit;transition:all 0.3s;">' +
+                        '🔧 Qwen ile Duzelt</button>' +
+                        '</div>';
+                    status.textContent = '● hata';
+                    status.style.color = '#ff5f56';
+                    // Hata alan kodu kaydet
+                    lastFailedCode = code;
+                    lastFailedError = errMsg;
+                    lastFailedLang = lang;
+                }
+            } catch(e) {
+                out.innerHTML += '<div class="term-line error"><span style="color:#ff5f56;">✘</span> Baglanti hatasi: ' + e.message + '</div>';
+                status.textContent = '● hata';
+                status.style.color = '#ff5f56';
+            }
+            out.scrollTop = out.scrollHeight;
+            setTimeout(() => { status.textContent = '● hazir'; status.style.color = '#22c55e'; }, 3000);
+        }
+
+        /* Qwen ile terminaldeki hatayi duzelt */
+        async function qwenFixFromTerminal() {
+            if (!lastFailedCode) return;
+            const out = document.getElementById('termOutput');
+            const status = document.getElementById('termStatus');
+            
+            out.innerHTML += '<div class="term-line"><span class="term-prompt">❯</span> <span style="color:#9B8FFF;">🔧 Qwen 14B hatayi analiz ediyor...</span></div>';
+            status.textContent = '● duzeltiliyor';
+            status.style.color = '#9B8FFF';
+            
+            try {
+                const r = await fetch('/api/qwen/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({code: lastFailedCode, language: lastFailedLang})
+                });
+                const j = await r.json();
+                
+                if (j.success) {
+                    // Basarili!
+                    out.innerHTML += '<div class="term-line success"><span style="color:#27c93f;">✅</span> <span style="color:#9B8FFF;">Qwen 14B hatayi duzeltti!</span></div>';
+                    if (j.fixed_code) {
+                        const fixedClean = j.fixed_code.replace(/</g, '&lt;');
+                        out.innerHTML += '<div class="term-line"><span class="term-prompt">❯</span> <span style="color:#a78bfa;">Duzeltilmis Kod:</span></div>';
+                        out.innerHTML += '<div class="term-line" style="background:rgba(106,90,205,0.06);border-left:2px solid #6A5ACD;padding:6px 10px;margin:4px 0;font-family:\'Cascadia Code\',monospace;font-size:12px;white-space:pre-wrap;">' + fixedClean + '</div>';
+                        // Kodu terminal input'una yerlestir
+                        document.getElementById('termInput').value = j.fixed_code;
+                    }
+                    if (j.output) {
+                        const lines = j.output.split('\n').filter(l => l.trim());
+                        let lineNum = 1;
+                        lines.forEach(line => {
+                            out.innerHTML += '<div class="term-line success"><span style="color:rgba(139,92,246,0.3);font-size:10px;min-width:24px;display:inline-block;">' + (lineNum++).toString().padStart(2,'0') + '</span> ' + line.replace(/</g, '&lt;') + '</div>';
+                        });
+                    }
+                    out.innerHTML += '<div class="term-line success"><span style="color:#27c93f;">✔</span> <span style="color:var(--text2);">Kod basariyla calisti! 🎉</span></div>';
+                    status.textContent = '● tamam';
+                    status.style.color = '#27c93f';
+                    lastFailedCode = '';
+                } else {
+                    out.innerHTML += '<div class="term-line error"><span style="color:#ff5f56;">✘</span> Qwen duzeltemedi: ' + (j.error || 'Bilinmeyen hata').replace(/</g, '&lt;') + '</div>';
+                    if (j.message) {
+                        out.innerHTML += '<div class="term-line" style="color:var(--text2);font-size:12px;">' + j.message.replace(/</g, '&lt;') + '</div>';
+                    }
+                    status.textContent = '● hata';
+                    status.style.color = '#ff5f56';
+                }
+            } catch(e) {
+                out.innerHTML += '<div class="term-line error"><span style="color:#ff5f56;">✘</span> Baglanti hatasi: ' + e.message + '</div>';
+                status.textContent = '● hata';
+                status.style.color = '#ff5f56';
+            }
+            out.scrollTop = out.scrollHeight;
+            setTimeout(() => { status.textContent = '● hazir'; status.style.color = '#22c55e'; }, 3000);
+        }
+
+        /* ========== EKLENTILER ========== */
+        async function fetchPlugins() {
+            const list = document.getElementById('pluginsList');
+            const status = document.getElementById('pluginStatus');
+            try {
+                const r = await fetch('/api/plugins');
+                const j = await r.json();
+                if (j.plugins && j.plugins.length > 0) {
+                    list.innerHTML = j.plugins.map(p => {
+                        const isActive = p.enabled || p.status === 'enabled';
+                        return '<div class="plugin-item">' +
+                            '<div class="p-icon">🧩</div>' +
+                            '<div class="p-info">' +
+                                '<div class="p-name">' + (p.name || p.metadata?.name || 'Adsiz') + '</div>' +
+                                '<div class="p-desc">' + (p.description || p.metadata?.description || 'Aciklama yok') + ' · v' + (p.version || p.metadata?.version || '1.0') + '</div>' +
+                            '</div>' +
+                            '<span class="p-status ' + (isActive ? 'active' : 'inactive') + '">' + (isActive ? 'Aktif' : 'Pasif') + '</span>' +
+                            '<button class="plugin-toggle ' + (isActive ? 'on' : 'off') + '" onclick="togglePlugin(\'' + (p.name || p.metadata?.name) + '\', ' + isActive + ')">' + (isActive ? 'Kapat' : 'Ac') + '</button>' +
+                        '</div>';
+                    }).join('');
+                } else {
+                    list.innerHTML = '<div class="plugin-item" style="justify-content:center;border-style:dashed;background:transparent;"><span style="color:var(--text2);font-size:13px;">📦 Henuz eklenti yok. plugins/ klasorune .py ekleyin.</span></div>';
+                }
+                status.textContent = j.status || 'Sistem: PluginManager v1.0 · ' + (j.plugins ? j.plugins.length + ' eklenti' : '');
+            } catch(e) {
+                list.innerHTML = '<div class="plugin-item" style="justify-content:center;border-style:dashed;background:transparent;"><span style="color:#ff5f56;font-size:13px;">⚠ Baglanti hatasi: ' + e.message + '</span></div>';
+                status.textContent = '● baglanti hatasi';
+                status.style.color = '#ff5f56';
+            }
+        }
+
+        async function togglePlugin(name, current) {
+            try {
+                const r = await fetch('/api/plugins/' + encodeURIComponent(name) + '/toggle', { method: 'POST' });
+                const j = await r.json();
+                fetchPlugins();
+            } catch(e) {
+                alert('Plugin degistirme hatasi: ' + e.message);
+            }
+        }
+
+        async function reloadPlugins() {
+            const list = document.getElementById('pluginsList');
+            list.innerHTML = '<div class="plugin-item loading"><div class="plugin-spin"></div><span style="color:var(--text2);font-size:13px;">Yeniden yukleniyor...</span></div>';
+            fetchPlugins();
+        }
+
+        /* Terminal Enter tusu */
+        document.getElementById('termInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                runCode();
+            }
+        });
+
+        /* ========== QWEN 14B ASSISTANT ========== */
+        let qwenHistory = [];
+        let qwenModel = 'qwen2.5-coder:14b';
+
+        // showPanel fonksiyonunu Qwen için genişlet (orijinali koru)
+        const origShowPanel = window.showPanel;
+        window.showPanel = function(name) {
+            origShowPanel(name);
+            if (name === 'qwen') {
+                setTimeout(qwenCheckStatus, 300);
+            }
+        };
+
+        async function qwenCheckStatus() {
+            try {
+                const r = await fetch('/api/qwen/status');
+                const j = await r.json();
+                const statusEl = document.getElementById('qwenStatus');
+                const dot = document.querySelector('.qwen-status-dot');
+                if (j.ollama_connected) {
+                    statusEl.textContent = 'Qwen 14B • hazır ' + (j.message_count > 0 ? '(' + j.message_count + ' mesaj)' : '');
+                    dot.style.background = '#22c55e';
+                } else if (j.enabled) {
+                    statusEl.textContent = 'Qwen 14B • plugin aktif, Ollama bekleniyor...';
+                    dot.style.background = '#ffbd2e';
+                } else {
+                    statusEl.textContent = 'Qwen 14B • Ollama bağlı değil';
+                    dot.style.background = '#ff5f56';
+                }
+            } catch(e) {
+                document.getElementById('qwenStatus').textContent = 'Qwen 14B • bağlantı hatası';
+                document.querySelector('.qwen-status-dot').style.background = '#ff5f56';
+            }
+        }
+
+        function qwenAddMsg(content, role) {
+            const chat = document.getElementById('qwenChat');
+            const d = document.createElement('div');
+            d.className = 'qwen-msg qwen-' + role;
+
+            const iconSvg = role === 'ai'
+                ? '<svg width="16" height="16" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#6A5ACD" opacity="0.3"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="Arial">Q</text></svg>'
+                : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>';
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            const safeContent = content.replace(/</g, '&lt;').replace(/\n/g, '<br>');
+
+            // Kod bloklarını formatla
+            const formatted = safeContent.replace(/```(\w*)\n?([\s\S]*?)```/g, function(match, lang, code) {
+                return '<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 10px;margin:6px 0;font-family:\'Cascadia Code\',monospace;font-size:11px;overflow-x:auto;border-left:2px solid #6A5ACD;">' +
+                    (lang ? '<div style="font-size:9px;color:#9B8FFF;margin-bottom:4px;">' + lang + '</div>' : '') +
+                    code.trim().replace(/\n/g, '<br>') +
+                    '</div>';
+            });
+
+            d.innerHTML = '<div class="qwen-msg-icon">' + iconSvg + '</div><div class="qwen-msg-bub">' + formatted + '<div class="qwen-msg-time">' + timeStr + '</div></div>';
+            chat.appendChild(d);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function qwenAddDots() {
+            const chat = document.getElementById('qwenChat');
+            const d = document.createElement('div');
+            d.className = 'qwen-msg qwen-ai';
+            d.id = 'qwenDots';
+            d.innerHTML = '<div class="qwen-msg-icon"><svg width="16" height="16" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#6A5ACD" opacity="0.3"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="Arial">Q</text></svg></div><div class="qwen-msg-bub"><div class="qwen-dotz"><span></span><span></span><span></span></div></div>';
+            chat.appendChild(d);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function qwenRemoveDots() {
+            const d = document.getElementById('qwenDots');
+            if (d) d.remove();
+        }
+
+        async function qwenSend() {
+            const inp = document.getElementById('qwenInput');
+            const text = inp.value.trim();
+            if (!text) return;
+
+            inp.value = '';
+            qwenAddMsg(text, 'user');
+
+            // Geçmişe ekle
+            qwenHistory.push({role: 'user', content: text});
+
+            qwenAddDots();
+
+            try {
+                const r = await fetch('/api/qwen/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        message: text,
+                        history: qwenHistory,
+                        model: qwenModel
+                    })
+                });
+                const j = await r.json();
+                qwenRemoveDots();
+
+                if (j.success && j.response) {
+                    qwenAddMsg(j.response, 'ai');
+                    qwenHistory.push({role: 'assistant', content: j.response});
+                    // Geçmişi sınırla
+                    if (qwenHistory.length > 20) {
+                        qwenHistory = qwenHistory.slice(-20);
+                    }
+                } else if (j.error) {
+                    qwenAddMsg('❌ ' + j.error, 'ai');
+                }
+            } catch(e) {
+                qwenRemoveDots();
+                qwenAddMsg('❌ Bağlantı hatası: ' + e.message, 'ai');
+            }
+        }
+
+        async function qwenRunCode() {
+            const inp = document.getElementById('qwenInput');
+            const code = inp.value.trim();
+            if (!code) {
+                qwenAddMsg('💡 Lütfen çalıştırmak için Python kodu yazın veya bir kod gönderin.', 'ai');
+                return;
+            }
+
+            qwenAddMsg('▶ **Kod çalıştırılıyor...**\n```python\n' + code + '\n```', 'user');
+            qwenAddDots();
+
+            try {
+                const r = await fetch('/api/qwen/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({code: code, language: 'python'})
+                });
+                const j = await r.json();
+                qwenRemoveDots();
+
+                if (j.success) {
+                    let msg = '✅ **Çıktı:**\n```\n' + (j.output || 'Başarılı') + '\n```';
+                    if (j.fixed_code) {
+                        msg = '🔧 **Qwen hatayı düzeltti!**\n\n```python\n' + j.fixed_code + '\n```\n\n' + msg;
+                    }
+                    if (j.message) {
+                        msg += '\n\n_' + j.message + '_';
+                    }
+                    qwenAddMsg(msg, 'ai');
+                } else {
+                    qwenAddMsg('❌ **Hata:**\n```\n' + (j.error || 'Bilinmeyen hata') + '\n```\n' + (j.message || ''), 'ai');
+                }
+            } catch(e) {
+                qwenRemoveDots();
+                qwenAddMsg('❌ Bağlantı hatası: ' + e.message, 'ai');
+            }
+
+            inp.value = '';
+        }
+
+        function qwenClearChat() {
+            const chat = document.getElementById('qwenChat');
+            chat.innerHTML = '<div class="qwen-msg qwen-ai">' +
+                '<div class="qwen-msg-icon"><svg width="16" height="16" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" fill="#6A5ACD" opacity="0.3"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="Arial">Q</text></svg></div>' +
+                '<div class="qwen-msg-bub">Merhaba! Ben <b>Qwen 14B</b>. Kod yazma, <b>.venv</b> çalıştırma ve yardım için buradayım 👋<div class="qwen-msg-time">şimdi</div></div></div>';
+            qwenHistory = [];
+
+            // Backend'deki geçmişi de temizle
+            fetch('/api/qwen/clear', {method: 'POST'}).catch(() => {});
+        }
+    </script>
+</body>
+</html>

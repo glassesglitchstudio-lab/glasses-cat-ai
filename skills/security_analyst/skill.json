@@ -1,0 +1,13 @@
+{
+    "name": "security_analyst",
+    "version": "1.0.0",
+    "description": "Güvenlik analizi ve penetrasyon testi uzmanı",
+    "author": "GlassesCat",
+    "category": "security",
+    "dependencies": [],
+    "python_deps": [
+        "requests",
+        "cryptography"
+    ],
+    "enabled": true
+}

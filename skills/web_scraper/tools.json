@@ -1,0 +1,58 @@
+[
+    {
+        "name": "scrape_url",
+        "description": "Bir URL'den HTML içeriğini çeker ve parse eder",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url": {"type": "string", "description": "Hedef URL"},
+                "selector": {"type": "string", "description": "CSS selector (opsiyonel)"},
+                "output_format": {"type": "string", "enum": ["text", "json", "csv"], "default": "json"},
+                "headers": {"type": "object", "description": "Özel HTTP headers"},
+                "timeout": {"type": "integer", "default": 30}
+            },
+            "required": ["url"]
+        }
+    },
+    {
+        "name": "extract_links",
+        "description": "Bir sayfadaki tüm linkleri ve meta verilerini çıkarır",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url": {"type": "string", "description": "Hedef URL"},
+                "filter_pattern": {"type": "string", "description": "Regex filtresi"},
+                "max_links": {"type": "integer", "default": 100}
+            },
+            "required": ["url"]
+        }
+    },
+    {
+        "name": "scrape_multiple_pages",
+        "description": "Birden çok sayfadan veri çeker (pagination desteği)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "base_url": {"type": "string", "description": "Temel URL"},
+                "page_param": {"type": "string", "description": "Sayfa parametre adı"},
+                "start_page": {"type": "integer", "default": 1},
+                "end_page": {"type": "integer", "default": 5},
+                "selector": {"type": "string", "description": "CSS selector"},
+                "delay": {"type": "number", "default": 1.0}
+            },
+            "required": ["base_url"]
+        }
+    },
+    {
+        "name": "check_robots_txt",
+        "description": "Bir sitenin robots.txt kurallarını kontrol eder",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url": {"type": "string", "description": "Site URL"},
+                "user_agent": {"type": "string", "default": "GlassesBot/1.0"}
+            },
+            "required": ["url"]
+        }
+    }
+]
