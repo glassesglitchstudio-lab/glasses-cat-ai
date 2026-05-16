@@ -1,5 +1,5 @@
 # 🐱 GlassesCat AI
-### 🎮 by Niko Software | Arda Burak Çetiner
+### 🎮 by GlassescatSoftware | Arda Burak Çetiner
 
 GlassesCat, Ollama modellerini kullanan ve yapay zeka mühendisliği ile yazılım mühendisliği alanlarında eğitim ve geliştirme amaçlı tasarlanmış bir AI asistanıdır.
 
@@ -127,9 +127,9 @@ glasses-cat-ai/
 └── plugins/                     # Eklenti sistemi
 ```
 
-## 👥 Niko Software Hakkında
+## 👥 GlassescatSoftware Hakkında
 
-**Niko Software**, Arda Burak Çetiner tarafından kurulan; yapay zeka mühendisliği ve yazılım mühendisliği alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
+**GlassescatSoftware**, Arda Burak Çetiner tarafından kurulan; yapay zeka mühendisliği ve yazılım mühendisliği alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
 
 🎮 **Misyon**: Teknolojiyi eğlenceli ve erişilebilir kılmak
 🚀 **Vizyon**: Yapay zeka ve yazılım mühendisliğinde öncü olmak
@@ -149,6 +149,6 @@ Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 ---
 
 <p align="center">
-  <b>🎮 Niko Software - Arda Burak Çetiner 🎮</b><br>
+  <b>🎮 GlassescatSoftware - Arda Burak Çetiner 🎮</b><br>
   <i>"Kod yaz, AI öğren, geleceği inşa et!"</i>
 </p>
