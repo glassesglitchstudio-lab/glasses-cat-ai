@@ -129,7 +129,7 @@ glasses-cat-ai/
 
 ## 👥 GlassescatSoftware Hakkında
 
-**GlassescatSoftware**, Arda Burak Çetiner tarafından kurulan; yapay zeka mühendisliği ve yazılım mühendisliği alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
+**GlassescatSoftware**, Berkay Gülmez tarafından kurulan; yapay zeka mühendisliği ve yazılım mühendisliği alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
 
 🎮 **Misyon**: Teknolojiyi eğlenceli ve erişilebilir kılmak
 🚀 **Vizyon**: Yapay zeka ve yazılım mühendisliğinde öncü olmak
