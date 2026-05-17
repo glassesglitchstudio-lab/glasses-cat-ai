@@ -268,7 +268,7 @@ class GlassesVibeIDE:
         tree = self.explorer.scan()
         return Panel(
             tree,
-            title="[bold {0}] 📁 PROJECT EXPLORER [/bold {0}]".format(CYAN),
+            title="[bold {0}] 📁 PROJECT EXPLORER / PROJE GEZGİNİ [/bold {0}]".format(CYAN),
             box=SIMPLE,
             border_style=MAGENTA,
             padding=(0, 1)
@@ -277,12 +277,12 @@ class GlassesVibeIDE:
     def get_chat_history_panel(self):
         content = Text()
         if not self.chat_messages:
-            content.append("  [dim]Henüz mesaj yok... Sohbet başlatın![/dim]\n", style="")
+            content.append("  [dim]No messages yet... Start chatting! / Henüz mesaj yok... Sohbet başlatın![/dim]\n", style="")
         else:
             for msg in self.chat_messages[-8:]:
                 if msg["role"] == "user":
                     content.append("  💬 ", style="")
-                    content.append("You: ", style="bold {0}".format(CYAN))
+                    content.append("You/Sen: ", style="bold {0}".format(CYAN))
                     content.append("{0}\n".format(msg["content"][:60]), style="#ffffff")
                 elif msg["role"] == "assistant":
                     preview = msg["content"][:60]
@@ -293,12 +293,12 @@ class GlassesVibeIDE:
                         except:
                             pass
                     content.append("  🤖 ", style="")
-                    content.append("AI: ", style="bold {0}".format(MAGENTA))
+                    content.append("AI/YZ: ", style="bold {0}".format(MAGENTA))
                     content.append("{0}\n".format(preview), style="#ffffff")
                 content.append("\n")
         return Panel(
             content,
-            title="[bold {0}] 💬 CHAT HISTORY [/bold {0}]".format(CYAN),
+            title="[bold {0}] 💬 CHAT HISTORY / SOHBET GEÇMİŞİ [/bold {0}]".format(CYAN),
             box=SIMPLE,
             border_style=MAGENTA,
             padding=(0, 1)
