@@ -329,7 +329,7 @@ class GlassesVibeAgent:
                 user_input = Prompt.ask(self.get_input_prompt())
             except (EOFError, KeyboardInterrupt):
                 console.print()
-                console.print("  [dim]Gule gule, Erkay![/dim]")
+                console.print("  [dim]Gule gule![/dim]")
                 break
             user_input = user_input.strip()
             if not user_input:
@@ -338,7 +338,7 @@ class GlassesVibeAgent:
                 cmd = user_input[1:].lower()
                 if cmd in ("exit", "quit"):
                     console.print()
-                    console.print("  [dim]Gule gule, Erkay![/dim]")
+                    console.print("  [dim]Gule gule![/dim]")
                     break
                 elif cmd == "help":
                     self.show_commands()
