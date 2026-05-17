@@ -11,16 +11,11 @@ import json
 import time
 import requests
 from rich.console import Console
-from rich.panel import Panel
 from rich.markdown import Markdown
 from rich.syntax import Syntax
 from rich.live import Live
 from rich.spinner import Spinner
-from rich.rule import Rule
-from rich.table import Table
-from rich.text import Text
 from rich.prompt import Prompt
-from rich import print as rprint
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
@@ -80,11 +75,13 @@ class GlassesVibeAgent:
     def show_banner(self):
         self.clear_screen()
         console.print()
-        console.print()
-        console.print("         [bold white]GlassesVibe[/bold white]")
-        console.print("         [dim]v3.0[/dim]")
-        console.print()
-        console.print(Rule(style="dim"))
+        console.print("   [bold]┌────────────────────────────────────────────┐[/bold]")
+        console.print("   [bold]│[/bold]                                            [bold]│[/bold]")
+        console.print("   [bold]│[/bold]    [bold cyan]GlassesVibe[/bold cyan]                            [bold]│[/bold]")
+        console.print("   [bold]│[/bold]    [dim]AGI CLI Agent v3.0[/dim]                      [bold]│[/bold]")
+        console.print("   [bold]│[/bold]    [dim]Niko Software[/dim]                         [bold]│[/bold]")
+        console.print("   [bold]│[/bold]                                            [bold]│[/bold]")
+        console.print("   [bold]└────────────────────────────────────────────┘[/bold]")
         console.print()
 
     def show_welcome(self):
@@ -113,9 +110,7 @@ class GlassesVibeAgent:
         console.print("  [cyan]1[/cyan]  Ollama (Yerel Modeller)")
         console.print("  [cyan]2[/cyan]  OpenRouter (Cloud API)")
         console.print()
-
         choice = Prompt.ask("  Secim", choices=["1", "2"], default="1")
-
         if choice == "2":
             return "openrouter"
         return "ollama"
@@ -123,20 +118,17 @@ class GlassesVibeAgent:
     def select_ollama_model(self):
         with Live(Spinner("dots", text="Modeller taraniyor...", style="cyan"), refresh_per_second=10, transient=True):
             models = self.get_ollama_models()
-
         if not models:
             console.print()
             console.print("  [red]Hicbir Ollama modeli bulunamadi![/red]")
             console.print("  [dim]Model indirmek icin: ollama pull <model>[/dim]")
             sys.exit(0)
-
         console.print()
         console.print("  [bold]Ollama Modelleri[/bold]")
         console.print()
         for i, m in enumerate(models, 1):
             console.print("  [cyan]{0}[/cyan]  {1}  [dim]({2})[/dim]".format(i, m['name'], m['size']))
         console.print()
-
         choice = Prompt.ask("  Model sec", default="1")
         try:
             idx = int(choice) - 1
@@ -144,7 +136,6 @@ class GlassesVibeAgent:
                 return models[idx]["name"]
         except ValueError:
             pass
-
         return models[0]["name"]
 
     def select_openrouter_model(self):
@@ -158,7 +149,6 @@ class GlassesVibeAgent:
             if not api_key:
                 console.print("  [red]API key olmadan OpenRouter kullanilamaz.[/red]")
                 return None, None
-
         models = [
             {"id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash (Ucretsiz)"},
             {"id": "meta-llama/llama-3.1-8b-instruct", "name": "Llama 3.1 8B (Ucretsiz)"},
@@ -168,7 +158,6 @@ class GlassesVibeAgent:
             {"id": "openai/gpt-4o", "name": "GPT-4o"},
             {"id": "qwen/qwen2.5-coder-32b-instruct", "name": "Qwen 2.5 Coder 32B"},
         ]
-
         console.print()
         console.print("  [bold]OpenRouter Modelleri[/bold]")
         console.print()
@@ -176,7 +165,6 @@ class GlassesVibeAgent:
             console.print("  [cyan]{0}[/cyan]  {1}".format(i, m['name']))
         console.print("  [cyan]8[/cyan]  Diger (manuel ID gir)")
         console.print()
-
         choice = Prompt.ask("  Model sec", default="1")
         try:
             idx = int(choice) - 1
@@ -187,7 +175,6 @@ class GlassesVibeAgent:
                 return model_id, api_key
         except ValueError:
             pass
-
         return models[0]["id"], api_key
 
     def ollama_request(self, model, prompt):
@@ -198,26 +185,25 @@ class GlassesVibeAgent:
             "stream": False,
             "format": "json",
         }
-
         try:
             response = requests.post(url, json=payload, timeout=120)
             response.raise_for_status()
             data = response.json()
             return data.get("response", "")
         except requests.exceptions.ConnectionError:
-            console.print("[red]Ollama servisi calismiyor! `ollama serve`[/red]")
+            console.print("  [red]Ollama servisi calismiyor! `ollama serve`[/red]")
             return None
         except requests.exceptions.Timeout:
-            console.print("[red]Istek zaman asimina ugradi.[/red]")
+            console.print("  [red]Istek zaman asimina ugradi.[/red]")
             return None
         except Exception as e:
-            console.print(f"[red]Hata: {e}[/red]")
+            console.print("  [red]Hata: {0}[/red]".format(e))
             return None
 
     def openrouter_request(self, model, api_key, messages):
         url = "https://openrouter.ai/api/v1/chat/completions"
         headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": "Bearer {0}".format(api_key),
             "Content-Type": "application/json",
             "HTTP-Referer": "https://glassesglitchstudio.com",
             "X-Title": "GlassesVibe",
@@ -227,23 +213,22 @@ class GlassesVibeAgent:
             "messages": messages,
             "response_format": {"type": "json_object"},
         }
-
         try:
             response = requests.post(url, headers=headers, json=payload, timeout=120)
             if response.status_code == 401:
-                console.print("[red]API Key gecersiz! OPENROUTER_API_KEY'i kontrol et.[/red]")
+                console.print("  [red]API Key gecersiz![/red]")
                 return None
             if response.status_code == 402:
-                console.print("[red]OpenRouter kredi bitti![/red]")
+                console.print("  [red]OpenRouter kredi bitti![/red]")
                 return None
             response.raise_for_status()
             data = response.json()
             return data["choices"][0]["message"]["content"]
         except requests.exceptions.Timeout:
-            console.print("[red]Istek zaman asimina ugradi.[/red]")
+            console.print("  [red]Istek zaman asimina ugradi.[/red]")
             return None
         except Exception as e:
-            console.print(f"[red]OpenRouter Hata: {e}[/red]")
+            console.print("  [red]OpenRouter Hata: {0}[/red]".format(e))
             return None
 
     def process_json_response(self, response_text):
@@ -256,7 +241,6 @@ class GlassesVibeAgent:
             start = response_text.find("```") + 3
             end = response_text.find("```", start)
             response_text = response_text[start:end].strip()
-
         try:
             return json.loads(response_text)
         except json.JSONDecodeError:
@@ -282,8 +266,8 @@ class GlassesVibeAgent:
 
     def show_thought(self, thought):
         console.print()
-        console.print(f"  [dim]thinking...[/dim]")
-        console.print(f"  [dim]{thought}[/dim]")
+        console.print("  [dim]thinking...[/dim]")
+        console.print("  [dim]{0}[/dim]".format(thought))
 
     def show_file_created(self, file_path, content):
         ext = file_path.split('.')[-1] if '.' in file_path else "text"
@@ -291,9 +275,8 @@ class GlassesVibeAgent:
             syntax = Syntax(content, ext, theme="monokai", line_numbers=True, word_wrap=True)
         else:
             syntax = Syntax(content, "text", theme="monokai", line_numbers=True, word_wrap=True)
-
         console.print()
-        console.print(f"  [green]file created: {file_path}[/green]")
+        console.print("  [green]file created: {0}[/green]".format(file_path))
         console.print(syntax)
 
     def show_message(self, message):
@@ -304,7 +287,6 @@ class GlassesVibeAgent:
         elapsed = time.time() - self.start_time
         minutes = int(elapsed // 60)
         seconds = int(elapsed % 60)
-
         console.print()
         console.print("  [dim]provider:[/dim] [bold]{0}[/bold]".format(self.provider.upper()))
         console.print("  [dim]model:[/dim] {0}".format(self.model_name))
@@ -323,47 +305,40 @@ class GlassesVibeAgent:
         console.print()
 
     def get_input_prompt(self):
-        model_short = self.model_name.split(":")[0] if ":" in self.model_name else self.model_name
-        return f"[bold]>[/bold] "
+        return "[bold]>[/bold] "
 
     def run(self):
         self.show_banner()
         self.show_welcome()
-
         provider = self.select_provider()
-
         if provider == "ollama":
             self.provider = "ollama"
             self.model_name = self.select_ollama_model()
         elif provider == "openrouter":
             result = self.select_openrouter_model()
             if result[0] is None:
-                console.print("[red]OpenRouter kurulumu basarisiz. Cikis yapiliyor...[/red]")
+                console.print("  [red]OpenRouter kurulumu basarisiz. Cikis yapiliyor...[/red]")
                 return
             self.provider = "openrouter"
             self.model_name, self.api_key = result
-
         console.print()
         console.print("  [dim]session started[/dim]")
         console.print()
-
         while True:
             try:
                 user_input = Prompt.ask(self.get_input_prompt())
             except (EOFError, KeyboardInterrupt):
                 console.print()
-                console.print("[dim]Gule gule, Erkay![/dim]")
+                console.print("  [dim]Gule gule, Erkay![/dim]")
                 break
-
             user_input = user_input.strip()
             if not user_input:
                 continue
-
             if user_input.startswith("/"):
                 cmd = user_input[1:].lower()
                 if cmd in ("exit", "quit"):
                     console.print()
-                    console.print("[dim]Gule gule, Erkay![/dim]")
+                    console.print("  [dim]Gule gule, Erkay![/dim]")
                     break
                 elif cmd == "help":
                     self.show_commands()
@@ -373,7 +348,7 @@ class GlassesVibeAgent:
                     continue
                 elif cmd == "clear":
                     self.history.clear()
-                    console.print("[dim]Conversation history cleared.[/dim]")
+                    console.print("  [dim]Conversation history cleared.[/dim]")
                     continue
                 elif cmd == "models":
                     if self.provider == "ollama":
@@ -391,48 +366,38 @@ class GlassesVibeAgent:
                         console.print("  [dim]OpenRouter models are selected at startup.[/dim]")
                     continue
                 else:
-                    console.print(f"[dim]Unknown command: /{cmd}. Type /help.[/dim]")
+                    console.print("  [dim]Unknown command: /{0}. Type /help.[/dim]".format(cmd))
                     continue
-
             self.history.add("user", user_input)
             self.request_count += 1
-
             messages = [{"role": "system", "content": self.history.get_system_prompt()}]
             messages.extend(self.history.get_messages())
-
             console.print()
-
             if self.provider == "ollama":
                 with Live(Spinner("dots", text="thinking...", style="cyan"), refresh_per_second=10, transient=True):
                     response = self.ollama_request(self.model_name, user_input)
             else:
                 with Live(Spinner("dots", text="thinking...", style="cyan"), refresh_per_second=10, transient=True):
                     response = self.openrouter_request(self.model_name, self.api_key, messages)
-
             if response is None:
                 continue
-
             parsed = self.process_json_response(response)
             self.history.add("assistant", response)
-
             dusunce = parsed.get("dusunce", "")
             aksiyon = parsed.get("aksiyon", "mesaj_gonder")
             dosya_adi = parsed.get("dosya_adi", "")
             kod_icerigi = parsed.get("kod_icerigi", "")
-
             if dusunce:
                 self.show_thought(dusunce)
-
             if aksiyon == "dosya_yarat" and dosya_adi and kod_icerigi:
                 success, result = self.create_file(dosya_adi, kod_icerigi)
                 if success:
                     self.show_file_created(dosya_adi, kod_icerigi)
                 else:
-                    console.print(f"[red]File creation error: {result}[/red]")
+                    console.print("  [red]File creation error: {0}[/red]".format(result))
             else:
                 if kod_icerigi:
                     self.show_message(kod_icerigi)
-
             console.print()
 
 
@@ -446,5 +411,5 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         console.print()
-        console.print("[dim]Gule gule, Erkay![/dim]")
+        console.print("  [dim]Gule gule, Erkay![/dim]")
         sys.exit(0)
