@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-GlassesVibe - AGI CLI Agent v3.0
+GlassesVibe - AGI CLI Agent v4.0
 Niko Software
 """
 
@@ -34,7 +34,7 @@ class ConversationHistory:
             self.messages = self.messages[-self.max_turns * 2:]
 
     def get_system_prompt(self):
-        return """Sen GlassesVibe adli bir AGI asistansin. Niko Software tarafindan gelistirildin.
+        return """Sen GlassesVibe adli bir AGI asistansin.
 
 YANIT FORMATIN:
 Sen SADECE ve SADECE asagidaki JSON semasi ile yanit vermelisin.
@@ -61,9 +61,7 @@ KURALLAR:
 
 class GlassesVibeAgent:
     def __init__(self):
-        self.provider = None
         self.model_name = None
-        self.api_key = None
         self.history = ConversationHistory()
         self.request_count = 0
         self.file_count = 0
@@ -78,7 +76,7 @@ class GlassesVibeAgent:
         console.print("   [bold]┌────────────────────────────────────────────┐[/bold]")
         console.print("   [bold]│[/bold]                                            [bold]│[/bold]")
         console.print("   [bold]│[/bold]    [bold cyan]GlassesVibe[/bold cyan]                            [bold]│[/bold]")
-        console.print("   [bold]│[/bold]    [dim]AGI CLI Agent v3.0[/dim]                      [bold]│[/bold]")
+        console.print("   [bold]│[/bold]    [dim]AGI CLI Agent v4.0[/dim]                      [bold]│[/bold]")
         console.print("   [bold]│[/bold]    [dim]Niko Software[/dim]                         [bold]│[/bold]")
         console.print("   [bold]│[/bold]                                            [bold]│[/bold]")
         console.print("   [bold]└────────────────────────────────────────────┘[/bold]")
@@ -104,27 +102,20 @@ class GlassesVibeAgent:
         except Exception:
             return []
 
-    def select_provider(self):
-        console.print("  [bold]Model Saglayici Sec[/bold]")
-        console.print()
-        console.print("  [cyan]1[/cyan]  Ollama (Yerel Modeller)")
-        console.print("  [cyan]2[/cyan]  OpenRouter (Cloud API)")
-        console.print()
-        choice = Prompt.ask("  Secim", choices=["1", "2"], default="1")
-        if choice == "2":
-            return "openrouter"
-        return "ollama"
-
-    def select_ollama_model(self):
+    def select_model(self):
         with Live(Spinner("dots", text="Modeller taraniyor...", style="cyan"), refresh_per_second=10, transient=True):
             models = self.get_ollama_models()
         if not models:
             console.print()
             console.print("  [red]Hicbir Ollama modeli bulunamadi![/red]")
-            console.print("  [dim]Model indirmek icin: ollama pull <model>[/dim]")
+            console.print()
+            console.print("  [dim]Ollama yuklu degil veya hic model indirilmemis.[/dim]")
+            console.print("  [dim]Ollama indir: https://ollama.com[/dim]")
+            console.print("  [dim]Model indir: ollama pull qwen2.5-coder:14b[/dim]")
+            console.print()
             sys.exit(0)
         console.print()
-        console.print("  [bold]Ollama Modelleri[/bold]")
+        console.print("  [bold]Kullanilabilir Modeller[/bold]")
         console.print()
         for i, m in enumerate(models, 1):
             console.print("  [cyan]{0}[/cyan]  {1}  [dim]({2})[/dim]".format(i, m['name'], m['size']))
@@ -137,45 +128,6 @@ class GlassesVibeAgent:
         except ValueError:
             pass
         return models[0]["name"]
-
-    def select_openrouter_model(self):
-        api_key = os.environ.get("OPENROUTER_API_KEY", "")
-        if not api_key:
-            console.print()
-            console.print("  [yellow]OpenRouter API Key gerekli![/yellow]")
-            console.print("  [dim]https://openrouter.ai/settings/keys[/dim]")
-            console.print()
-            api_key = input("  API Key yapistir (Ctrl+V): ").strip()
-            if not api_key:
-                console.print("  [red]API key olmadan OpenRouter kullanilamaz.[/red]")
-                return None, None
-        models = [
-            {"id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash (Ucretsiz)"},
-            {"id": "meta-llama/llama-3.1-8b-instruct", "name": "Llama 3.1 8B (Ucretsiz)"},
-            {"id": "mistralai/mistral-7b-instruct", "name": "Mistral 7B (Ucretsiz)"},
-            {"id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro"},
-            {"id": "anthropic/claude-sonnet-4-20250514", "name": "Claude Sonnet 4"},
-            {"id": "openai/gpt-4o", "name": "GPT-4o"},
-            {"id": "qwen/qwen2.5-coder-32b-instruct", "name": "Qwen 2.5 Coder 32B"},
-        ]
-        console.print()
-        console.print("  [bold]OpenRouter Modelleri[/bold]")
-        console.print()
-        for i, m in enumerate(models, 1):
-            console.print("  [cyan]{0}[/cyan]  {1}".format(i, m['name']))
-        console.print("  [cyan]8[/cyan]  Diger (manuel ID gir)")
-        console.print()
-        choice = Prompt.ask("  Model sec", default="1")
-        try:
-            idx = int(choice) - 1
-            if 0 <= idx < len(models):
-                return models[idx]["id"], api_key
-            elif idx == 7:
-                model_id = Prompt.ask("  Model ID")
-                return model_id, api_key
-        except ValueError:
-            pass
-        return models[0]["id"], api_key
 
     def ollama_request(self, model, prompt):
         url = "http://localhost:11434/api/generate"
@@ -191,44 +143,16 @@ class GlassesVibeAgent:
             data = response.json()
             return data.get("response", "")
         except requests.exceptions.ConnectionError:
-            console.print("  [red]Ollama servisi calismiyor! `ollama serve`[/red]")
+            console.print()
+            console.print("  [red]Ollama servisi calismiyor![/red]")
+            console.print("  [dim]Terminalde `ollama serve` komutunu calistir.[/dim]")
+            console.print()
             return None
         except requests.exceptions.Timeout:
             console.print("  [red]Istek zaman asimina ugradi.[/red]")
             return None
         except Exception as e:
             console.print("  [red]Hata: {0}[/red]".format(e))
-            return None
-
-    def openrouter_request(self, model, api_key, messages):
-        url = "https://openrouter.ai/api/v1/chat/completions"
-        headers = {
-            "Authorization": "Bearer {0}".format(api_key),
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://glassesglitchstudio.com",
-            "X-Title": "GlassesVibe",
-        }
-        payload = {
-            "model": model,
-            "messages": messages,
-            "response_format": {"type": "json_object"},
-        }
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=120)
-            if response.status_code == 401:
-                console.print("  [red]API Key gecersiz![/red]")
-                return None
-            if response.status_code == 402:
-                console.print("  [red]OpenRouter kredi bitti![/red]")
-                return None
-            response.raise_for_status()
-            data = response.json()
-            return data["choices"][0]["message"]["content"]
-        except requests.exceptions.Timeout:
-            console.print("  [red]Istek zaman asimina ugradi.[/red]")
-            return None
-        except Exception as e:
-            console.print("  [red]OpenRouter Hata: {0}[/red]".format(e))
             return None
 
     def process_json_response(self, response_text):
@@ -288,7 +212,6 @@ class GlassesVibeAgent:
         minutes = int(elapsed // 60)
         seconds = int(elapsed % 60)
         console.print()
-        console.print("  [dim]provider:[/dim] [bold]{0}[/bold]".format(self.provider.upper()))
         console.print("  [dim]model:[/dim] {0}".format(self.model_name))
         console.print("  [dim]requests:[/dim] {0}".format(self.request_count))
         console.print("  [dim]files created:[/dim] {0}".format(self.file_count))
@@ -310,17 +233,7 @@ class GlassesVibeAgent:
     def run(self):
         self.show_banner()
         self.show_welcome()
-        provider = self.select_provider()
-        if provider == "ollama":
-            self.provider = "ollama"
-            self.model_name = self.select_ollama_model()
-        elif provider == "openrouter":
-            result = self.select_openrouter_model()
-            if result[0] is None:
-                console.print("  [red]OpenRouter kurulumu basarisiz. Cikis yapiliyor...[/red]")
-                return
-            self.provider = "openrouter"
-            self.model_name, self.api_key = result
+        self.model_name = self.select_model()
         console.print()
         console.print("  [dim]session started[/dim]")
         console.print()
@@ -351,19 +264,16 @@ class GlassesVibeAgent:
                     console.print("  [dim]Conversation history cleared.[/dim]")
                     continue
                 elif cmd == "models":
-                    if self.provider == "ollama":
-                        models = self.get_ollama_models()
-                        if models:
-                            console.print()
-                            console.print("  [bold]Ollama Modelleri[/bold]")
-                            console.print()
-                            for m in models:
-                                console.print("  {0}  [dim]({1})[/dim]".format(m["name"], m["size"]))
-                            console.print()
-                        else:
-                            console.print("  [dim]No models found.[/dim]")
+                    models = self.get_ollama_models()
+                    if models:
+                        console.print()
+                        console.print("  [bold]Ollama Modelleri[/bold]")
+                        console.print()
+                        for m in models:
+                            console.print("  {0}  [dim]({1})[/dim]".format(m["name"], m["size"]))
+                        console.print()
                     else:
-                        console.print("  [dim]OpenRouter models are selected at startup.[/dim]")
+                        console.print("  [dim]No models found.[/dim]")
                     continue
                 else:
                     console.print("  [dim]Unknown command: /{0}. Type /help.[/dim]".format(cmd))
@@ -373,12 +283,8 @@ class GlassesVibeAgent:
             messages = [{"role": "system", "content": self.history.get_system_prompt()}]
             messages.extend(self.history.get_messages())
             console.print()
-            if self.provider == "ollama":
-                with Live(Spinner("dots", text="thinking...", style="cyan"), refresh_per_second=10, transient=True):
-                    response = self.ollama_request(self.model_name, user_input)
-            else:
-                with Live(Spinner("dots", text="thinking...", style="cyan"), refresh_per_second=10, transient=True):
-                    response = self.openrouter_request(self.model_name, self.api_key, messages)
+            with Live(Spinner("dots", text="thinking...", style="cyan"), refresh_per_second=10, transient=True):
+                response = self.ollama_request(self.model_name, user_input)
             if response is None:
                 continue
             parsed = self.process_json_response(response)
@@ -411,5 +317,5 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         console.print()
-        console.print("  [dim]Gule gule, Erkay![/dim]")
+        console.print("  [dim]Gule gule![/dim]")
         sys.exit(0)
