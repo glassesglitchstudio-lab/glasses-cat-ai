@@ -399,6 +399,23 @@ class GlassesVibeIDE:
             console.print("[dim]Otomatik tarandi ve siralandi[/dim]")
             console.print()
 
+            console.print("  [bold {0}]★ GULMEZCETINER v1.2.0 (Ana Model)[/bold {0}]".format(GREEN))
+            menu_items.append({"idx": idx, "engine": "ollama", "model": "gulmzcetiner:latest", "label": "gulmzcetiner:latest"})
+            console.print("  [bold {0}][{1}][/bold {0}] gulmzcetiner:latest [dim](v1.2.0 - GGUF Muhurlu)[/dim]".format(GREEN, idx))
+            idx += 1
+            console.print()
+
+            recommended = []
+            other = []
+            for m in ollama_models:
+                ml = m.lower()
+                if "gulmzcetiner" in ml or "glasses" in ml:
+                    continue
+                elif "qwen" in ml or "llama" in ml or "deepseek" in ml:
+                    recommended.append(m)
+                else:
+                    other.append(m)
+
             if recommended:
                 console.print("  [bold {0}]★ ONERILEN MODELLER[/bold {0}]".format(YELLOW))
                 for m in recommended:
