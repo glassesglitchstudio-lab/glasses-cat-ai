@@ -289,7 +289,7 @@ class GlassesVibeIDE:
 
         if self.user_input:
             content.append("\n")
-            content.append("User: {0}\n".format(self.user_input), style="bold {0}".format(CYAN))
+            content.append("💬 User: {0}\n".format(self.user_input), style="bold {0}".format(CYAN))
 
         if self.last_file_name and self.last_file_content:
             content.append("\n")
@@ -752,11 +752,25 @@ class GlassesVibeIDE:
         console.print("  [dim]session:[/dim] {0}m {1}s".format(minutes, seconds))
         console.print()
 
+    def get_chat_input_panel(self):
+        input_text = Text()
+        input_text.append("  💬 ", style="bold {0}".format(CYAN))
+        input_text.append("Mesajınızı yazın ve Enter'a basın...", style="dim #ffffff")
+        input_text.append("  │  ", style="dim")
+        input_text.append("CEO Berkay", style="bold {0}".format(GREEN))
+        return Panel(
+            input_text,
+            box=SIMPLE,
+            border_style=CYAN,
+            padding=(0, 2)
+        )
+
     def build_layout(self):
         layout = Layout()
         layout.split_column(
             Layout(name="header", size=10),
             Layout(name="main", ratio=1),
+            Layout(name="chat_input", size=3),
             Layout(name="status", size=3)
         )
         layout["header"].split_row(
@@ -766,6 +780,7 @@ class GlassesVibeIDE:
             Layout(self.get_explorer_panel(), name="explorer", ratio=1),
             Layout(self.get_workspace_panel(), name="workspace", ratio=2)
         )
+        layout["chat_input"].update(self.get_chat_input_panel())
         layout["status"].update(self.get_status_bar())
         return layout
 
