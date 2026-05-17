@@ -109,7 +109,7 @@ class GlassesVibeAgent:
         console.print()
         console.print(Panel(
             Text(ASCII_LOGO.strip(), style="bold cyan"),
-            subtitle=Text("Niko Software System v2.0", style="dim #888888"),
+            subtitle=Text("GlassesVibe", style="dim #888888"),
             border_style="magenta",
             padding=(1, 2)
         ))
@@ -179,22 +179,31 @@ class GlassesVibeAgent:
     def select_openrouter_model(self):
         api_key = os.environ.get("OPENROUTER_API_KEY", "")
         if not api_key:
+            console.print(Panel(
+                "[yellow]OpenRouter API Key gerekli![/yellow]\n"
+                "[dim]https://openrouter.ai/settings keys adresinden alabilirsin.\n"
+                "veya .env dosyasina OPENROUTER_API_KEY=sk-or-xxx ekle.[/dim]",
+                border_style="yellow"
+            ))
             api_key = questionary.password(
-                "OpenRouter API Key gir (veya .env dosyasina OPENROUTER_API_KEY ekle):",
+                "OpenRouter API Key gir:",
                 style=CUSTOM_STYLE,
                 qmark=">>"
             ).ask()
             if not api_key:
-                console.print(Panel("[red]API key gerekli. Cikis yapiliyor...[/red]", border_style="red"))
-                sys.exit(0)
+                console.print(Panel("[red]API key olmadan OpenRouter kullanilamaz. Ollama'ya yonlendiriliyorsun...[/red]", border_style="red"))
+                self.provider = "ollama"
+                self.model_name = self.select_ollama_model()
+                return
 
         models = [
+            {"id": "google/gemini-2.5-flash", "name": "Google Gemini 2.5 Flash (Ucretsiz)"},
+            {"id": "meta-llama/llama-3.1-8b-instruct", "name": "Llama 3.1 8B (Ucretsiz)"},
+            {"id": "mistralai/mistral-7b-instruct", "name": "Mistral 7B (Ucretsiz)"},
             {"id": "google/gemini-2.5-pro", "name": "Google Gemini 2.5 Pro"},
             {"id": "anthropic/claude-sonnet-4-20250514", "name": "Claude Sonnet 4"},
             {"id": "openai/gpt-4o", "name": "OpenAI GPT-4o"},
-            {"id": "meta-llama/llama-3.3-70b-instruct", "name": "Llama 3.3 70B"},
             {"id": "qwen/qwen2.5-coder-32b-instruct", "name": "Qwen 2.5 Coder 32B"},
-            {"id": "mistralai/mistral-large-2411", "name": "Mistral Large 2"},
         ]
 
         choices = [questionary.Choice(m["name"], value=m["id"]) for m in models]
@@ -281,6 +290,12 @@ class GlassesVibeAgent:
 
         try:
             response = requests.post(url, headers=headers, json=payload, timeout=120)
+            if response.status_code == 401:
+                console.print(Panel("[red]API Key gecersiz! OPENROUTER_API_KEY'i kontrol et.[/red]", border_style="red"))
+                return None
+            if response.status_code == 402:
+                console.print(Panel("[red]OpenRouter kredi bitti! Hesabina kredi ekle.[/red]", border_style="red"))
+                return None
             response.raise_for_status()
             data = response.json()
             return data["choices"][0]["message"]["content"]
@@ -406,8 +421,12 @@ class GlassesVibeAgent:
             self.provider = "ollama"
             self.model_name = self.select_ollama_model()
         elif provider == "openrouter":
-            self.provider = "openrouter"
-            self.model_name, self.api_key = self.select_openrouter_model()
+            result = self.select_openrouter_model()
+            if result:
+                self.provider = "openrouter"
+                self.model_name, self.api_key = result
+            else:
+                return
 
         console.print()
         console.print(Rule("[dim]session started[/dim]", style="dim cyan"))
