@@ -236,6 +236,7 @@ class GlassesVibeIDE:
         self.last_file_content = ""
         self.last_file_name = ""
         self.user_input = ""
+        self.chat_messages = []
 
     def clear_screen(self):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -267,7 +268,37 @@ class GlassesVibeIDE:
         tree = self.explorer.scan()
         return Panel(
             tree,
-            title="[bold {0}] PROJECT EXPLORER [/bold {0}]".format(CYAN),
+            title="[bold {0}] 📁 PROJECT EXPLORER [/bold {0}]".format(CYAN),
+            box=SIMPLE,
+            border_style=MAGENTA,
+            padding=(0, 1)
+        )
+
+    def get_chat_history_panel(self):
+        content = Text()
+        if not self.chat_messages:
+            content.append("  [dim]Henüz mesaj yok... Sohbet başlatın![/dim]\n", style="")
+        else:
+            for msg in self.chat_messages[-8:]:
+                if msg["role"] == "user":
+                    content.append("  💬 ", style="")
+                    content.append("You: ", style="bold {0}".format(CYAN))
+                    content.append("{0}\n".format(msg["content"][:60]), style="#ffffff")
+                elif msg["role"] == "assistant":
+                    preview = msg["content"][:60]
+                    if "dusunce" in msg["content"]:
+                        try:
+                            data = json.loads(msg["content"])
+                            preview = data.get("dusunce", "")[:60]
+                        except:
+                            pass
+                    content.append("  🤖 ", style="")
+                    content.append("AI: ", style="bold {0}".format(MAGENTA))
+                    content.append("{0}\n".format(preview), style="#ffffff")
+                content.append("\n")
+        return Panel(
+            content,
+            title="[bold {0}] 💬 CHAT HISTORY [/bold {0}]".format(CYAN),
             box=SIMPLE,
             border_style=MAGENTA,
             padding=(0, 1)
@@ -286,10 +317,6 @@ class GlassesVibeIDE:
         else:
             content.append("[AI LOG LOGIC] ", style="bold {0}".format(CYAN))
             content.append("Waiting for input...\n", style="dim {0}".format(DIM))
-
-        if self.user_input:
-            content.append("\n")
-            content.append("💬 User: {0}\n".format(self.user_input), style="bold {0}".format(CYAN))
 
         if self.last_file_name and self.last_file_content:
             content.append("\n")
@@ -778,7 +805,11 @@ class GlassesVibeIDE:
         )
         layout["main"].split_row(
             Layout(self.get_explorer_panel(), name="explorer", ratio=1),
-            Layout(self.get_workspace_panel(), name="workspace", ratio=2)
+            Layout(name="right_panel", ratio=2)
+        )
+        layout["right_panel"].split_column(
+            Layout(self.get_workspace_panel(), name="workspace", ratio=1),
+            Layout(self.get_chat_history_panel(), name="chat_history", ratio=1)
         )
         layout["chat_input"].update(self.get_chat_input_panel())
         layout["status"].update(self.get_status_bar())
@@ -822,6 +853,7 @@ class GlassesVibeIDE:
                     continue
 
                 self.user_input = user_input
+                self.chat_messages.append({"role": "user", "content": user_input})
 
                 if user_input.startswith("/"):
                     cmd = user_input[1:].lower()
@@ -842,6 +874,7 @@ class GlassesVibeIDE:
                         self.last_file_name = ""
                         self.last_file_content = ""
                         self.user_input = ""
+                        self.chat_messages = []
                         console.print("[dim]Conversation history cleared.[/dim]")
                         continue
                     elif cmd == "models":
@@ -899,6 +932,7 @@ class GlassesVibeIDE:
 
                 parsed = JSONParser.clean_and_parse(response)
                 self.history.add("assistant", response)
+                self.chat_messages.append({"role": "assistant", "content": response})
 
                 dusunce = parsed.get("dusunce", "")
                 aksiyon = parsed.get("aksiyon", "mesaj_gonder")
