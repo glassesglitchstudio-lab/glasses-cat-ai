@@ -145,7 +145,7 @@ class GlassesVibeAgent:
             console.print("  [yellow]OpenRouter API Key gerekli![/yellow]")
             console.print("  [dim]https://openrouter.ai/settings/keys[/dim]")
             console.print()
-            api_key = Prompt.ask("  API Key", password=True)
+            api_key = input("  API Key yapistir (Ctrl+V): ").strip()
             if not api_key:
                 console.print("  [red]API key olmadan OpenRouter kullanilamaz.[/red]")
                 return None, None
