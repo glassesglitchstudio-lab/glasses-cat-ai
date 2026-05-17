@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-GlassesVibe - AGI CLI Agent v4.0
+GlassesVibe - AGI CLI Agent v5.0
 Niko Software
 """
 
@@ -16,6 +16,7 @@ from rich.syntax import Syntax
 from rich.live import Live
 from rich.spinner import Spinner
 from rich.prompt import Prompt
+from rich.rule import Rule
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
@@ -73,13 +74,7 @@ class GlassesVibeAgent:
     def show_banner(self):
         self.clear_screen()
         console.print()
-        console.print("   [bold]┌────────────────────────────────────────────┐[/bold]")
-        console.print("   [bold]│[/bold]                                            [bold]│[/bold]")
-        console.print("   [bold]│[/bold]    [bold cyan]GlassesVibe[/bold cyan]                            [bold]│[/bold]")
-        console.print("   [bold]│[/bold]    [dim]AGI CLI Agent v4.0[/dim]                      [bold]│[/bold]")
-        console.print("   [bold]│[/bold]    [dim]Niko Software[/dim]                         [bold]│[/bold]")
-        console.print("   [bold]│[/bold]                                            [bold]│[/bold]")
-        console.print("   [bold]└────────────────────────────────────────────┘[/bold]")
+        console.print("  [bold white]GlassesVibe[/bold white]")
         console.print()
 
     def show_welcome(self):
