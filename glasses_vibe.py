@@ -80,14 +80,16 @@ class GlassesVibeAgent:
     def show_banner(self):
         self.clear_screen()
         console.print()
-        console.print("[bold cyan]GlassesVibe[/bold cyan] [dim]v3.0[/dim]")
+        console.print()
+        console.print("         [bold white]GlassesVibe[/bold white]")
+        console.print("         [dim]v3.0[/dim]")
+        console.print()
         console.print(Rule(style="dim"))
         console.print()
 
     def show_welcome(self):
-        console.print("[bold]GlassesVibe AGI CLI Agent[/bold]")
-        console.print("[dim]Kod yaz, dosya olustur, sinirsiz guc seninle.[/dim]")
-        console.print("[dim]Yardim icin /help yaz.[/dim]")
+        console.print("  [dim]Kod yaz, dosya olustur, sinirsiz guc seninle.[/dim]")
+        console.print("  [dim]/help ile komutlari gor.[/dim]")
         console.print()
 
     def get_ollama_models(self):
@@ -106,12 +108,13 @@ class GlassesVibeAgent:
             return []
 
     def select_provider(self):
-        console.print("[bold]Model Saglayici Sec:[/bold]")
-        console.print("  [cyan]1[/cyan]) Ollama (Yerel Modeller)")
-        console.print("  [cyan]2[/cyan]) OpenRouter (Cloud API)")
+        console.print("  [bold]Model Saglayici Sec[/bold]")
+        console.print()
+        console.print("  [cyan]1[/cyan]  Ollama (Yerel Modeller)")
+        console.print("  [cyan]2[/cyan]  OpenRouter (Cloud API)")
         console.print()
 
-        choice = Prompt.ask("Secim", choices=["1", "2"], default="1")
+        choice = Prompt.ask("  Secim", choices=["1", "2"], default="1")
 
         if choice == "2":
             return "openrouter"
@@ -123,17 +126,18 @@ class GlassesVibeAgent:
 
         if not models:
             console.print()
-            console.print("[red]Hicbir Ollama modeli bulunamadi![/red]")
-            console.print("[dim]Model indirmek icin: ollama pull <model>[/dim]")
+            console.print("  [red]Hicbir Ollama modeli bulunamadi![/red]")
+            console.print("  [dim]Model indirmek icin: ollama pull <model>[/dim]")
             sys.exit(0)
 
         console.print()
-        console.print("[bold]Ollama Modelleri:[/bold]")
+        console.print("  [bold]Ollama Modelleri[/bold]")
+        console.print()
         for i, m in enumerate(models, 1):
-            console.print(f"  [cyan]{i}[/cyan]) {m['name']}  [dim]({m['size']})[/dim]")
+            console.print("  [cyan]{0}[/cyan]  {1}  [dim]({2})[/dim]".format(i, m['name'], m['size']))
         console.print()
 
-        choice = Prompt.ask("Model sec", default="1")
+        choice = Prompt.ask("  Model sec", default="1")
         try:
             idx = int(choice) - 1
             if 0 <= idx < len(models):
@@ -147,38 +151,39 @@ class GlassesVibeAgent:
         api_key = os.environ.get("OPENROUTER_API_KEY", "")
         if not api_key:
             console.print()
-            console.print("[yellow]OpenRouter API Key gerekli![/yellow]")
-            console.print("[dim]https://openrouter.ai/settings/keys adresinden al.[/dim]")
+            console.print("  [yellow]OpenRouter API Key gerekli![/yellow]")
+            console.print("  [dim]https://openrouter.ai/settings/keys[/dim]")
             console.print()
-            api_key = Prompt.ask("API Key gir", password=True)
+            api_key = Prompt.ask("  API Key", password=True)
             if not api_key:
-                console.print("[red]API key olmadan OpenRouter kullanilamaz.[/red]")
+                console.print("  [red]API key olmadan OpenRouter kullanilamaz.[/red]")
                 return None, None
 
         models = [
-            {"id": "google/gemini-2.5-flash", "name": "Google Gemini 2.5 Flash (Ucretsiz)"},
+            {"id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash (Ucretsiz)"},
             {"id": "meta-llama/llama-3.1-8b-instruct", "name": "Llama 3.1 8B (Ucretsiz)"},
             {"id": "mistralai/mistral-7b-instruct", "name": "Mistral 7B (Ucretsiz)"},
-            {"id": "google/gemini-2.5-pro", "name": "Google Gemini 2.5 Pro"},
+            {"id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro"},
             {"id": "anthropic/claude-sonnet-4-20250514", "name": "Claude Sonnet 4"},
-            {"id": "openai/gpt-4o", "name": "OpenAI GPT-4o"},
+            {"id": "openai/gpt-4o", "name": "GPT-4o"},
             {"id": "qwen/qwen2.5-coder-32b-instruct", "name": "Qwen 2.5 Coder 32B"},
         ]
 
         console.print()
-        console.print("[bold]OpenRouter Modelleri:[/bold]")
+        console.print("  [bold]OpenRouter Modelleri[/bold]")
+        console.print()
         for i, m in enumerate(models, 1):
-            console.print(f"  [cyan]{i}[/cyan]) {m['name']}")
-        console.print("  [cyan]8[/cyan]) Diger (manuel ID gir)")
+            console.print("  [cyan]{0}[/cyan]  {1}".format(i, m['name']))
+        console.print("  [cyan]8[/cyan]  Diger (manuel ID gir)")
         console.print()
 
-        choice = Prompt.ask("Model sec", default="1")
+        choice = Prompt.ask("  Model sec", default="1")
         try:
             idx = int(choice) - 1
             if 0 <= idx < len(models):
                 return models[idx]["id"], api_key
             elif idx == 7:
-                model_id = Prompt.ask("Model ID gir (orn: google/gemini-2.5-pro)")
+                model_id = Prompt.ask("  Model ID")
                 return model_id, api_key
         except ValueError:
             pass
@@ -277,12 +282,8 @@ class GlassesVibeAgent:
 
     def show_thought(self, thought):
         console.print()
-        console.print(Panel(
-            Text(thought, style="italic dim"),
-            title="thinking",
-            border_style="dim",
-            padding=(0, 1)
-        ))
+        console.print(f"  [dim]thinking...[/dim]")
+        console.print(f"  [dim]{thought}[/dim]")
 
     def show_file_created(self, file_path, content):
         ext = file_path.split('.')[-1] if '.' in file_path else "text"
@@ -292,57 +293,38 @@ class GlassesVibeAgent:
             syntax = Syntax(content, "text", theme="monokai", line_numbers=True, word_wrap=True)
 
         console.print()
-        console.print(Panel(
-            syntax,
-            title=f"file created: {file_path}",
-            border_style="green",
-            padding=(0, 0)
-        ))
+        console.print(f"  [green]file created: {file_path}[/green]")
+        console.print(syntax)
 
     def show_message(self, message):
         console.print()
-        console.print(Panel(
-            Markdown(message),
-            border_style="cyan",
-            padding=(0, 1)
-        ))
+        console.print(Markdown(message))
 
     def show_status(self):
         elapsed = time.time() - self.start_time
         minutes = int(elapsed // 60)
         seconds = int(elapsed % 60)
 
-        table = Table(show_header=False, box=None, padding=(0, 1))
-        table.add_column("key", style="dim")
-        table.add_column("value", style="bold")
-
-        table.add_row("provider", self.provider.upper())
-        table.add_row("model", self.model_name)
-        table.add_row("requests", str(self.request_count))
-        table.add_row("files created", str(self.file_count))
-        table.add_row("session", f"{minutes}m {seconds}s")
-
         console.print()
-        console.print(Panel(table, title="status", border_style="dim"))
+        console.print("  [dim]provider:[/dim] [bold]{0}[/bold]".format(self.provider.upper()))
+        console.print("  [dim]model:[/dim] {0}".format(self.model_name))
+        console.print("  [dim]requests:[/dim] {0}".format(self.request_count))
+        console.print("  [dim]files created:[/dim] {0}".format(self.file_count))
+        console.print("  [dim]session:[/dim] {0}m {1}s".format(minutes, seconds))
+        console.print()
 
     def show_commands(self):
-        table = Table(show_header=False, box=None, padding=(0, 1))
-        table.add_column("command", style="bold cyan")
-        table.add_column("description", style="dim")
-
-        table.add_row("/status", "Show session status")
-        table.add_row("/clear", "Clear conversation history")
-        table.add_row("/models", "List available models")
-        table.add_row("/help", "Show this help menu")
-        table.add_row("/exit", "Exit GlassesVibe")
-
         console.print()
-        console.print(Panel(table, title="commands", border_style="dim"))
+        console.print("  [bold cyan]/status[/bold cyan]     Show session status")
+        console.print("  [bold cyan]/clear[/bold cyan]      Clear conversation history")
+        console.print("  [bold cyan]/models[/bold cyan]     List available models")
+        console.print("  [bold cyan]/help[/bold cyan]       Show this help menu")
+        console.print("  [bold cyan]/exit[/bold cyan]       Exit GlassesVibe")
+        console.print()
 
     def get_input_prompt(self):
         model_short = self.model_name.split(":")[0] if ":" in self.model_name else self.model_name
-        provider_tag = "ollama" if self.provider == "ollama" else "cloud"
-        return f"[bold cyan]{model_short}[/bold cyan] [dim]({provider_tag})[/dim] > "
+        return f"[bold]>[/bold] "
 
     def run(self):
         self.show_banner()
@@ -362,7 +344,7 @@ class GlassesVibeAgent:
             self.model_name, self.api_key = result
 
         console.print()
-        console.print(Rule("session started", style="dim"))
+        console.print("  [dim]session started[/dim]")
         console.print()
 
         while True:
@@ -397,17 +379,16 @@ class GlassesVibeAgent:
                     if self.provider == "ollama":
                         models = self.get_ollama_models()
                         if models:
-                            table = Table(show_header=True, box=None)
-                            table.add_column("model", style="cyan")
-                            table.add_column("size", style="dim")
-                            for m in models:
-                                table.add_row(m["name"], m["size"])
                             console.print()
-                            console.print(Panel(table, title="ollama models", border_style="dim"))
+                            console.print("  [bold]Ollama Modelleri[/bold]")
+                            console.print()
+                            for m in models:
+                                console.print("  {0}  [dim]({1})[/dim]".format(m["name"], m["size"]))
+                            console.print()
                         else:
-                            console.print("[dim]No models found.[/dim]")
+                            console.print("  [dim]No models found.[/dim]")
                     else:
-                        console.print("[dim]OpenRouter models are selected at startup.[/dim]")
+                        console.print("  [dim]OpenRouter models are selected at startup.[/dim]")
                     continue
                 else:
                     console.print(f"[dim]Unknown command: /{cmd}. Type /help.[/dim]")
