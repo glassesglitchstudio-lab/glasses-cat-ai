@@ -783,8 +783,6 @@ class GlassesVibeIDE:
         input_text = Text()
         input_text.append("  💬 ", style="bold {0}".format(CYAN))
         input_text.append("Mesajınızı yazın ve Enter'a basın...", style="dim #ffffff")
-        input_text.append("  │  ", style="dim")
-        input_text.append("CEO Berkay", style="bold {0}".format(GREEN))
         return Panel(
             input_text,
             box=SIMPLE,
@@ -797,8 +795,7 @@ class GlassesVibeIDE:
         layout.split_column(
             Layout(name="header", size=10),
             Layout(name="main", ratio=1),
-            Layout(name="chat_input", size=3),
-            Layout(name="status", size=3)
+            Layout(name="chat_input", size=3)
         )
         layout["header"].split_row(
             Layout(self.get_logo_panel(), ratio=1)
@@ -812,7 +809,6 @@ class GlassesVibeIDE:
             Layout(self.get_chat_history_panel(), name="chat_history", ratio=1)
         )
         layout["chat_input"].update(self.get_chat_input_panel())
-        layout["status"].update(self.get_status_bar())
         return layout
 
     def run(self):
