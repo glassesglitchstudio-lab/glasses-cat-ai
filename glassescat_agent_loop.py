@@ -395,12 +395,12 @@ class AgentLoop:
                 except Exception:
                     pass
                 
-                # Ollama
+                # Ollama - Gemma 4 ile dene
                 try:
                     resp = session.post(
                         "http://localhost:11434/v1/chat/completions",
                         json={
-                            "model": "qwen2.5-coder:7b",
+                            "model": "gemma4:latest",
                             "messages": [
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}

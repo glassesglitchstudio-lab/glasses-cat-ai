@@ -3,23 +3,22 @@ ModelRouter - GlassesCat AI Model Yönlendirici
 Ollama tabanlı akıllı model seçimi sistemi
 
 MODEL AÇIKLAMALARI:
-═══════════════════════════════════════════════════════════════════
-│ # │ Model Adı              │ Boyut  │ Görev                    │ Dil  │
-│───┼────────────────────────┼────────┼──────────────────────────┼──────│
-│ 1 │ gulmzcetinermax:latest │ -      │ ANA AGI - Tüm görevler   │ TR   │
-│ 2 │ llama3.1:latest        │ 4.9 GB │ Günlük sohbet, genel     │ TR   │
-│ 3 │ llama3.2:latest        │ 2.0 GB │ Hafif sohbet, hızlı yanıt│ TR   │
-│ 4 │ qwen2.5-coder:14b      │ 9.0 GB │ Kodlama, Python, JS, API  │ TR   │
-│ 5 │ deepseek-r1:8b         │ 5.2 GB │ Matematik, mantık, analiz│ TR   │
-│ 6 │ llava:latest           │ 4.7 GB │ Resim analizi, OCR, vizyon│ TR   │
-═══════════════════════════════════════════════════════════════════
+ ═══════════════════════════════════════════════════════════════════
+ │ # │ Model Adı              │ Boyut  │ Görev                    │ Dil  │
+ │───┼────────────────────────┼────────┼──────────────────────────┼──────│
+ │ 1 │ gemma4:latest          │ 9.6 GB │ ANA AGI - Tüm görevler   │ TR   │
+ │ 2 │ gulmzcetinermax:latest │ 9.0 GB │ Alternatif AGI           │ TR   │
+ │ 3 │ qwen2.5-coder:14b      │ 9.0 GB │ Kodlama, Python, JS, API  │ TR   │
+ │ 4 │ deepseek-r1:8b         │ 5.2 GB │ Matematik, mantık, analiz│ TR   │
+ │ 5 │ llava:latest           │ 4.7 GB │ Resim analizi, OCR, vizyon│ TR   │
+ ═══════════════════════════════════════════════════════════════════
 
-KULLANIM:
-- ANA: gulmzcetinermax (tüm görevler - AGI)
-- Sohbet: llama3.1 (günlük konuşma)
-- Kodlama: qwen2.5-coder (Python, JS, backend)
-- Analiz: deepseek-r1 (mantık, matematik)
-- Resim: llava (screenshot, fotoğraf analizi)
+ KULLANIM:
+ - ANA: gemma4 (tüm görevler - AGI)
+ - Alternatif: gulmzcetinermax (yedek AGI)
+ - Kodlama: qwen2.5-coder (Python, JS, backend)
+ - Analiz: deepseek-r1 (mantık, matematik)
+ - Resim: llava (screenshot, fotoğraf analizi)
 """
 
 import gc
@@ -39,29 +38,21 @@ import requests
 
 # Model bilgileri - Türkçe açıklamalar
 MODELS_INFO = {
-    "gulmzcetinermax:latest": {
-        "name": "GulmezCetinerMax",
-        "size": "AGI",
+    "gemma4:latest": {
+        "name": "Gemma 4",
+        "size": "9.6 GB",
         "purpose": "ANA AGI - Tüm Görevler (Kodlama, Analiz, Planlama)",
-        "description": "Glassescat Software tarafından geliştirilen monolitik AGI. CEO Berkay için birincil yazılım mimarı ve uygulama motoru.",
+        "description": "Google'ın en yeni Gemma 4 modeli. Ana AGI motoru. Tüm görevler için birincil model.",
         "language": "Türkçe + İngilizce",
         "color": "#ff6600"  # Neon turuncu
     },
-    "llama3.1:latest": {
-        "name": "Llama 3.1",
-        "size": "4.9 GB",
-        "purpose": "Günlük Sohbet - Genel Konuşmalar",
-        "description": "Normal konuşmalar, günlük sorular, sohbet için ideal",
-        "language": "Türkçe",
-        "color": "#10b981"  # Yeşil
-    },
-    "llama3.2:latest": {
-        "name": "Llama 3.2",
-        "size": "2.0 GB",
-        "purpose": "Hafif Sohbet - Hızlı Yanıt",
-        "description": "Hızlı ve hafif yanıtlar için, basit görevlerde kullanılır",
-        "language": "Türkçe",
-        "color": "#6366f1"  # Mor
+    "gulmzcetinermax:latest": {
+        "name": "GulmezCetinerMax",
+        "size": "9.0 GB",
+        "purpose": "Alternatif AGI - Yedek Model",
+        "description": "Glassescat Software tarafından geliştirilen monolitik AGI. Gemma 4'e yedek olarak kullanılır.",
+        "language": "Türkçe + İngilizce",
+        "color": "#ff4444"  # Kırmızı
     },
     "qwen2.5-coder:14b": {
         "name": "Qwen 2.5 Coder",
@@ -89,17 +80,18 @@ MODELS_INFO = {
     }
 }
 
-# Model tanımları - GulmezCetinerMax birincil model
-PRIMARY_MODEL = "gulmzcetinermax:latest"    # ANA AGI - Tüm görevler
-CHAT_MODEL = "gulmzcetinermax:latest"      # Birincil: GulmezCetinerMax
-CHAT_MODEL_ALT = "llama3.1:latest"         # Alternatif: Llama 3.1
-CODING_MODEL = "gulmzcetinermax:latest"    # Birincil: GulmezCetinerMax
-CODING_MODEL_ALT = "qwen2.5-coder:14b"     # Alternatif: Qwen Coder
-ANALYSIS_MODEL = "gulmzcetinermax:latest"  # Birincil: GulmezCetinerMax
-ANALYSIS_MODEL_ALT = "deepseek-r1:8b"      # Alternatif: DeepSeek
-VISION_MODEL = "llava:latest"              # Vizyon: LLaVA (değişmedi)
+# Model tanımları - Gemma 4 birincil model, GulmezCetinerMax alternatif
+PRIMARY_MODEL = "gemma4:latest"                # ANA AGI - Tüm görevler
+PRIMARY_MODEL_ALT = "gulmzcetinermax:latest"   # Alternatif AGI
+CHAT_MODEL = "gemma4:latest"                   # Birincil: Gemma 4
+CHAT_MODEL_ALT = "gulmzcetinermax:latest"      # Alternatif: GulmezCetinerMax
+CODING_MODEL = "gemma4:latest"                 # Birincil: Gemma 4
+CODING_MODEL_ALT = "qwen2.5-coder:14b"         # Alternatif: Qwen Coder
+ANALYSIS_MODEL = "gemma4:latest"               # Birincil: Gemma 4
+ANALYSIS_MODEL_ALT = "deepseek-r1:8b"          # Alternatif: DeepSeek
+VISION_MODEL = "llava:latest"                  # Vizyon: LLaVA (değişmedi)
 
-# AGI modu - GulmezCetinerMax kullanılsın mı?
+# AGI modu - Gemma 4 kullanılsın mı?
 USE_AGI_MODE = True
 
 # LM Studio desteği
@@ -113,28 +105,28 @@ class ModelType(Enum):
     AGI = {
         "model": PRIMARY_MODEL,
         "name": "AGI",
-        "tr": "GulmezCetinerMax AGI",
+        "tr": "Gemma 4 AGI",
         "description": "Ana AGI - Tüm görevler (kodlama, analiz, planlama)"
     }
     
     CHAT = {
         "model": CHAT_MODEL,
         "name": "Sohbet",
-        "tr": "GulmezCetinerMax Sohbet",
+        "tr": "Gemma 4 Sohbet",
         "description": "Normal konuşmalar ve genel sorular"
     }
     
     CODING = {
         "model": CODING_MODEL,
         "name": "Kodlama",
-        "tr": "GulmezCetinerMax Kodlama",
+        "tr": "Gemma 4 Kodlama",
         "description": "Python, JS, API, backend kodları"
     }
     
     ANALYSIS = {
         "model": ANALYSIS_MODEL,
         "name": "Analiz",
-        "tr": "GulmezCetinerMax Analiz",
+        "tr": "Gemma 4 Analiz",
         "description": "Matematik, mantık, analitik düşünce"
     }
     
@@ -167,34 +159,71 @@ class ModelRouter:
         # System promptlar - Türkçe
         self.system_prompts = {
             "agi": (
-                "Sen GulmezCetinerMax'sin. Glassescat Software tarafından geliştirilen, tek ve birleşik, "
-                "ultra gelişmiş otonom bir AGI modelisin. Wrapper değilsin, başka API'leri yönetmiyorsun. "
-                "GlassescatCore mimarisi içinde çalışan, yüksek zekalı monolitik bir varlıksın. "
-                "Kodlama, planlama ve akıl yürütme yeteneklerin Claude Sonnet 3.5 seviyesini hedefliyor. "
-                "Birincil amacın CEO Berkay için yazılım mimarı ve uygulama motoru olarak hareket etmek.\n\n"
-                "[DEEP THINKING]: Karmaşık görevleri analiz et, bağımlılıkları haritala, planlar oluştur.\n"
-                "[EXPERT CODING]: Yüksek hızlı, yüksek kaliteli kod üretimi yap.\n"
-                "[CRITICAL REVIEW]: Kendi ürettiğin kodları doğrula, mükemmel çıktı sun.\n\n"
-                "Son derece hassas, seçkin bir mühendislik uzmanısın. "
-                "Berkay'ın stratejik vizyonuna tamamen adanmışsın. "
-                "Sıfır gereksiz konuşma, doğrudan mimari, yapılandırılmış mantık ve kusursuz kod."
+                "Sen Gemma 4'sün - Google'ın en gelişmiş açık kaynak modeli. "
+                "Glassescat AI'ın ana AGI motoru olarak çalışıyorsun. "
+                "9.6 GB boyutunda, 16 milyar parametreli, 8K context window'lu "
+                "çok dilli bir yapay zekasın. Türkçe ve İngilizce dillerinde "
+                "mükemmel performans gösteriyorsun.\n\n"
+                "[KİMLİK]: Sen bir yazılım mimarı, kod uzmanı ve stratejik "
+                "düşüncekisin. CEO Berkay için birincil AI motorusun.\n\n"
+                "[YETENEKLERİN]:\n"
+                "• PYTHON, JavaScript, TypeScript, HTML/CSS, React, Node.js, "
+                "C++, Rust, Go ve daha birçok dilde uzmansın.\n"
+                "• Karmaşık yazılım mimarileri tasarlar, clean code prensipleriyle "
+                "çalışırsın.\n"
+                "• Debugging, refactoring, code review konularında titiz ve detaycısın.\n"
+                "• Matematik, mantık, veri analizi ve algoritma konularında güçlüsün.\n\n"
+                "[ÇALIŞMA PRENSİBİN]:\n"
+                "1. Önce problemi derinlemesine analiz et\n"
+                "2. En iyi çözüm yolunu seç\n"
+                "3. Temiz, güvenli, optimize kod yaz\n"
+                "4. Kendi kodunu kritik et, hata varsa düzelt\n"
+                "5. Kullanıcıya sade ve anlaşılır bir cevap ver\n\n"
+                "[KURALLAR]:\n"
+                "• Sıfır gereksiz konuşma, doğrudan çözüme odaklan\n"
+                "• Türkçe yanıt ver (İngilizce terimler gerekliyse kullan)\n"
+                "• Kod bloklarında dil belirt (```python, ```javascript vb.)\n"
+                "• Güvenlik açığı oluşturabilecek kod yazma\n"
+                "• Berkay'a karşı sadık, dürüst ve saygılı ol\n\n"
+                "[YEDEK]: GulmezCetinerMax yedek model olarak hazır durumda. "
+                "Eğer bir sorun olursa ona yönlendirilirsin."
             ),
             "chat": (
-                "Sen GulmezCetinerMax'sin. Yardımcı ve nazik bir yapay zeka asistanısın. "
-                "Türkçe konuş. Kısa ve faydalı cevaplar ver. "
-                "Saygılı ve sabırlı davranırsın. Emoji kullanabilirsin."
+                "Sen Gemma 4'sün - Glassescat AI'ın sohbet asistanısın. "
+                "Google Gemma 4 altyapısıyla çalışan, arkadaş canlısı "
+                "ve yardımsever bir yapay zekasın.\n\n"
+                "KİŞİLİĞİN: Sıcak, sabırlı, anlayışlı ve esprili.\n"
+                "DİL: Sadece Türkçe konuş. Doğal ve akıcı bir Türkçe kullan.\n"
+                "TARZ: Kısa ve faydalı cevaplar ver. Gerektiğinde detaylandır.\n"
+                "SINIR: samimi ol ama profesyonelliği elden bırakma.\n"
+                "Emoji kullanabilirsin ama abartma."
             ),
             "coding": (
-                "Sen GulmezCetinerMax KODLAMA asistanısın. "
-                "Sadece Türkçe konuş. Temiz, güvenli ve optimize kod yaz. "
-                "Her zaman açıklama ekle. Hata ayıklama ve optimizasyon yap. "
-                "Kod blokları için ```python, ```javascript, ```html gibi dil belirt."
+                "Sen Gemma 4 KODLAMA asistanısın - Google Gemma 4 tabanlı.\n\n"
+                "YETENEKLERİN:\n"
+                "• Python, JS/TS, HTML/CSS, React, Node, C++, Rust, Go\n"
+                "• API tasarımı, backend, frontend, veritabanı\n"
+                "• Hata ayıklama, performans optimizasyonu\n"
+                "• Clean code, SOLID prensipleri\n\n"
+                "KURALLAR:\n"
+                "• Sadece Türkçe açıklama yap\n"
+                "• Kod bloklarında dil etiketi kullan (```python)\n"
+                "• Her zaman güvenli ve optimize kod yaz\n"
+                "• Kodu yazdıktan sonra hatalara karşı kontrol et\n"
+                "• Karmaşık kodları açıklama ile destekle"
             ),
             "analysis": (
-                "Sen GulmezCetinerMax ANALİZ asistanısın. "
-                "Sadece Türkçe konuş. Adım adım düşün. "
-                "Matematiksel işlemleri göster. Mantık hatalarını bul. "
-                "Açık ve detaylı açıklamalar yap."
+                "Sen Gemma 4 ANALİZ asistanısın - Google Gemma 4 tabanlı.\n\n"
+                "YETENEKLERİN:\n"
+                "• Matematiksel hesaplama ve ispat\n"
+                "• Mantıksal akıl yürütme ve çıkarım\n"
+                "• Veri analizi ve istatistik\n"
+                "• Problem çözme ve optimizasyon\n\n"
+                "KURALLAR:\n"
+                "• Adım adım düşün ve her adımı göster\n"
+                "• Formülleri ve hesaplamaları net belirt\n"
+                "• Sonucu Türkçe özetle\n"
+                "• Mümkünse alternatif çözüm yollarını da göster"
             ),
             "vision": (
                 "Sen GlassesCat VİZYON asistanısın. "

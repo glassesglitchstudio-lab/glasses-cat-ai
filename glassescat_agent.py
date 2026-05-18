@@ -994,16 +994,17 @@ class GlassescatNotes:
 
 # ===== AI ENTEGRASYONU =====
 class GlassescatAI:
-    """AI sohbet sistemi (Ollama)"""
+    """AI sohbet sistemi (Ollama - Gemma 4)"""
     
     OLLAMA_URL = "http://localhost:11434/api/generate"
-    DEFAULT_MODEL = "llama3.2"
+    DEFAULT_MODEL = "gemma4:latest"
+    ALT_MODEL = "gulmzcetinermax:latest"
     
     @staticmethod
     def chat(message: str, model: str = None) -> Dict:
         """AI ile sohbet et"""
         if model is None:
-            model = NikoAI.DEFAULT_MODEL
+            model = GlassescatAI.DEFAULT_MODEL
         
         try:
             import requests
@@ -1013,7 +1014,7 @@ class GlassescatAI:
                 "stream": False
             }
             
-            response = requests.post(NikoAI.OLLAMA_URL, json=payload, timeout=60)
+            response = requests.post(GlassescatAI.OLLAMA_URL, json=payload, timeout=60)
             
             if response.status_code == 200:
                 result = response.json()
@@ -1146,7 +1147,7 @@ class GlassescatAgent:
         self.apps = GlassescatApps
         self.files = NikoFiles
         self.notes = GlassescatNotes
-        self.ai = NikoAI
+        self.ai = GlassescatAI
         self.control = NikoControl
         
         # Komutlar
