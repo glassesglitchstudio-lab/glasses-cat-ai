@@ -15,7 +15,7 @@
 ║         ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝            ║
 ║                                                                           ║
 ║          COKLU-DIL PLUGIN ALT SISTEMI / MULTI-LANGUAGE PLUGIN            ║
-║                    Erkay Software - Lead Engineer AI                      ║
+║                    Berkay Software - Lead Engineer AI                      ║
 ║                         Version 1.0 - SWA 1.6                            ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -2867,7 +2867,7 @@ async def demo() -> None:
     """
     print("=" * 60)
     print("  NIKO AI COKLU-DIL PLUGIN SISTEMI - Test")
-    print("  Erkay Software - Lead Engineer AI")
+    print("  Berkay Software - Lead Engineer AI")
     print("=" * 60)
 
     logging.basicConfig(

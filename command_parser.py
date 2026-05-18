@@ -14,14 +14,14 @@
 ║                         ██║  ██║███████╗                                        ║
 ║                         ╚═╝  ╚═╝╚══════╝                                        ║
 ║                      GLASSESCAT AUTONOMOUS ENGINE                              ║
-║                    Erkay Software - Lead Engineer AI                          ║
+║                    Berkay Software - Lead Engineer AI                          ║
 ║                         Version 2.0 - SWA 1.6                                  ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 
 User Intent System - Command Parser
 Kullanıcı Niyeti Algilama ve Komut Ayristirma
-Erkay Software - Lead Engineer AI
+Berkay Software - Lead Engineer AI
 
 Modlar:
 - [G] Game Mod: Oyun gelistirme ve oyunla ilgili islemler
@@ -910,7 +910,7 @@ class FileRetry:
     GlassesCat Retry Sistemi
     Dosya islemlerinde 'Erisim Engellendi' ve 'Dosya Kullanimda' hatalarini otomatik asar
     
-    Erkay Software - Lead Engineer AI
+    Berkay Software - Lead Engineer AI
     """
     
     MAX_RETRIES = 5
@@ -988,7 +988,7 @@ class FileRetry:
 def run_command_parser():
     print("=" * 60)
     print("  GLASSESCAT USER INTENT - COMMAND PARSER")
-    print("  Erkay Software - Lead Engineer AI")
+    print("  Berkay Software - Lead Engineer AI")
     print("=" * 60)
     print()
     print("Modlar:")

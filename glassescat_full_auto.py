@@ -1,7 +1,7 @@
 ﻿"""
 GlassesCat - TAM OTOMATIK SISTEM
 Web + Godot + Command Parser - Hepsi Otomatik!
-Erkay Software - Lead Engineer AI
+Berkay Software - Lead Engineer AI
 """
 
 import os

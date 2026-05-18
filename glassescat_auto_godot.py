@@ -1,6 +1,6 @@
 ﻿"""
 GlassesCat - TAM OTOMATİK GODOT SİSTEMİ
-Erkay Software - Lead Engineer AI
+Berkay Software - Lead Engineer AI
 Otomatik: Kod Üretimi -> Godot Proje Oluşturma -> Çalıştırma
 """
 

@@ -16,7 +16,7 @@
 ║                                                                           ║
 ║              NIKO AI / GLASSCAT SKILL SISTEMI v1.0                       ║
 ║           Yapay Zeka Yetenek Paketleri ve Domain Uzmanligi               ║
-║                    Erkay Software - Lead Engineer AI                      ║
+║                    Berkay Software - Lead Engineer AI                      ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 

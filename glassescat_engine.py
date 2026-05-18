@@ -1,6 +1,6 @@
 """
 GlassesCat Engine v1.0
-Erkay Software - Lead Engineer AI
+Berkay Software - Lead Engineer AI
 Otomatik Hata Tespiti ve Düzeltme Sistemi
 Düşünce Akışı Entegrasyonlu
 """
@@ -304,7 +304,7 @@ class ErrorFixEngine:
 class GlassesCat:
     """
     GlassesCat Ana Sistemi
-    Erkay Software Lead Engineer AI
+    Berkay Software Lead Engineer AI
     """
     
     def __init__(self):
@@ -355,7 +355,7 @@ class GlassesCat:
         """GlassesCat durum raporu"""
         return {
             "name": "GlassesCat",
-            "role": "Erkay Software Lead Engineer",
+            "role": "Berkay Software Lead Engineer",
             "version": "1.0",
             "error_fix": "Active",
             "thoughts_count": len(GLASSESCAT_THOUGHTS),

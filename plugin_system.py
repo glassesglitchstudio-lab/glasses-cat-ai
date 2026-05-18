@@ -15,7 +15,7 @@
 ║                    ╚══════╝   ╚═╝   ╚══════╝   ╚═╝                        ║
 ║                                                                           ║
 ║              NIKO AI / GLASSCAT PLUGIN & EKLENTI SISTEMI                  ║
-║                    Erkay Software - Lead Engineer AI                      ║
+║                    Berkay Software - Lead Engineer AI                      ║
 ║                         Version 1.0 - SWA 1.6                            ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -281,7 +281,7 @@ class BasePlugin(metaclass=PluginIsolationMeta):
                 self.metadata = PluginMetadata(
                     name="Hava Durumu",
                     version="1.0.0",
-                    author="Erkay",
+                    author="Berkay",
                     description="Hava durumu bilgisi gosterir"
                 )
 
@@ -2363,7 +2363,7 @@ if __name__ == "__main__":
     # ----------------------------------------------------------------
     print("=" * 60)
     print("  NIKO AI PLUGIN SISTEMI - Test")
-    print("  Erkay Software - Lead Engineer AI")
+    print("  Berkay Software - Lead Engineer AI")
     print("=" * 60)
 
     logging.basicConfig(
@@ -2394,7 +2394,7 @@ if __name__ == "__main__":
     print("\nOrnek plugin sablonu olusturuluyor...")
     template = create_plugin_template(
         name="Hava Durumu",
-        author="Erkay",
+        author="Berkay",
         description="Canli hava durumu bilgisi",
         command="hava",
     )

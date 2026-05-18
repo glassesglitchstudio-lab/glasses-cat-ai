@@ -11,7 +11,7 @@
 - **System Prompt:** Kodlama standartları ve davranış kuralları eklendi
 
 ### Test Sonuçları
-- Kendini tanıtma: Başarılı (Erkay patron referansı, Niko Software)
+- Kendini tanıtma: Başarılı (Berkay patron referansı, Niko Software)
 - Binary Search Tree: Hatısız Python kodu
 - Flask REST API: GET/POST endpoint'leri, hata yönetimi dahil
 
@@ -31,4 +31,4 @@
 - Base: qwen2.5-coder:14b
 - Monolithic AGI mimarisi
 - GlassesCat AI entegrasyonu
-- CEO Erkay yetkilendirmesi
+- CEO Berkay yetkilendirmesi
