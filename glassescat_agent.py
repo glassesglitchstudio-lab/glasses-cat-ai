@@ -994,10 +994,10 @@ class GlassescatNotes:
 
 # ===== AI ENTEGRASYONU =====
 class GlassescatAI:
-    """AI sohbet sistemi (Ollama - Gemma 4)"""
+    """AI sohbet sistemi (Ollama - GulmezCetiner V3A)"""
     
     OLLAMA_URL = "http://localhost:11434/api/generate"
-    DEFAULT_MODEL = "gemma4:latest"
+    DEFAULT_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"
     ALT_MODEL = "gulmzcetinermax:latest"
     
     @staticmethod

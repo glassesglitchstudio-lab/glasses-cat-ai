@@ -28,11 +28,11 @@
 
 ### 🎯 Kullanım
 ```bash
-ollama run glassesglitchstudio/gulmzcetiner:V3A
+ollama run gemma4:latest
 ```
 
 ### 📝 System Prompt
-Model, CEO **Berkay** (GlassesSoftware Kurucusu) için bir siber ortak olarak yapılandırılmıştır. Kodlama, oyun bilgisi ve otonom ajan görevlerinde yüksek performans gösterir.
+Model, herkesin kullanımına açık şekilde yapılandırılmıştır. Kodlama, oyun bilgisi ve otonom ajan görevlerinde yüksek performans gösterir.
 
 ---
 

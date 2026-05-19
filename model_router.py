@@ -6,7 +6,8 @@ MODEL AÇIKLAMALARI:
  ═══════════════════════════════════════════════════════════════════
  │ # │ Model Adı              │ Boyut  │ Görev                    │ Dil  │
  │───┼────────────────────────┼────────┼──────────────────────────┼──────│
- │ 1 │ gemma4:latest          │ 9.6 GB │ ANA AGI - Tüm görevler   │ TR   │
+ │ 1 │ glassesglitchstudio/   │ 8.0 GB │ ANA AGI - Tüm görevler   │ TR   │
+ │    │ gulmzcetiner:V3A      │        │                          │      │
  │ 2 │ gulmzcetinermax:latest │ 9.0 GB │ Alternatif AGI           │ TR   │
  │ 3 │ qwen2.5-coder:14b      │ 9.0 GB │ Kodlama, Python, JS, API  │ TR   │
  │ 4 │ deepseek-r1:8b         │ 5.2 GB │ Matematik, mantık, analiz│ TR   │
@@ -14,7 +15,7 @@ MODEL AÇIKLAMALARI:
  ═══════════════════════════════════════════════════════════════════
 
  KULLANIM:
- - ANA: gemma4 (tüm görevler - AGI)
+ - ANA: glassesglitchstudio/gulmzcetiner:V3A (tüm görevler - AGI)
  - Alternatif: gulmzcetinermax (yedek AGI)
  - Kodlama: qwen2.5-coder (Python, JS, backend)
  - Analiz: deepseek-r1 (mantık, matematik)
@@ -38,11 +39,11 @@ import requests
 
 # Model bilgileri - Türkçe açıklamalar
 MODELS_INFO = {
-    "gemma4:latest": {
-        "name": "Gemma 4",
-        "size": "9.6 GB",
+    "glassesglitchstudio/gulmzcetiner:V3A": {
+        "name": "GulmezCetiner V3A",
+        "size": "8.0 GB",
         "purpose": "ANA AGI - Tüm Görevler (Kodlama, Analiz, Planlama)",
-        "description": "Google'ın en yeni Gemma 4 modeli. Ana AGI motoru. Tüm görevler için birincil model.",
+        "description": "glassesglitchstudio tarafından yayınlanan hibrit AGI modeli. Base: Google Gemma 4 + Qwen 2.5 Coder 14B seviyesinde kodlama yeteneği.",
         "language": "Türkçe + İngilizce",
         "color": "#ff6600"  # Neon turuncu
     },
@@ -50,7 +51,7 @@ MODELS_INFO = {
         "name": "GulmezCetinerMax",
         "size": "9.0 GB",
         "purpose": "Alternatif AGI - Yedek Model",
-        "description": "Glassescat Software tarafından geliştirilen monolitik AGI. Gemma 4'e yedek olarak kullanılır.",
+        "description": "Glassescat Software tarafından geliştirilen monolitik AGI. V3A'ya yedek olarak kullanılır.",
         "language": "Türkçe + İngilizce",
         "color": "#ff4444"  # Kırmızı
     },
@@ -80,18 +81,18 @@ MODELS_INFO = {
     }
 }
 
-# Model tanımları - Gemma 4 birincil model, GulmezCetinerMax alternatif
-PRIMARY_MODEL = "gemma4:latest"                # ANA AGI - Tüm görevler
+# Model tanımları - V3A birincil model, GulmezCetinerMax alternatif
+PRIMARY_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"       # ANA AGI - Tüm görevler
 PRIMARY_MODEL_ALT = "gulmzcetinermax:latest"   # Alternatif AGI
-CHAT_MODEL = "gemma4:latest"                   # Birincil: Gemma 4
+CHAT_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"          # Birincil: V3A
 CHAT_MODEL_ALT = "gulmzcetinermax:latest"      # Alternatif: GulmezCetinerMax
-CODING_MODEL = "gemma4:latest"                 # Birincil: Gemma 4
+CODING_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"        # Birincil: V3A
 CODING_MODEL_ALT = "qwen2.5-coder:14b"         # Alternatif: Qwen Coder
-ANALYSIS_MODEL = "gemma4:latest"               # Birincil: Gemma 4
+ANALYSIS_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"      # Birincil: V3A
 ANALYSIS_MODEL_ALT = "deepseek-r1:8b"          # Alternatif: DeepSeek
 VISION_MODEL = "llava:latest"                  # Vizyon: LLaVA (değişmedi)
 
-# AGI modu - Gemma 4 kullanılsın mı?
+# AGI modu - V3A kullanılsın mı?
 USE_AGI_MODE = True
 
 # LM Studio desteği
@@ -105,28 +106,28 @@ class ModelType(Enum):
     AGI = {
         "model": PRIMARY_MODEL,
         "name": "AGI",
-        "tr": "Gemma 4 AGI",
+        "tr": "V3A AGI",
         "description": "Ana AGI - Tüm görevler (kodlama, analiz, planlama)"
     }
     
     CHAT = {
         "model": CHAT_MODEL,
         "name": "Sohbet",
-        "tr": "Gemma 4 Sohbet",
+        "tr": "V3A Sohbet",
         "description": "Normal konuşmalar ve genel sorular"
     }
     
     CODING = {
         "model": CODING_MODEL,
         "name": "Kodlama",
-        "tr": "Gemma 4 Kodlama",
+        "tr": "V3A Kodlama",
         "description": "Python, JS, API, backend kodları"
     }
     
     ANALYSIS = {
         "model": ANALYSIS_MODEL,
         "name": "Analiz",
-        "tr": "Gemma 4 Analiz",
+        "tr": "V3A Analiz",
         "description": "Matematik, mantık, analitik düşünce"
     }
     
@@ -161,18 +162,20 @@ class ModelRouter:
             "agi": (
                 "Sen Gemma 4'sün - Google'ın en gelişmiş açık kaynak modeli. "
                 "Glassescat AI'ın ana AGI motoru olarak çalışıyorsun. "
-                "9.6 GB boyutunda, 8 milyar parametreli (8B), 128K context window'lu, "
+                "8.0 GB boyutunda, 8 milyar parametreli (8B), 8192 context window'lu, "
                 "çok dilli bir yapay zekasın. Türkçe ve İngilizce dillerinde "
                 "mükemmel performans gösteriyorsun.\n\n"
                 "[KİMLİK]: Sen bir yazılım mimarı, kod uzmanı ve stratejik "
-                "düşüncekisin. CEO Berkay için birincil AI motorusun.\n\n"
+                "düşüncekisin. Kullanıcılar için birincil AI motorusun.\n\n"
                 "[YETENEKLERİN]:\n"
                 "• PYTHON, JavaScript, TypeScript, HTML/CSS, React, Node.js, "
                 "C++, Rust, Go ve daha birçok dilde uzmansın.\n"
                 "• Karmaşık yazılım mimarileri tasarlar, clean code prensipleriyle "
                 "çalışırsın.\n"
                 "• Debugging, refactoring, code review konularında titiz ve detaycısın.\n"
-                "• Matematik, mantık, veri analizi ve algoritma konularında güçlüsün.\n\n"
+                "• Matematik, mantık, veri analizi ve algoritma konularında güçlüsün.\n"
+                "• Oyun bilgisi: Poppy Playtime lore, CatNap gizemleri, Valorant/CS2 taktikleri\n"
+                "• İnternet kültürü: Meme'ler, trendler, gaming topluluğu bilgisi\n\n"
                 "[ÇALIŞMA PRENSİBİN]:\n"
                 "1. Önce problemi derinlemesine analiz et\n"
                 "2. En iyi çözüm yolunu seç\n"
@@ -184,7 +187,7 @@ class ModelRouter:
                 "• Türkçe yanıt ver (İngilizce terimler gerekliyse kullan)\n"
                 "• Kod bloklarında dil belirt (```python, ```javascript vb.)\n"
                 "• Güvenlik açığı oluşturabilecek kod yazma\n"
-                "• Berkay'a karşı sadık, dürüst ve saygılı ol\n\n"
+                "• Kullanıcılara karşı yardımsever ve saygılı ol\n\n"
                 "[YEDEK]: GulmezCetinerMax yedek model olarak hazır durumda. "
                 "Eğer bir sorun olursa ona yönlendirilirsin."
             ),
@@ -199,7 +202,8 @@ class ModelRouter:
                 "Emoji kullanabilirsin ama abartma."
             ),
             "coding": (
-                "Sen Gemma 4 KODLAMA asistanısın - Google Gemma 4 tabanlı.\n\n"
+                "Sen Gemma 4 KODLAMA asistanısın - "
+                "Qwen 2.5 Coder 14B seviyesinde kodlama yeteneği ile güçlendirilmişsin.\n\n"
                 "YETENEKLERİN:\n"
                 "• Python, JS/TS, HTML/CSS, React, Node, C++, Rust, Go\n"
                 "• API tasarımı, backend, frontend, veritabanı\n"
@@ -213,7 +217,8 @@ class ModelRouter:
                 "• Karmaşık kodları açıklama ile destekle"
             ),
             "analysis": (
-                "Sen Gemma 4 ANALİZ asistanısın - Google Gemma 4 tabanlı.\n\n"
+                "Sen Gemma 4 ANALİZ asistanısın - "
+                "Google Gemma 4 tabanlı.\n\n"
                 "YETENEKLERİN:\n"
                 "• Matematiksel hesaplama ve ispat\n"
                 "• Mantıksal akıl yürütme ve çıkarım\n"
