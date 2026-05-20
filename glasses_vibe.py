@@ -13,6 +13,8 @@ import re
 import time
 import subprocess
 import requests
+import webbrowser
+import urllib.parse
 from rich.console import Console
 from rich.panel import Panel
 from rich.layout import Layout
@@ -1039,6 +1041,60 @@ class GlassesVibeIDE:
                 self.status = "IDLE"
                 self.status_detail = ""
                 console.print()
+
+
+# ═══════════════════════════════════════════════════════════════
+# GLASSESGLITCHSTUDIO / GULMZCETINER V4+ — Text-to-Image Motoru
+#═══════════════════════════════════════════════════════════════
+# Tamamen ücretsiz · Sınırsız kullanım · API anahtarı gerekmez
+# Hiçbir yerel kurulum yok · Donanım yükü SIFIR
+# Altyapı: https://image.pollinations.ai/p/ (halka açık bulut)
+#═══════════════════════════════════════════════════════════════
+
+def v4_gorsel_olustur(prompt):
+    """
+    Kullanıcının yazdığı prompt metnini alır,
+    Pollinations.ai üzerinden 1920×1080 Flux kalitesinde
+    görsel üretir ve tarayıcıda açar.
+
+    Parametre:
+        prompt (str): "bir kedi" gibi görsel açıklaması
+
+    Geri Döndürür:
+        str: Oluşturulan görselin tam URL'i
+    """
+    # Prompt'u URL güvenli hale getir (Türkçe karakterler, boşluklar vs.)
+    guvenli_prompt = urllib.parse.quote(prompt)
+
+    # V4+ görsel linkini oluştur: geniş ekran + Flux model
+    gorsel_url = (
+        "https://image.pollinations.ai/p/"
+        + guvenli_prompt
+        + "?width=1920&height=1080&model=flux"
+    )
+
+    # Görseli doğrudan Erkay patronun tarayıcısında aç
+    webbrowser.open(gorsel_url)
+
+    return gorsel_url
+
+def v4_gorsel_olustur_console(prompt):
+    """
+    V4+ motorunu konsoldan çalıştırır,
+    durumu Glasses Vibe arayüzüne uygun şekilde gösterir.
+    """
+    console.print("[bold {0}═══ V4+ GÖRSEL ÜRETİM MOTORU ═══[/bold {0}]".format(CYAN))
+    console.print("[dim]{0}[/dim]".format(prompt))
+    console.print()
+
+    with console.status("[bold {0}]Görsel oluşturuluyor...[/bold {0}]".format(YELLOW)):
+        url = v4_gorsel_olustur(prompt)
+        time.sleep(0.5)
+
+    console.print("[bold {0}✓[/bold {0}] [bold]V4+ Görsel hazır![/bold]".format(GREEN))
+    console.print("[dim]{0}[/dim]".format(url))
+    console.print("[bold {0}▶[/bold {0}] Tarayıcıda açıldı, Berkay patron!".format(MAGENTA))
+    console.print()
 
 
 def main():
