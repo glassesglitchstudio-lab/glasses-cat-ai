@@ -233,6 +233,8 @@
         @keyframes b { 0%,80%,100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
         @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
+        @keyframes v4Pulse { 0%,100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.08); opacity: 1; } }
+
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb {
@@ -693,20 +695,38 @@
                         </div>
                         <div style="font-size:11px;color:var(--text2);margin-top:4px;">glassesglitchstudio/gulmzcetiner:V4Plus — Sıfır kurulum, sınırsız ücretsiz</div>
                     </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;min-height:260px;">
-                        <div id="v4ImageContainer" style="width:100%;max-width:560px;min-height:200px;border-radius:12px;border:1px dashed rgba(255,107,0,0.2);display:flex;align-items:center;justify-content:center;background:rgba(255,107,0,0.03);overflow:hidden;">
-                            <div id="v4Placeholder" style="text-align:center;color:var(--text2);padding:20px;">
-                                <div style="font-size:32px;margin-bottom:8px;">🎨</div>
-                                <div style="font-size:13px;">V4+ görselin burada görünecek</div>
-                                <div style="font-size:11px;margin-top:4px;">Bir prompt yaz ve "Oluştur"a bas</div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;min-height:260px;position:relative;">
+                        <div id="v4ImageContainer" style="width:100%;max-width:560px;min-height:240px;border-radius:12px;border:1px dashed rgba(255,107,0,0.2);display:flex;align-items:center;justify-content:center;background:rgba(255,107,0,0.03);overflow:hidden;">
+                            <div id="v4Placeholder" style="text-align:center;color:var(--text2);padding:30px;width:100%;">
+                                <div style="font-size:36px;margin-bottom:10px;">🎨</div>
+                                <div style="font-size:14px;font-weight:500;">V4+ Görsel Üretim Motoru</div>
+                                <div style="font-size:12px;margin-top:6px;color:var(--text2);">Bir prompt yaz ve "✨ Oluştur" butonuna bas</div>
+                                <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                                    <span style="font-size:10px;background:rgba(255,107,0,0.1);padding:3px 10px;border-radius:10px;color:var(--text2);">🌅 manzara</span>
+                                    <span style="font-size:10px;background:rgba(255,107,0,0.1);padding:3px 10px;border-radius:10px;color:var(--text2);">🐱 kedi</span>
+                                    <span style="font-size:10px;background:rgba(255,107,0,0.1);padding:3px 10px;border-radius:10px;color:var(--text2);">🌼 çiçek</span>
+                                    <span style="font-size:10px;background:rgba(255,107,0,0.1);padding:3px 10px;border-radius:10px;color:var(--text2);">🌃 gece</span>
+                                </div>
+                            </div>
+                            <div id="v4Loading" style="display:none;text-align:center;padding:30px;width:100%;">
+                                <div style="width:60px;height:60px;margin:0 auto 12px;border-radius:50%;background:linear-gradient(135deg,#ff6b00,#ff8c38);display:flex;align-items:center;justify-content:center;animation:v4Pulse 1.2s ease-in-out infinite;box-shadow:0 0 30px rgba(255,107,0,0.3);">
+                                    <span style="font-size:24px;color:#fff;">✨</span>
+                                </div>
+                                <div style="font-size:13px;font-weight:500;background:linear-gradient(135deg,#ff6b00,#ff8c38);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">V4+ Görsel Oluşturuluyor...</div>
+                                <div id="v4LoadingPrompt" style="font-size:11px;color:var(--text2);margin-top:6px;">&nbsp;</div>
+                                <div class="dotz" style="justify-content:center;margin-top:10px;"><span></span><span></span><span></span></div>
                             </div>
                             <img id="v4Image" src="" style="width:100%;display:none;border-radius:12px;" alt="V4+ Generated Image">
                         </div>
-                        <div id="v4Status" style="font-size:11px;color:var(--text2);min-height:16px;">&nbsp;</div>
+                        <div id="v4Status" style="font-size:11px;color:var(--text2);min-height:18px;">&nbsp;</div>
                     </div>
                     <div style="display:flex;gap:8px;padding:10px 16px;border-top:1px solid rgba(255,107,0,0.1);background:rgba(255,107,0,0.03);">
-                        <input type="text" id="v4Input" placeholder="Görsel promptu yaz... (ör: neon cyberpunk kedi)" style="flex:1;padding:9px 14px;border-radius:20px;border:1px solid rgba(255,107,0,0.15);background:rgba(255,255,255,0.04);color:var(--text);font-size:13px;outline:none;font-family:inherit;" onkeydown="if(event.key=='Enter') v4Generate()">
-                        <button onclick="v4Generate()" style="padding:9px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,#ff6b00,#ff8c38);color:#fff;font-weight:500;cursor:pointer;font-size:13px;font-family:inherit;transition:0.3s;">✨ Oluştur</button>
+                        <input type="text" id="v4Input" placeholder="Görsel promptu yaz... (ör: neon cyberpunk kedi)" style="flex:1;padding:9px 14px;border-radius:20px;border:1px solid rgba(255,107,0,0.15);background:rgba(255,255,255,0.04);color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:0.3s;" onkeydown="if(event.key=='Enter') v4Generate()">
+                        <button id="v4GenerateBtn" onclick="v4Generate()" style="padding:9px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,#ff6b00,#ff8c38);color:#fff;font-weight:500;cursor:pointer;font-size:13px;font-family:inherit;transition:0.3s;">✨ Oluştur</button>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 16px;font-size:10px;color:var(--text2);border-top:1px solid rgba(255,107,0,0.05);background:rgba(255,107,0,0.02);">
+                        <span><span style="color:#22c55e;">●</span> V4+ aktif</span>
+                        <span>1920×1080 · Flux · Ücretsiz</span>
                     </div>
                 </div>
             </div>
@@ -1291,11 +1311,18 @@
             const statusEl = document.getElementById('v4Status');
             const img = document.getElementById('v4Image');
             const placeholder = document.getElementById('v4Placeholder');
+            const loading = document.getElementById('v4Loading');
+            const loadingPrompt = document.getElementById('v4LoadingPrompt');
+            const btn = document.getElementById('v4GenerateBtn');
 
-            statusEl.textContent = '✨ V4+ görsel oluşturuluyor... (' + prompt + ')';
+            // Loading moduna geç
             img.style.display = 'none';
-            placeholder.style.display = 'block';
-            placeholder.innerHTML = '<div class="dotz" style="justify-content:center;"><span></span><span></span><span></span></div><div style="font-size:12px;margin-top:8px;color:var(--text2);">Flux ile görsel üretiliyor...</div>';
+            placeholder.style.display = 'none';
+            loading.style.display = 'block';
+            loadingPrompt.textContent = '✨ "' + prompt + '"';
+            statusEl.innerHTML = '<span style="color:#ff8c38;">⟳ V4+ düşünüyor... Prompt analiz ediliyor</span>';
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
 
             try {
                 const r = await fetch('/api/image/generate', {
@@ -1306,27 +1333,34 @@
                 const j = await r.json();
 
                 if (j.success && j.url) {
+                    statusEl.innerHTML = '<span style="color:#ff8c38;">⟳ Flux motoru çalışıyor... Görsel oluşturuluyor</span>';
+
                     img.src = j.url;
                     img.onload = function() {
+                        loading.style.display = 'none';
                         img.style.display = 'block';
-                        placeholder.style.display = 'none';
-                        statusEl.innerHTML = '✅ <b>V4+ görsel hazır!</b> • <a href="' + j.url + '" target="_blank" style="color:#ff8c38;">Tam boyut aç</a>';
+                        statusEl.innerHTML = '✅ <b style="color:#22c55e;">V4+ görsel hazır!</b> <span style="color:var(--text2);font-size:10px;">1920×1080 · Flux</span>';
                     };
                     img.onerror = function() {
+                        loading.style.display = 'none';
                         img.style.display = 'block';
-                        placeholder.style.display = 'none';
-                        statusEl.innerHTML = '✅ Görsel linki: <a href="' + j.url + '" target="_blank" style="color:#ff8c38;">' + j.url.substring(0, 50) + '...</a>';
+                        statusEl.innerHTML = '✅ <a href="' + j.url + '" target="_blank" style="color:#ff8c38;">Görsel linki — tarayıcıda aç</a>';
                     };
                 } else {
-                    statusEl.textContent = '❌ Hata: ' + (j.error || 'Bilinmeyen hata');
+                    loading.style.display = 'none';
                     placeholder.style.display = 'block';
-                    placeholder.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">❌</div><div style="font-size:13px;">Görsel oluşturulamadı</div>';
+                    placeholder.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">❌</div><div style="font-size:13px;">Görsel oluşturulamadı</div><div style="font-size:11px;color:var(--text2);margin-top:4px;">' + (j.error || 'Bilinmeyen hata') + '</div>';
+                    statusEl.textContent = '';
                 }
             } catch(e) {
-                statusEl.textContent = '❌ Bağlantı hatası: ' + e.message;
+                loading.style.display = 'none';
                 placeholder.style.display = 'block';
                 placeholder.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">❌</div><div style="font-size:13px;">Sunucuya bağlanılamadı</div>';
+                statusEl.textContent = '❌ Bağlantı hatası';
             }
+
+            btn.disabled = false;
+            btn.style.opacity = '1';
         }
     </script>
 </body>

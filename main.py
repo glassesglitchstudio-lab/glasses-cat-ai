@@ -639,7 +639,6 @@ async def generate_image(request: ImageRequest):
     """
     try:
         import urllib.parse
-        import webbrowser
 
         prompt = request.prompt
         guvenli_prompt = urllib.parse.quote(prompt)
@@ -648,9 +647,6 @@ async def generate_image(request: ImageRequest):
             + guvenli_prompt
             + "?width=1920&height=1080&model=flux"
         )
-
-        # Otomatik tarayıcıda aç
-        webbrowser.open(gorsel_url)
 
         logger.info(f"V4+ Görsel oluşturuldu: {gorsel_url}")
 
