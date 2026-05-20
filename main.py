@@ -1,4 +1,4 @@
-﻿"""
+"""
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
 ║     🐱 NIKO AI - WEB SUNUCUSU (FastAPI) 🐱              ║
@@ -622,6 +622,53 @@ async def agent_loop_status():
         return {"success": False, "error": "Agent loop yuklu degil"}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+# ═══════════════════════════════════════════════════════════════
+# V4+ TEXT-TO-IMAGE API ENDPOINT
+# ═══════════════════════════════════════════════════════════════
+
+class ImageRequest(BaseModel):
+    prompt: str
+
+@app.post("/api/image/generate")
+async def generate_image(request: ImageRequest):
+    """
+    V4+ Görsel Üretim Motoru (Text-to-Image)
+    Pollinations.ai + Flux ile sıfır kurulum, sınırsız ücretsiz
+    """
+    try:
+        import urllib.parse
+        import webbrowser
+
+        prompt = request.prompt
+        guvenli_prompt = urllib.parse.quote(prompt)
+        gorsel_url = (
+            "https://image.pollinations.ai/p/"
+            + guvenli_prompt
+            + "?width=1920&height=1080&model=flux"
+        )
+
+        # Otomatik tarayıcıda aç
+        webbrowser.open(gorsel_url)
+
+        logger.info(f"V4+ Görsel oluşturuldu: {gorsel_url}")
+
+        return {
+            "success": True,
+            "prompt": prompt,
+            "url": gorsel_url,
+            "width": 1920,
+            "height": 1080,
+            "model": "flux",
+            "engine": "glassesglitchstudio/gulmzcetiner:V4Plus"
+        }
+    except Exception as e:
+        logger.error(f"V4+ görsel hatası: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
 # ==================== NIKO CORE BASLATMA ====================

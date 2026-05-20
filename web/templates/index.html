@@ -554,6 +554,7 @@
                 <button onclick="showPanel('terminal')">🐍 Kod</button>
                 <button onclick="showPanel('plugins')">🧩 Eklentiler</button>
                 <button onclick="showPanel('qwen')" title="Qwen 14B Asistan" style="font-size:13px;padding:4px 10px;">💠 Qwen</button>
+                <button onclick="showPanel('v4')" title="V4+ Görsel Üret" style="font-size:13px;padding:4px 10px;background:linear-gradient(135deg,#ff6b00,#ff8c38);color:#fff;border-radius:8px;">✨ V4+</button>
                 <div class="theme-selector">
                     <button class="theme-btn active" onclick="setTheme('purple')" title="Mor Tema" style="background:#8b5cf6;"></button>
                     <button class="theme-btn" onclick="setTheme('orange')" title="Turuncu Tema" style="background:#ff6b00;"></button>
@@ -678,6 +679,35 @@
                 </div>
                 <div class="plugins-bar">
                     <span id="pluginStatus" style="color:var(--text2);font-size:12px;">Sistem: PluginManager v1.0</span>
+                </div>
+            </div>
+
+            <!-- V4+ GÖRSEL ÜRETİM PANELİ -->
+            <div class="panel panel-v4">
+                <div style="display:flex;flex-direction:column;height:100%;">
+                    <div style="padding:12px 16px;border-bottom:1px solid rgba(255,107,0,0.12);background:rgba(255,107,0,0.05);">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:18px;">✨</span>
+                            <span style="font-weight:600;background:linear-gradient(135deg,#ff6b00,#ff8c38);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">V4+ Text-to-Image</span>
+                            <span style="font-size:9px;background:rgba(255,107,0,0.15);color:#ff8c38;padding:2px 8px;border-radius:10px;">Flux</span>
+                        </div>
+                        <div style="font-size:11px;color:var(--text2);margin-top:4px;">glassesglitchstudio/gulmzcetiner:V4Plus — Sıfır kurulum, sınırsız ücretsiz</div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px;min-height:260px;">
+                        <div id="v4ImageContainer" style="width:100%;max-width:560px;min-height:200px;border-radius:12px;border:1px dashed rgba(255,107,0,0.2);display:flex;align-items:center;justify-content:center;background:rgba(255,107,0,0.03);overflow:hidden;">
+                            <div id="v4Placeholder" style="text-align:center;color:var(--text2);padding:20px;">
+                                <div style="font-size:32px;margin-bottom:8px;">🎨</div>
+                                <div style="font-size:13px;">V4+ görselin burada görünecek</div>
+                                <div style="font-size:11px;margin-top:4px;">Bir prompt yaz ve "Oluştur"a bas</div>
+                            </div>
+                            <img id="v4Image" src="" style="width:100%;display:none;border-radius:12px;" alt="V4+ Generated Image">
+                        </div>
+                        <div id="v4Status" style="font-size:11px;color:var(--text2);min-height:16px;">&nbsp;</div>
+                    </div>
+                    <div style="display:flex;gap:8px;padding:10px 16px;border-top:1px solid rgba(255,107,0,0.1);background:rgba(255,107,0,0.03);">
+                        <input type="text" id="v4Input" placeholder="Görsel promptu yaz... (ör: neon cyberpunk kedi)" style="flex:1;padding:9px 14px;border-radius:20px;border:1px solid rgba(255,107,0,0.15);background:rgba(255,255,255,0.04);color:var(--text);font-size:13px;outline:none;font-family:inherit;" onkeydown="if(event.key=='Enter') v4Generate()">
+                        <button onclick="v4Generate()" style="padding:9px 20px;border-radius:20px;border:none;background:linear-gradient(135deg,#ff6b00,#ff8c38);color:#fff;font-weight:500;cursor:pointer;font-size:13px;font-family:inherit;transition:0.3s;">✨ Oluştur</button>
+                    </div>
                 </div>
             </div>
 
@@ -1247,6 +1277,56 @@
 
             // Backend'deki geçmişi de temizle
             fetch('/api/qwen/clear', {method: 'POST'}).catch(() => {});
+        }
+
+        /* ========== V4+ GORSEL URETIM ========== */
+        async function v4Generate() {
+            const inp = document.getElementById('v4Input');
+            const prompt = inp.value.trim();
+            if (!prompt) {
+                document.getElementById('v4Status').textContent = '⚠️ Lütfen bir prompt yazın!';
+                return;
+            }
+
+            const statusEl = document.getElementById('v4Status');
+            const img = document.getElementById('v4Image');
+            const placeholder = document.getElementById('v4Placeholder');
+
+            statusEl.textContent = '✨ V4+ görsel oluşturuluyor... (' + prompt + ')';
+            img.style.display = 'none';
+            placeholder.style.display = 'block';
+            placeholder.innerHTML = '<div class="dotz" style="justify-content:center;"><span></span><span></span><span></span></div><div style="font-size:12px;margin-top:8px;color:var(--text2);">Flux ile görsel üretiliyor...</div>';
+
+            try {
+                const r = await fetch('/api/image/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: prompt})
+                });
+                const j = await r.json();
+
+                if (j.success && j.url) {
+                    img.src = j.url;
+                    img.onload = function() {
+                        img.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        statusEl.innerHTML = '✅ <b>V4+ görsel hazır!</b> • <a href="' + j.url + '" target="_blank" style="color:#ff8c38;">Tam boyut aç</a>';
+                    };
+                    img.onerror = function() {
+                        img.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        statusEl.innerHTML = '✅ Görsel linki: <a href="' + j.url + '" target="_blank" style="color:#ff8c38;">' + j.url.substring(0, 50) + '...</a>';
+                    };
+                } else {
+                    statusEl.textContent = '❌ Hata: ' + (j.error || 'Bilinmeyen hata');
+                    placeholder.style.display = 'block';
+                    placeholder.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">❌</div><div style="font-size:13px;">Görsel oluşturulamadı</div>';
+                }
+            } catch(e) {
+                statusEl.textContent = '❌ Bağlantı hatası: ' + e.message;
+                placeholder.style.display = 'block';
+                placeholder.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">❌</div><div style="font-size:13px;">Sunucuya bağlanılamadı</div>';
+            }
         }
     </script>
 </body>
