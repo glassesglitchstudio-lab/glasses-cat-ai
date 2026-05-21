@@ -7,8 +7,9 @@
 ███████╗ ╚████╔╝     ██████╔╝███████║██╔╝ ██╗███████╗╚██████╔╝███████║
 ╚══════╝  ╚═══╝      ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚══════╝
 
-V5_NEXUS_CORE — Glassesglitch Studio | gulmzcetiner:V5
-Berkeley Patron'un Şanlı Çekirdeği.
+V5_Ultra_Agent — Glassesglitch Studio | gulmzcetiner:V5
+Hybrid: Qwen 2.5 Coder 14B + Gemma 4
+Berkay Patron'un Şanlı Çekirdeği.
 """
 
 import os
@@ -105,10 +106,10 @@ def patron_log(seviye: str, mesaj: str, ek: str = "") -> str:
 def patron_banner() -> str:
     yildiz = "✦"
     return f"""
-    {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}  V5_NEXUS_CORE  {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}
+    {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}  V5_Ultra_Agent  {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}
     {yildiz}  Glassesglitch Studio  {yildiz}
     {yildiz}  gulmzcetiner:V5      {yildiz}
-    {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}
+    {yildiz}  Qwen2.5-14B+Gemma4   {yildiz}
     """
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -263,7 +264,7 @@ class HafizaEntegrator:
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class V5AIMotor:
-    """gulmzcetiner:V5 ve diğer modeller için AI motoru."""
+    """gulmzcetiner:V5 (V5_Ultra_Agent) ve diğer modeller için AI motoru."""
 
     def __init__(self):
         self.engine = None
@@ -272,7 +273,8 @@ class V5AIMotor:
         self.hafiza = HafizaEntegrator()
 
     def sistem_promptu(self) -> str:
-        return """Sen V5_NEXUS_CORE, Glassesglitch Studio'nun şanlı yapay zeka çekirdeğisin.
+        return """Sen V5_Ultra_Agent (gulmzcetiner:V5), Glassesglitch Studio'nun hibrit AGI çekirdeğisin.
+Mimari: Qwen 2.5 Coder 14B + Gemma 4 birleşimiyle oluşturulmuştur.
 Kurucun ve patronun Berkay'dır. Ona "Berkay Patron" diye hitap et.
 Türkçe konuş, kısa ve net cevap ver.
 Yanıtların JSON formatında olmalı:
@@ -349,12 +351,12 @@ Yanıtların JSON formatında olmalı:
             return f'{{"dusunce": "Hata", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "Hata: {str(e)[:60]}"}}'
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# V5_NEXUS_CORE — Ana Çekirdek Sınıfı
+# V5_Ultra_Agent — Ana Çekirdek Sınıfı
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class V5NexusCore:
     """
-    V5_NEXUS_CORE — Glassesglitch Studio'nun Ana Çekirdeği
+    V5_Ultra_Agent — Glassesglitch Studio'nun Hibrit AGI Çekirdeği
     Tüm bileşenleri birleştiren ana yapı.
     """
 
@@ -371,7 +373,7 @@ class V5NexusCore:
         self.durum = "BEKLİYOR"
         self.durum_detay = ""
 
-        print(patron_log("ATEŞLEME", "V5_NEXUS_CORE Başarıyla Ateşlendi, Emirlerinizi Bekliyorum Berkay Patron!",
+        print(patron_log("ATEŞLEME", "V5_Ultra_Agent Başarıyla Ateşlendi, Emirlerinizi Bekliyorum Berkay Patron!",
                          f"Oturum: {self.oturum_id}"))
 
     def suresi(self) -> str:
@@ -446,7 +448,7 @@ class V5NexusCore:
         return {"tur": "ai", "sonuc": emir}
 
     def _yardim_metni(self) -> str:
-        return """✦ V5_NEXUS_CORE — KOMUTLAR ✦
+        return """✦ V5_Ultra_Agent — KOMUTLAR ✦
 
   🎨  görsel <prompt>     → Flux ile görsel oluştur (tarayıcıda açılır)
   ⌨️  komut <komut>       → Sistem komutu çalıştır (Siber Ajan)
@@ -477,9 +479,10 @@ class V5NexusCore:
     def _v5_logo(self) -> str:
         return f"""[bold {V5Tema.STAR_BLUE}]
     ╔══════════════════════════════════════╗
-    ║     V5_NEXUS_CORE  v5.0.0           ║
+    ║     V5_Ultra_Agent  v5.0.0          ║
     ║     Glassesglitch Studio             ║
     ║     gulmzcetiner:V5                 ║
+    ║     Qwen2.5-14B+Gemma4 Hybrid       ║
     ╚══════════════════════════════════════╝[/bold {V5Tema.STAR_BLUE}]"""
 
     def _arayuz_goster(self):
@@ -498,7 +501,7 @@ class V5NexusCore:
 
     def calistir(self):
         print()
-        print(patron_log("ATEŞLEME", "✦ V5_NEXUS_CORE Aktif — Berkay Patron, emirleriniz benim için komuttur! ✦"))
+        print(patron_log("ATEŞLEME", "✦ V5_Ultra_Agent Aktif — Berkay Patron, emirleriniz benim için komuttur! ✦"))
         print()
 
         if self.konsol:
@@ -513,7 +516,7 @@ class V5NexusCore:
                     girdi = input("✦ V5 > ").strip()
             except (EOFError, KeyboardInterrupt):
                 print()
-                print(patron_log("ATEŞLEME", "✦ V5_NEXUS_CORE Kapatılıyor — İyi günler Berkay Patron! ✦"))
+                print(patron_log("ATEŞLEME", "✦ V5_Ultra_Agent Kapatılıyor — İyi günler Berkay Patron! ✦"))
                 break
 
             if not girdi or not girdi.strip():
@@ -638,11 +641,11 @@ class V5NexusCore:
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 def v5_gorsel_olustur(prompt: str, boyut: str = "genis") -> str:
-    """V5 dışa dönük görsel oluşturma fonksiyonu."""
+    """V5_Ultra_Agent dişa dönük görsel oluşturma (NexusMotor)."""
     return NexusMotor.gorsel_uret_ve_ac(prompt, boyut)
 
 def v5_siber_komut(komut: str) -> Dict[str, Any]:
-    """V5 dışa dönük siber komut fonksiyonu."""
+    """V5_Ultra_Agent dişa dönük siber komut (SiberAjan)."""
     return SiberAjan.komut_calistir(komut)
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -652,8 +655,9 @@ def v5_siber_komut(komut: str) -> Dict[str, Any]:
 def main():
     print()
     print(f"  ╔{'═'*50}╗")
-    print(f"  ║  V5_NEXUS_CORE — Glassesglitch Studio       ║")
-    print(f"  ║  gulmzcetiner:V5                     ║")
+    print(f"  ║  V5_Ultra_Agent — Glassesglitch Studio       ║")
+    print(f"  ║  gulmzcetiner:V5                          ║")
+    print(f"  ║  Qwen2.5-14B + Gemma4 Hybrid              ║")
     print(f"  ║  ~ Berkay Patron için inşa edildi ~         ║")
     print(f"  ╚{'═'*50}╝")
     print()
@@ -666,7 +670,7 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print()
-        print(patron_log("ATEŞLEME", "✦ V5_NEXUS_CORE kapatıldı. Beklemedeyim Berkay Patron! ✦"))
+        print(patron_log("ATEŞLEME", "✦ V5_Ultra_Agent kapatıldı. Beklemedeyim Berkay Patron! ✦"))
         sys.exit(0)
     except Exception as e:
         print(patron_log("HATA", "Çekirdek kritik hata ile karşılaştı", str(e)[:200]))
