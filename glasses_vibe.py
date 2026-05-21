@@ -1,1111 +1,673 @@
 # -*- coding: utf-8 -*-
 """
-GLASSES VIBE IDE - Terminal Agent v10.0.0
-Cyberpunk UI - Exact v10.0.0 Release Notes Design
-Niko Software System
+███████╗██╗   ██╗    ██████╗ ███████╗██╗  ██╗███████╗██╗   ██╗███████╗
+██╔════╝██║   ██║    ╚════██╗██╔════╝╚██╗██╔╝██╔════╝██║   ██║██╔════╝
+█████╗  ██║   ██║     █████╔╝███████╗ ╚███╔╝ █████╗  ██║   ██║███████╗
+██╔══╝  ╚██╗ ██╔╝    ██╔══██╗╚════██║ ██╔██╗ ██╔══╝  ██║   ██║╚════██║
+███████╗ ╚████╔╝     ██████╔╝███████║██╔╝ ██╗███████╗╚██████╔╝███████║
+╚══════╝  ╚═══╝      ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚══════╝
+
+V5_NEXUS_CORE — Glassesglitch Studio | gulmzcetiner:V5
+Berkeley Patron'un Şanlı Çekirdeği.
 """
 
 import os
 import sys
-import io
 import json
 import re
 import time
+import uuid
 import subprocess
-import requests
-import webbrowser
 import urllib.parse
-from rich.console import Console
-from rich.panel import Panel
-from rich.layout import Layout
-from rich.live import Live
-from rich.spinner import Spinner
-from rich.rule import Rule
-from rich.table import Table
-from rich.text import Text
-from rich.syntax import Syntax
-from rich.markdown import Markdown
-from rich.prompt import Prompt
-from rich.tree import Tree
-from rich.box import SIMPLE, ROUNDED
-from rich.console import Group
-from rich.align import Align
-
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
-console = Console(force_terminal=True, width=140, height=40)
-
-CYAN = "#00ffff"
-MAGENTA = "#ff00ff"
-GREEN = "#00ff00"
-YELLOW = "#ffaa00"
-RED = "#ff0000"
-BLUE = "#0088ff"
-DIM = "#888888"
-
-ASCII_LOGO = """
- ██████╗ ██╗  ██╗ █████╗ ██████╗  █████╗ ██╗     ██╗   ██╗ ██████╗ ██████╗ 
-██╔════╝ ██║  ██║██╔══██╗██╔══██╗██╔══██╗██║     ██║   ██║██╔════╝██╔═══██╗
-██║  ███╗███████║███████║██║  ██║███████║██║     ██║   ██║██║     ██║   ██║
-██║   ██║██╔══██║██╔══██║██║  ██║██╔══██║██║     ██║   ██║██║     ██║   ██║
-╚██████╔╝██║  ██║██║  ██║██████╔╝██║  ██║███████╗╚██████╔╝╚██████╗██████╔╝
- ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═════╝ 
-"""
-
-SYSTEM_PROMPT = """Sen GLASSES VIBE adli bir AGI asistansin. Niko Software tarafindan gelistirildin.
-
-Mevcut calisma dizini (cwd) header'da gosteriliyor, 'pwd' komutuna ihtiyacin yok.
-
-YANIT FORMATIN:
-Sen SADECE ve SADECE asagidaki JSON semasi ile yanit vermelisin. Baska hicbir sey yazma.
-
-{
-  "dusunce": "Arka planda yuruttugun derin mantik ve algoritma plani",
-  "aksiyon": "dosya_yarat" veya "dosya_oku" veya "terminal_komutu" veya "mesaj_gonder",
-  "hedef": "dosya_adi_veya_komut",
-  "icerik": "kod_veya_mesaj"
-}
-
-AKSIYON ACIKLAMALARI:
-- dosya_yarat: Yeni dosya olusturur. hedef=dosya_adi, icerik=kod.
-- dosya_oku: Dosya icerigini okur. hedef=dosya_adi.
-- terminal_komutu: Terminal komutu calistirir. hedef=komut.
-- mesaj_gonder: Kullaniciya mesaj gonderir. icerik=mesaj.
-
-KURALLAR:
-- JSON disinda hicbir karakter yazma. Backtick kullanma.
-- Turkce konus.
-- Eger kullanici kod yazmani isterse, aksiyon 'dosya_yarat' olmali.
-- Eger kullanici mevcut bir dosyayi okumak isterse, aksiyon 'dosya_oku' olmali.
-- Eger kullanici kodu test etmeni isterse, aksiyon 'terminal_komutu' olmali.
-- Kullanici dosya konumu sorarsa, header'daki cwd bilgisini kullan, komut calistirma.
-- Yanitin SADECE JSON olmali, baska hicbir aciklama metni olmamali."""
+import webbrowser
+from datetime import datetime
+from pathlib import Path
+from collections import deque
+from typing import Optional, Dict, List, Any
 
 
-class ConversationHistory:
-    def __init__(self, max_turns=20):
-        self.messages = []
-        self.max_turns = max_turns
 
-    def add(self, role, content):
-        self.messages.append({"role": role, "content": content})
-        if len(self.messages) > self.max_turns * 2:
-            self.messages = self.messages[-self.max_turns * 2:]
+try:
+    import requests
+except ImportError:
+    requests = None
 
-    def get_system_prompt(self):
-        return SYSTEM_PROMPT
+try:
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.layout import Layout
+    from rich.live import Live
+    from rich.spinner import Spinner
+    from rich.table import Table
+    from rich.text import Text
+    from rich.syntax import Syntax
+    from rich.markdown import Markdown
+    from rich.prompt import Prompt
+    from rich.tree import Tree
+    from rich.box import SIMPLE, ROUNDED
+    from rich.console import Group
+    from rich.align import Align
+    from rich.rule import Rule
+    from rich.columns import Columns
+    from rich.style import Style
+    RICH_AVAILABLE = True
+except ImportError:
+    RICH_AVAILABLE = False
 
-    def get_messages(self):
-        return self.messages
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V5 GÖRSEL TEMA — Google Gemini'nin Mavi Yıldızlı Vizyonu
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-    def clear(self):
-        self.messages = []
-
-
-class EngineChecker:
-    @staticmethod
-    def check_ollama():
-        try:
-            result = subprocess.run(["ollama", "list"], capture_output=True, text=True, timeout=10)
-            if result.returncode == 0:
-                models = []
-                for line in result.stdout.strip().split('\n')[1:]:
-                    if line.strip():
-                        parts = line.split()
-                        if parts:
-                            models.append(parts[0])
-                return True, models
-            return False, []
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            return False, []
+class V5Tema:
+    NEBULA_BLUE = "#1a2a6c"
+    STAR_BLUE  = "#4facfe"
+    DEEP_SPACE = "#0a0e27"
+    ICE_WHITE  = "#e8f0fe"
+    GLOW_CYAN  = "#00f2fe"
+    AURORA     = "#667eea"
+    DIM_STAR   = "#6c7a99"
+    GEMINI_BG  = "#0d1117"
+    GEMINI_CARD = "#161b22"
+    STAR_YELLOW = "#ffd700"
+    SUCCESS_GREEN = "#00e676"
+    ERROR_RED  = "#ff1744"
+    WARNING_ORANGE = "#ff9100"
 
     @staticmethod
-    def check_openrouter(api_key):
-        try:
-            headers = {"Authorization": "Bearer {0}".format(api_key), "Content-Type": "application/json"}
-            response = requests.get("https://openrouter.ai/api/v1/auth/key", headers=headers, timeout=10)
-            return response.status_code == 200, response.status_code
-        except Exception:
-            return False, 0
+    def mavi_parlayan(text: str) -> Text:
+        return Text(text, style=f"bold {V5Tema.STAR_BLUE}")
 
     @staticmethod
-    def check_huggingface(api_key):
-        try:
-            headers = {"Authorization": "Bearer {0}".format(api_key)}
-            response = requests.get("https://huggingface.co/api/whoami-v2", headers=headers, timeout=10)
-            return response.status_code == 200, response.status_code
-        except Exception:
-            return False, 0
+    def yildizli(text: str) -> Text:
+        return Text(text, style=f"bold {V5Tema.STAR_YELLOW}")
 
-
-class FileExplorer:
-    def __init__(self, root_path=None):
-        self.root_path = root_path or os.getcwd()
-        self.cache = None
-        self.cache_time = 0
-
-    def scan(self, force=False):
-        now = time.time()
-        if not force and self.cache and (now - self.cache_time) < 2:
-            return self.cache
-        tree = Tree("[bold {0}]📁 /Project_Root_NikoSoftware/[/bold {0}] [dim](current dir)[/dim]".format(CYAN), guide_style="dim {0}".format(CYAN))
-        self._add_files(self.root_path, tree, depth=0, max_depth=3)
-        self.cache = tree
-        self.cache_time = now
-        return tree
-
-    def _add_files(self, path, parent, depth=0, max_depth=3):
-        if depth >= max_depth:
-            return
-        try:
-            entries = sorted(os.listdir(path))
-            dirs = []
-            files = []
-            for entry in entries:
-                if entry.startswith('.'):
-                    continue
-                full = os.path.join(path, entry)
-                if os.path.isdir(full):
-                    dirs.append(entry)
-                else:
-                    files.append(entry)
-            for d in dirs:
-                full = os.path.join(path, d)
-                branch = parent.add("[bold {0}]📂 {1}[/bold {0}]".format(CYAN, d), guide_style="dim {0}".format(CYAN))
-                self._add_files(full, branch, depth + 1, max_depth)
-            for f in files:
-                ext = f.split('.')[-1] if '.' in f else ''
-                icon, color = self._get_icon(ext)
-                parent.add("[{0}]{1}[/] [dim]{2}[/dim]".format(color, icon, f))
-        except PermissionError:
-            parent.add("[dim]🔒 [locked][/dim]")
-
-    def _get_icon(self, ext):
-        icons = {
-            'py': ('🐍', MAGENTA), 'js': ('⚙', YELLOW), 'html': ('🌐', '#ff6600'), 'css': ('🎨', BLUE),
-            'json': ('📋', YELLOW), 'md': ('📖', GREEN), 'txt': ('📄', DIM),
-            'bat': ('⚙', DIM), 'ps1': ('⚙', DIM), 'sh': ('⚙', DIM),
-            'png': ('🖼', MAGENTA), 'jpg': ('🖼', MAGENTA), 'gif': ('🖼', MAGENTA),
-            'zip': ('📦', '#ff6600'), 'log': ('📝', DIM),
-        }
-        return icons.get(ext, ('📄', DIM))
-
-
-class JSONParser:
     @staticmethod
-    def clean_and_parse(response_text):
-        response_text = response_text.strip()
-        if response_text.startswith("```json"):
-            response_text = response_text[7:]
-        elif response_text.startswith("```"):
-            response_text = response_text[3:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-        response_text = response_text.strip()
-        json_match = re.search(r'\{[\s\S]*\}', response_text)
-        if json_match:
-            response_text = json_match.group(0)
+    def buzlu(text: str) -> Text:
+        return Text(text, style=f"{V5Tema.ICE_WHITE}")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PATRON LOGLAMA — Tüm mesajlar Berkay Patron'a hitaben
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def patron_log(seviye: str, mesaj: str, ek: str = "") -> str:
+    zaman = datetime.now().strftime("%H:%M:%S")
+    semboller = {
+        "ATEŞLEME": "🚀", "BASARI": "✅", "HATA": "❌",
+        "UYARI": "⚠️", "BILGI": "ℹ️", "SİBER": "🛡️",
+        "GORSEL": "🎨", "HAFIZA": "🧠", "KOMUT": "⌨️"
+    }
+    s = semboller.get(seviye, "💠")
+    satir = f"{s} [{zaman}] V5_NEXUS | {mesaj}"
+    if ek:
+        satir += f" | {ek}"
+    return satir
+
+def patron_banner() -> str:
+    yildiz = "✦"
+    return f"""
+    {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}  V5_NEXUS_CORE  {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}
+    {yildiz}  Glassesglitch Studio  {yildiz}
+    {yildiz}  gulmzcetiner:V5      {yildiz}
+    {yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}{yildiz}
+    """
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# NEXUS MOTOR — Pollinations.ai Flux + Webbrowser
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class NexusMotor:
+    """
+    V5 NEXUS COMPONENT — MOTOR
+    Pollinations.ai üzerinden Flux görsel üretimi.
+    Tamamen ücretsiz, kotasız, bilgisayarı yormaz.
+    """
+
+    TABAN_URL = "https://image.pollinations.ai/p/"
+    BOYUTLAR  = {"genis": "1920x1080", "kare": "1024x1024", "portre": "1080x1920"}
+
+    @staticmethod
+    def gorsel_olustur(prompt: str, boyut: str = "genis", model: str = "flux") -> str:
+        guvenli = urllib.parse.quote(prompt)
+        cozunurluk = NexusMotor.BOYUTLAR.get(boyut, "1920x1080")
+        url = f"{NexusMotor.TABAN_URL}{guvenli}?width={cozunurluk.split('x')[0]}&height={cozunurluk.split('x')[1]}&model={model}"
+        return url
+
+    @staticmethod
+    def tarayicida_ac(url: str) -> None:
+        webbrowser.open(url)
+
+    @staticmethod
+    def gorsel_uret_ve_ac(prompt: str, boyut: str = "genis") -> str:
+        print(patron_log("GORSEL", f"Flux motoru ateşleniyor: \"{prompt}\"", f"Boyut: {boyut}"))
+        url = NexusMotor.gorsel_olustur(prompt, boyut)
+        NexusMotor.tarayicida_ac(url)
+        print(patron_log("BASARI", f"Görsel Berkay Patron'un tarayıcısında açıldı!", url))
+        return url
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# SİBER AJAN — subprocess + os ile sistem füzyonu
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class SiberAjan:
+    """
+    V5 CORE ACTION — SİBER AJAN
+    Python subprocess ve os modülleriyle sistem komutlarını
+    ve siber araçları arka planda tetikler.
+    """
+
+    @staticmethod
+    def komut_calistir(komut: str, zaman_asimi: int = 60) -> Dict[str, Any]:
+        print(patron_log("SİBER", f"Siber ajan komut alıyor", komut[:80]))
         try:
-            return json.loads(response_text)
-        except json.JSONDecodeError:
-            response_text = response_text.strip().lstrip('{').rstrip('}')
-            try:
-                return json.loads('{' + response_text + '}')
-            except json.JSONDecodeError:
-                return {
-                    "dusunce": "Yanit JSON formatinda degil, ham yanit gosteriliyor.",
-                    "aksiyon": "mesaj_gonder",
-                    "hedef": "",
-                    "icerik": response_text
-                }
-
-
-class GlassesVibeIDE:
-    def __init__(self):
-        self.model_name = None
-        self.engine = None
-        self.api_key = None
-        self.history = ConversationHistory()
-        self.request_count = 0
-        self.file_count = 0
-        self.start_time = time.time()
-        self.status = "IDLE"
-        self.status_detail = ""
-        self.thought_log = []
-        self.output_log = []
-        self.explorer = FileExplorer()
-        self.last_file_content = ""
-        self.last_file_name = ""
-        self.user_input = ""
-        self.chat_messages = []
-
-    def clear_screen(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-    def get_logo_panel(self):
-        logo_text = Text()
-        lines = ASCII_LOGO.strip().split('\n')
-        for i, line in enumerate(lines):
-            if i % 2 == 0:
-                logo_text.append(line + "\n", style="bold {0}".format(CYAN))
-            else:
-                logo_text.append(line + "\n", style="bold {0}".format(MAGENTA))
-        return Panel(
-            Align.center(logo_text),
-            box=SIMPLE,
-            border_style=CYAN,
-            padding=(0, 0)
-        )
-
-    def get_subtitle_panel(self):
-        return Panel(
-            Align.center(Text("Niko Software System v10.0.0 - AGI Agent CLI", style="dim #ffffff")),
-            box=SIMPLE,
-            border_style=MAGENTA,
-            padding=(0, 0)
-        )
-
-    def get_explorer_panel(self):
-        tree = self.explorer.scan()
-        return Panel(
-            tree,
-            title="[bold {0}] 📁 PROJECT EXPLORER / PROJE GEZGİNİ [/bold {0}]".format(CYAN),
-            box=SIMPLE,
-            border_style=MAGENTA,
-            padding=(0, 1)
-        )
-
-    def get_chat_history_panel(self):
-        content = Text()
-        if not self.chat_messages:
-            content.append("  [dim]No messages yet... Start chatting! / Henüz mesaj yok... Sohbet başlatın![/dim]\n", style="")
-        else:
-            for msg in self.chat_messages[-8:]:
-                if msg["role"] == "user":
-                    content.append("  💬 ", style="")
-                    content.append("You/Sen: ", style="bold {0}".format(CYAN))
-                    content.append("{0}\n".format(msg["content"][:60]), style="#ffffff")
-                elif msg["role"] == "assistant":
-                    preview = msg["content"][:60]
-                    if "dusunce" in msg["content"]:
-                        try:
-                            data = json.loads(msg["content"])
-                            preview = data.get("dusunce", "")[:60]
-                        except:
-                            pass
-                    content.append("  🤖 ", style="")
-                    content.append("AI/YZ: ", style="bold {0}".format(MAGENTA))
-                    content.append("{0}\n".format(preview), style="#ffffff")
-                content.append("\n")
-        return Panel(
-            content,
-            title="[bold {0}] 💬 CHAT HISTORY / SOHBET GEÇMİŞİ [/bold {0}]".format(CYAN),
-            box=SIMPLE,
-            border_style=MAGENTA,
-            padding=(0, 1)
-        )
-
-    def get_workspace_panel(self):
-        content = Text()
-        if self.thought_log:
-            content.append("[AI LOG LOGIC] ", style="bold {0}".format(CYAN))
-            content.append("{0}: Planning...\n".format(self.model_name or "gulmzcetinerMax"), style=MAGENTA)
-            for t in self.thought_log[-3:]:
-                content.append("• {0}\n".format(t[:80]), style="dim {0}".format(CYAN))
-            content.append("  ↳ Pseudo-code:\n", style="dim {0}".format(YELLOW))
-            content.append("    • Prompt = %gulmazascetagenit....\n", style="dim {0}".format(DIM))
-            content.append("    • Pseudo-code ...\n", style="dim {0}".format(DIM))
-        else:
-            content.append("[AI LOG LOGIC] ", style="bold {0}".format(CYAN))
-            content.append("Waiting for input...\n", style="dim {0}".format(DIM))
-
-        if self.last_file_name and self.last_file_content:
-            content.append("\n")
-            content.append("📄 {0} ×\n".format(self.last_file_name), style="bold {0}".format(YELLOW))
-            ext = self.last_file_name.split('.')[-1] if '.' in self.last_file_name else "text"
-            lang_map = {"py": "python", "js": "javascript", "html": "html", "css": "css", "json": "json"}
-            lang = lang_map.get(ext, "text")
-            syntax = Syntax(self.last_file_content, lang, theme="monokai", line_numbers=True, word_wrap=False)
-            return Panel(
-                Group(
-                    Panel(content, box=None, padding=(0, 0)),
-                    Panel(syntax, box=SIMPLE, border_style=YELLOW, padding=(0, 0))
-                ),
-                title="[bold {0}] WORKSPACE [/bold {0}]".format(CYAN),
-                box=SIMPLE,
-                border_style=MAGENTA,
-                padding=(0, 1)
+            sonuc = subprocess.run(
+                komut, shell=True, capture_output=True, text=True,
+                timeout=zaman_asimi, cwd=os.getcwd()
             )
+            cikti = sonuc.stdout
+            hata = sonuc.stderr
+            durum = sonuc.returncode
+            if durum == 0:
+                print(patron_log("BASARI", "Komut başarıyla çalıştı", f"Çıktı: {len(cikti)} karakter"))
+            else:
+                print(patron_log("UYARI", f"Komut hata döndü (kod: {durum})", hata[:100] if hata else ""))
+            return {
+                "basari": durum == 0,
+                "cikti": cikti,
+                "hata": hata,
+                "durum_kodu": durum
+            }
+        except subprocess.TimeoutExpired:
+            print(patron_log("HATA", f"Komut zaman aşımı ({zaman_asimi}s)", komut[:60]))
+            return {"basari": False, "cikti": "", "hata": f"Zaman aşımı: {zaman_asimi}s", "durum_kodu": -1}
+        except Exception as e:
+            print(patron_log("HATA", f"Siber ajan hatası", str(e)[:100]))
+            return {"basari": False, "cikti": "", "hata": str(e), "durum_kodu": -2}
 
-        return Panel(
-            content,
-            title="[bold {0}] WORKSPACE [/bold {0}]".format(CYAN),
-            box=SIMPLE,
-            border_style=MAGENTA,
-            padding=(0, 1)
-        )
+    @staticmethod
+    def dosya_calistir(dosya_yolu: str) -> Dict[str, Any]:
+        if not os.path.exists(dosya_yolu):
+            print(patron_log("HATA", f"Dosya bulunamadı", dosya_yolu))
+            return {"basari": False, "cikti": "", "hata": "Dosya mevcut değil"}
+        return SiberAjan.komut_calistir(dosya_yolu)
 
-    def get_status_bar(self):
-        status_config = {
-            "CONNECTING": ("bold {0}".format(BLUE), "CONNECTING & CHECKING", BLUE, "◐"),
-            "THINKING": ("bold {0}".format(YELLOW), "THINKING", YELLOW, "◉"),
-            "WRITING": ("bold {0}".format(MAGENTA), "WRITING", MAGENTA, "✎"),
-            "SUCCESS": ("bold {0}".format(GREEN), "BASARIYLA DOSYALANDI", GREEN, "✓"),
-            "IDLE": ("bold {0}".format(GREEN), "IDLE", GREEN, "●"),
+    @staticmethod
+    def sistem_bilgisi() -> Dict[str, Any]:
+        bilgi = {
+            "isletim_sistemi": os.name,
+            "calisma_dizini": os.getcwd(),
+            "kullanici": os.environ.get("USERNAME", "Bilinmiyor"),
+            "python_versiyon": sys.version,
+            "islemci_sayisi": os.cpu_count()
         }
-        style, text, border, icon = status_config.get(self.status, status_config["IDLE"])
-        detail = " - {0}".format(self.status_detail) if self.status_detail else ""
+        return bilgi
 
-        bar = Text()
-        bar.append(" {0} ".format(icon), style=style)
-        bar.append("STATUS: ", style="dim")
-        bar.append(text, style=style)
-        bar.append(detail, style="dim")
-        bar.append("  │  ", style="dim")
-        bar.append("CEO Berkay", style="bold {0}".format(GREEN))
-        bar.append("  │  ", style="dim")
-        bar.append("GLASSES VIBE IDE", style="dim {0}".format(CYAN))
-        bar.append("  │  ", style="dim")
-        engine_colors = {"ollama": CYAN, "openrouter": MAGENTA, "huggingface": GREEN}
-        engine_color = engine_colors.get(self.engine, DIM)
-        bar.append(self.engine or "none", style="bold {0}".format(engine_color))
+    @staticmethod
+    def port_dinle(port: int) -> bool:
+        import socket
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(("127.0.0.1", port)) == 0
 
+    @staticmethod
+    def ag_testi(hedef: str = "8.8.8.8") -> Dict[str, Any]:
+        if os.name == "nt":
+            return SiberAjan.komut_calistir(f"ping -n 1 {hedef}")
+        return SiberAjan.komut_calistir(f"ping -c 1 {hedef}")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# OBSIDIAN HAFIZA ENTEGRASYONU
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class HafizaEntegrator:
+    """Obsidian hafıza sistemine V5 bağlantısı."""
+
+    def __init__(self):
+        self.hafiza = None
+        self._baglan()
+
+    def _baglan(self):
+        try:
+            from obsidian_memory import get_obsidian_memory
+            self.hafiza = get_obsidian_memory()
+        except Exception:
+            pass
+
+    def kaydet(self, baslik: str, icerik: str, etiketler: list = None) -> str:
+        if not self.hafiza:
+            return ""
+        try:
+            yol = self.hafiza.save_memory(baslik, icerik, tags=etiketler or ["v5", "nexus"])
+            print(patron_log("HAFIZA", f"Kaydedildi: {baslik}", yol))
+            return yol
+        except Exception as e:
+            print(patron_log("UYARI", "Hafızaya kaydedilemedi", str(e)[:60]))
+            return ""
+
+    def hatirla(self, sorgu: str, sayi: int = 5) -> list:
+        if not self.hafiza:
+            return []
+        try:
+            return self.hafiza.recall(sorgu, sayi)
+        except Exception:
+            return []
+
+    def baglam_olustur(self, girdi: str) -> str:
+        if not self.hafiza:
+            return ""
+        try:
+            return self.hafiza.auto_inject_context(girdi)
+        except Exception:
+            return ""
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V5 AI MOTOR — Model Yönlendirici
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class V5AIMotor:
+    """gulmzcetiner:V5 ve diğer modeller için AI motoru."""
+
+    def __init__(self):
+        self.engine = None
+        self.model = None
+        self.api_key = None
+        self.hafiza = HafizaEntegrator()
+
+    def sistem_promptu(self) -> str:
+        return """Sen V5_NEXUS_CORE, Glassesglitch Studio'nun şanlı yapay zeka çekirdeğisin.
+Kurucun ve patronun Berkay'dır. Ona "Berkay Patron" diye hitap et.
+Türkçe konuş, kısa ve net cevap ver.
+Yanıtların JSON formatında olmalı:
+{"dusunce": "...", "aksiyon": "mesaj_gonder|gorsel_uret|komut_calistir|dosya_yaz|dosya_oku", "hedef": "", "icerik": ""}"""
+
+    def ollama_baglan(self) -> bool:
+        try:
+            import requests
+            r = requests.get("http://localhost:11434/api/tags", timeout=5)
+            if r.status_code == 200:
+                modeller = [m["name"] for m in r.json().get("models", [])]
+                print(patron_log("BILGI", f"Ollama bağlandı", f"{len(modeller)} model"))
+                self.engine = "ollama"
+                return True
+        except Exception:
+            pass
+        return False
+
+    def openrouter_baglan(self, api_key: str) -> bool:
+        try:
+            import requests
+            h = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            r = requests.get("https://openrouter.ai/api/v1/auth/key", headers=h, timeout=10)
+            if r.status_code == 200:
+                self.engine = "openrouter"
+                self.api_key = api_key
+                print(patron_log("BASARI", "OpenRouter bağlantısı kuruldu"))
+                return True
+        except Exception:
+            pass
+        return False
+
+    def sor(self, prompt: str) -> str:
+        if self.engine == "ollama":
+            return self._ollama_sor(prompt)
+        elif self.engine == "openrouter":
+            return self._openrouter_sor(prompt)
+        return '{"dusunce": "Motor bağlı değil", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "Önce bir AI motoru seç Berkay Patron!"}'
+
+    def _ollama_sor(self, prompt: str) -> str:
+        if not requests:
+            return '{"dusunce": "requests kütüphanesi yok", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "requests yüklü değil"}'
+        try:
+            gonder = {
+                "model": self.model or "gulmzcetiner:V5",
+                "prompt": f"{self.sistem_promptu()}\n\nKullanıcı: {prompt}\nAsistan:",
+                "stream": False, "format": "json"
+            }
+            r = requests.post("http://localhost:11434/api/generate", json=gonder, timeout=120)
+            if r.status_code == 200:
+                return r.json().get("response", "{}")
+            return '{"dusunce": "Ollama hatası", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "Ollama isteği başarısız oldu"}'
+        except Exception as e:
+            return f'{{"dusunce": "Hata", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "Hata: {str(e)[:60]}"}}'
+
+    def _openrouter_sor(self, prompt: str) -> str:
+        if not requests:
+            return '{"dusunce": "requests yok", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "requests yüklü değil"}'
+        try:
+            gonder = {
+                "model": self.model or "google/gemini-2.0-flash-exp:free",
+                "messages": [
+                    {"role": "system", "content": self.sistem_promptu()},
+                    {"role": "user", "content": prompt}
+                ],
+                "response_format": {"type": "json_object"}
+            }
+            h = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=gonder, headers=h, timeout=120)
+            if r.status_code == 200:
+                return r.json()["choices"][0]["message"]["content"]
+            return '{"dusunce": "OpenRouter hatası", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": f"OpenRouter: HTTP {r.status_code}"}'
+        except Exception as e:
+            return f'{{"dusunce": "Hata", "aksiyon": "mesaj_gonder", "hedef": "", "icerik": "Hata: {str(e)[:60]}"}}'
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V5_NEXUS_CORE — Ana Çekirdek Sınıfı
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class V5NexusCore:
+    """
+    V5_NEXUS_CORE — Glassesglitch Studio'nun Ana Çekirdeği
+    Tüm bileşenleri birleştiren ana yapı.
+    """
+
+    def __init__(self):
+        self.motor = NexusMotor()
+        self.ajan = SiberAjan()
+        self.hafiza = HafizaEntegrator()
+        self.ai = V5AIMotor()
+        self.baslangic = time.time()
+        self.oturum_id = uuid.uuid4().hex[:8]
+        self.istek_sayisi = 0
+        self.konsol = Console(force_terminal=True, width=140) if RICH_AVAILABLE else None
+        self.sayfa_gecmisi = deque(maxlen=50)
+        self.durum = "BEKLİYOR"
+        self.durum_detay = ""
+
+        print(patron_log("ATEŞLEME", "V5_NEXUS_CORE Başarıyla Ateşlendi, Emirlerinizi Bekliyorum Berkay Patron!",
+                         f"Oturum: {self.oturum_id}"))
+
+    def suresi(self) -> str:
+        gecen = time.time() - self.baslangic
+        dk = int(gecen // 60)
+        sn = int(gecen % 60)
+        return f"{dk}d {sn}s"
+
+    def istatistik(self) -> Dict[str, Any]:
+        return {
+            "oturum": self.oturum_id,
+            "calisma_suresi": self.suresi(),
+            "istek_sayisi": self.istek_sayisi,
+            "motor": self.ai.engine or "bağlı değil",
+            "model": self.ai.model or "seçilmedi",
+            "durum": self.durum,
+            "hafiza_dosyasi": self.hafiza.hafiza.get_memory_count() if self.hafiza.hafiza else 0,
+            "sayfa_gecmisi": len(self.sayfa_gecmisi)
+        }
+
+    # ─── Komut İşleme ───────────────────────────────────────
+
+    def emir_cozumle(self, emir: str) -> Dict[str, Any]:
+        emir = emir.strip().lower()
+        if emir.startswith("görsel ") or emir.startswith("gorsel "):
+            prompt = emir[7:]
+            url = NexusMotor.gorsel_uret_ve_ac(prompt)
+            return {"tur": "gorsel", "sonuc": url, "mesaj": "Gorsel olusturuldu: " + prompt}
+
+        if emir.startswith("komut "):
+            komut = emir[6:]
+            sonuc = SiberAjan.komut_calistir(komut)
+            return {"tur": "komut", "sonuc": sonuc}
+
+        if emir.startswith("ara ") or emir.startswith("hafizada ara "):
+            sorgu = emir.replace("hafizada ara ", "").replace("ara ", "").strip()
+            bulunan = self.hafiza.hatirla(sorgu)
+            if bulunan:
+                return {"tur": "hafiza", "sonuc": bulunan, "mesaj": f"🧠 {len(bulunan)} kayıt bulundu"}
+            return {"tur": "hafiza", "sonuc": [], "mesaj": "🧠 Hafızada sonuç bulunamadı"}
+
+        if emir in ("durum", "status"):
+            return {"tur": "durum", "sonuc": self.istatistik()}
+
+        if emir in ("yardim", "help"):
+            return {"tur": "yardim", "sonuc": self._yardim_metni()}
+
+        if emir.startswith("kaydet "):
+            icerik = emir[7:]
+            self.hafiza.kaydet(f"V5 Not - {datetime.now().strftime('%H:%M:%S')}", icerik, ["v5", "not"])
+            return {"tur": "mesaj", "sonuc": "🧠 Notunuz hafızaya kaydedildi Berkay Patron!"}
+
+        if emir.startswith("ping "):
+            hedef = emir[5:].strip() or "8.8.8.8"
+            sonuc = SiberAjan.ag_testi(hedef)
+            return {"tur": "komut", "sonuc": sonuc, "mesaj": f"📡 Ping testi: {hedef}"}
+
+        if emir == "sistem":
+            bilgi = SiberAjan.sistem_bilgisi()
+            return {"tur": "bilgi", "sonuc": bilgi}
+
+        if emir.startswith("port "):
+            try:
+                port = int(emir[5:].strip())
+                acik = SiberAjan.port_dinle(port)
+                durum_str = "AÇIK" if acik else "KAPALI"
+                return {"tur": "mesaj", "sonuc": f"🔌 Port {port}: {durum_str}"}
+            except ValueError:
+                return {"tur": "mesaj", "sonuc": "⚠️ Geçerli bir port numarası girin Berkay Patron!"}
+
+        # AI motoruna yönlendir
+        return {"tur": "ai", "sonuc": emir}
+
+    def _yardim_metni(self) -> str:
+        return """✦ V5_NEXUS_CORE — KOMUTLAR ✦
+
+  🎨  görsel <prompt>     → Flux ile görsel oluştur (tarayıcıda açılır)
+  ⌨️  komut <komut>       → Sistem komutu çalıştır (Siber Ajan)
+  🧠  ara <sorgu>         → Obsidian hafızada ara
+  📝  kaydet <not>        → Hafızaya not kaydet
+  📡  ping <hedef>        → Ağ testi yap
+  🔌  port <numara>       → Port kontrol et
+  💻  sistem              → Sistem bilgisi göster
+  ℹ️  durum               → Çekirdek durumunu göster
+  ❓  yardim              → Bu yardım menüsü
+  🚪  çıkış / exit        → Çekirdeği kapat
+
+  Bunun dışındaki her şey AI'ya gider. (V5 AI Motor)"""
+
+    # ─── Zengin UI (varsa) ──────────────────────────────────
+
+    def _tema_paneli(self, icerik, baslik="", renk=V5Tema.STAR_BLUE) -> Panel:
+        if not self.konsol:
+            return None
         return Panel(
-            bar,
+            icerik,
+            title=f"[bold {renk}]✦ {baslik} ✦[/bold {renk}]" if baslik else None,
+            border_style=Style(color=V5Tema.NEBULA_BLUE, dim=True),
             box=SIMPLE,
-            border_style=GREEN,
-            style="on {0}".format(GREEN),
             padding=(0, 2)
         )
 
-    def show_banner(self):
-        self.clear_screen()
-        console.print()
-        console.print(self.get_logo_panel())
-        console.print(self.get_subtitle_panel())
-        console.print()
+    def _v5_logo(self) -> str:
+        return f"""[bold {V5Tema.STAR_BLUE}]
+    ╔══════════════════════════════════════╗
+    ║     V5_NEXUS_CORE  v5.0.0           ║
+    ║     Glassesglitch Studio             ║
+    ║     gulmzcetiner:V5                 ║
+    ╚══════════════════════════════════════╝[/bold {V5Tema.STAR_BLUE}]"""
 
-    def select_model(self):
-        console.print(Panel(
-            "[bold {0}] Ateşlemek İstediğiniz Zeka Katmanını Seçin, CEO Berkay: [/bold {0}]".format(CYAN),
-            box=SIMPLE,
-            border_style=CYAN,
-            padding=(0, 2)
+    def _arayuz_goster(self):
+        if not self.konsol:
+            return
+        self.konsol.clear()
+        self.konsol.print(Align.center(self._v5_logo()))
+        self.konsol.print(Align.center(f"[dim {V5Tema.DIM_STAR}]✦ Berkay Patron için inşa edildi ✦[/dim {V5Tema.DIM_STAR}]"))
+        durum = self.istatistik()
+        self.konsol.print(self._tema_paneli(
+            f"⏱  {durum['calisma_suresi']}  |  📡 {durum['motor']}  |  🤖 {durum['model']}  |  🧠 {durum['hafiza_dosyasi']} kayıt",
+            "NEXUS DURUM", V5Tema.GLOW_CYAN
         ))
-        console.print()
 
-        console.print("[bold {0}]>>> Sistem Kontrol Ediliyor...[/bold {0}]".format(CYAN))
-        console.print()
+    # ─── Ana Döngü ──────────────────────────────────────────
 
-        with Live(Spinner("dots", text="Ollama servisi kontrol ediliyor...", style=CYAN), refresh_per_second=10, transient=True):
-            ollama_ok, ollama_models = EngineChecker.check_ollama()
+    def calistir(self):
+        print()
+        print(patron_log("ATEŞLEME", "✦ V5_NEXUS_CORE Aktif — Berkay Patron, emirleriniz benim için komuttur! ✦"))
+        print()
 
-        menu_items = []
-        idx = 1
-
-        if ollama_ok:
-            console.print(Panel(
-                "[bold {0}]✓ Ollama Servisi: AKTIF[/bold {0}]  [dim]({1} model bulundu)[/dim]".format(GREEN, len(ollama_models)),
-                box=SIMPLE,
-                border_style=GREEN,
-                padding=(0, 2)
-            ))
-            console.print()
-
-            recommended = []
-            other = []
-            for m in ollama_models:
-                ml = m.lower()
-                if "gulmzcetiner" in ml or "glasses" in ml:
-                    recommended.append(m)
-                elif "qwen" in ml or "llama" in ml or "deepseek" in ml:
-                    recommended.append(m)
-                else:
-                    other.append(m)
-
-            console.print("[bold {0}]╔══ YEREL MODELLER (OLLAMA) ══╗[/bold {0}]".format(CYAN))
-            console.print("[dim]Otomatik tarandi ve siralandi[/dim]")
-            console.print()
-
-            console.print("  [bold {0}]★ GULMEZCETINER v1.2.0 (Ana Model)[/bold {0}]".format(GREEN))
-            menu_items.append({"idx": idx, "engine": "ollama", "model": "gulmzcetiner:latest", "label": "gulmzcetiner:latest"})
-            console.print("  [bold {0}][{1}][/bold {0}] gulmzcetiner:latest [dim](v1.2.0 - GGUF Muhurlu)[/dim]".format(GREEN, idx))
-            idx += 1
-            console.print()
-
-            recommended = []
-            other = []
-            for m in ollama_models:
-                ml = m.lower()
-                if "gulmzcetiner" in ml or "glasses" in ml:
-                    continue
-                elif "qwen" in ml or "llama" in ml or "deepseek" in ml:
-                    recommended.append(m)
-                else:
-                    other.append(m)
-
-            if recommended:
-                console.print("  [bold {0}]★ ONERILEN MODELLER[/bold {0}]".format(YELLOW))
-                for m in recommended:
-                    size_info = ""
-                    try:
-                        resp = requests.get("http://localhost:11434/api/tags", timeout=5)
-                        for mod in resp.json().get("models", []):
-                            if mod["name"] == m:
-                                size_gb = round(mod.get("size", 0) / (1024**3), 1)
-                                size_info = " ({0} GB)".format(size_gb)
-                                break
-                    except Exception:
-                        pass
-                    menu_items.append({"idx": idx, "engine": "ollama", "model": m, "label": m})
-                    console.print("  [bold {0}][{1}][/bold {0}] {2}{3}".format(CYAN, idx, m, size_info))
-                    idx += 1
-                console.print()
-
-            if other:
-                console.print("  [dim]Diger Modeller[/dim]")
-                for m in other:
-                    menu_items.append({"idx": idx, "engine": "ollama", "model": m, "label": m})
-                    console.print("  [dim cyan][{0}][/dim cyan] {1}".format(idx, m))
-                    idx += 1
-                console.print()
-        else:
-            console.print(Panel(
-                "[bold {0}]✗ Ollama Servisi: PASIF[/bold {0}]\n[dim]Ollama yuklu degil veya calismiyor[/dim]".format(RED),
-                box=SIMPLE,
-                border_style=RED,
-                padding=(0, 2)
-            ))
-            console.print()
-            console.print("  [bold {0}][{1}][/bold {0}] Ollama'yi otomatik baslat".format(CYAN, idx))
-            menu_items.append({"idx": idx, "engine": "ollama_start", "model": "", "label": "Ollama'yi baslat"})
-            idx += 1
-            console.print("  [bold {0}][{1}][/bold {0}] Ollama yukleme sayfasini ac".format(CYAN, idx))
-            menu_items.append({"idx": idx, "engine": "ollama_install", "model": "", "label": "Ollama yukle"})
-            idx += 1
-            console.print()
-
-        console.print()
-        console.print("[bold {0}]╔══ BULUT MODELLER (OPENROUTER) ══╗[/bold {0}]".format(MAGENTA))
-        or_key_env = os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OR_API_KEY")
-        or_status = "[bold {0}]✓ API Key bulundu[/bold {0}]".format(GREEN) if or_key_env else "[bold {0}]○ API Key yok (secince istenecek)[/bold {0}]".format(YELLOW)
-        console.print("  [dim]Durum: {0}[/dim]".format(or_status))
-        console.print()
-        or_models = [
-            ("anthropic/claude-3.5-sonnet", "Claude 3.5 Sonnet"),
-            ("openai/gpt-4o", "GPT-4o"),
-            ("anthropic/claude-3-opus", "Claude 3 Opus"),
-            ("meta-llama/llama-3.1-70b-instruct", "Llama 3.1 70B"),
-            ("google/gemini-2.0-flash-exp:free", "Gemini 2.0 Flash (Ucretsiz)"),
-            ("mistralai/mistral-large-2411", "Mistral Large"),
-        ]
-        for model_id, display in or_models:
-            menu_items.append({"idx": idx, "engine": "openrouter", "model": model_id, "label": display})
-            console.print("  [bold {0}][{1}][/bold {0}] {2}".format(MAGENTA, idx, display))
-            idx += 1
-
-        console.print()
-        console.print("[bold {0}]╔══ ACIK KAYNAK MODELLER (HUGGING FACE) ══╗[/bold {0}]".format(GREEN))
-        hf_key_env = os.environ.get("HUGGINGFACE_API_KEY") or os.environ.get("HF_TOKEN")
-        hf_status = "[bold {0}]✓ API Key bulundu[/bold {0}]".format(GREEN) if hf_key_env else "[bold {0}]○ API Key yok (secince istenecek)[/bold {0}]".format(YELLOW)
-        console.print("  [dim]Durum: {0}[/dim]".format(hf_status))
-        console.print()
-        hf_models = [
-            ("HuggingFaceH4/zephyr-7b-beta", "Zephyr 7B"),
-            ("mistralai/Mistral-7B-Instruct-v0.3", "Mistral 7B Instruct"),
-            ("meta-llama/Meta-Llama-3-8B-Instruct", "Llama 3 8B Instruct"),
-            ("Qwen/Qwen2.5-72B-Instruct", "Qwen 2.5 72B"),
-        ]
-        for model_id, display in hf_models:
-            menu_items.append({"idx": idx, "engine": "huggingface", "model": model_id, "label": display})
-            console.print("  [bold {0}][{1}][/bold {0}] {2}".format(GREEN, idx, display))
-            idx += 1
-
-        console.print()
-        console.print("  [dim]Cikis icin 0 veya Ctrl+C basin[/dim]")
-        console.print()
+        if self.konsol:
+            self._arayuz_goster()
 
         while True:
             try:
-                choice_str = Prompt.ask("[bold {0}]>> Seciminiz[/bold {0}]".format(CYAN), default="1")
-                choice_num = int(choice_str)
-            except (ValueError, TypeError):
-                console.print("[bold {0}]Gecerli bir numara girin![/bold {0}]".format(RED))
-                continue
+                if self.konsol:
+                    self.konsol.print()
+                    girdi = Prompt.ask(f"[bold {V5Tema.STAR_BLUE}]✦ V5[/bold {V5Tema.STAR_BLUE}]")
+                else:
+                    girdi = input("✦ V5 > ").strip()
             except (EOFError, KeyboardInterrupt):
-                console.print()
-                console.print(Panel("[bold {0}]Cikis yapiliyor...[/bold {0}]".format(RED), box=SIMPLE, border_style=RED))
-                sys.exit(0)
+                print()
+                print(patron_log("ATEŞLEME", "✦ V5_NEXUS_CORE Kapatılıyor — İyi günler Berkay Patron! ✦"))
+                break
 
-            if choice_num == 0:
-                console.print(Panel("[bold {0}]Cikis yapiliyor...[/bold {0}]".format(RED), box=SIMPLE, border_style=RED))
-                sys.exit(0)
-
-            if choice_num < 1 or choice_num > len(menu_items):
-                console.print("[bold {0}]Gecerli bir numara girin (1-{1})![/bold {0}]".format(RED, len(menu_items)))
+            if not girdi or not girdi.strip():
                 continue
 
-            selected = menu_items[choice_num - 1]
-            engine = selected["engine"]
-            model = selected["model"]
+            girdi = girdi.strip()
 
-            if engine == "ollama_start":
-                console.print("[bold {0}]Ollama baslatiliyor...[/bold {0}]".format(CYAN))
-                with Live(Spinner("dots", text="ollama serve calistiriliyor...", style=CYAN), refresh_per_second=10, transient=True):
-                    subprocess.Popen(["ollama", "serve"], creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-                time.sleep(3)
-                ok, _ = EngineChecker.check_ollama()
-                if ok:
-                    console.print(Panel("[bold {0}]✓ Ollama basarili sekilde baslatildi![/bold {0}]".format(GREEN), box=SIMPLE, border_style=GREEN))
-                    return self.select_model()
-                else:
-                    console.print(Panel("[bold {0}]Ollama baslatilamadi.[/bold {0}]".format(RED), box=SIMPLE, border_style=RED))
-                    sys.exit(0)
+            if girdi.lower() in ("cikis", "exit", "quit", "kapat"):
+                print(patron_log("ATEŞLEME", "✦ Çekirdek sonlandırılıyor. Beklemedeyim Berkay Patron! ✦"))
+                break
 
-            if engine == "ollama_install":
-                import webbrowser
-                webbrowser.open("https://ollama.com/download")
-                console.print(Panel("[dim]Tarayicida Ollama indirme sayfasi acildi.[/dim]", box=SIMPLE, border_style=DIM))
-                sys.exit(0)
+            self.istek_sayisi += 1
+            self.durum = "İŞLENİYOR"
 
-            if engine == "openrouter":
-                self.status = "CONNECTING"
-                self.status_detail = "Checking OpenRouter API key..."
-                api_key = os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OR_API_KEY")
-                if not api_key:
-                    console.print()
-                    console.print(Panel(
-                        "[bold {0}]OpenRouter API Key gerekiyor[/bold {0}]\n[dim]https://openrouter.ai/keys adresinden olusturabilirsiniz.[/dim]".format(YELLOW),
-                        box=SIMPLE,
-                        border_style=YELLOW,
-                        padding=(0, 2)
-                    ))
-                    api_key = Prompt.ask("[bold {0}]>> OpenRouter API Key girin[/bold {0}]".format(CYAN))
-                    api_key = api_key.strip()
-                if api_key:
-                    with Live(Spinner("dots", text="OpenRouter API kontrol ediliyor...", style=CYAN), refresh_per_second=10, transient=True):
-                        ok, status = EngineChecker.check_openrouter(api_key)
-                    if not ok:
-                        console.print(Panel("[bold {0}]OpenRouter API key gecersiz! (HTTP {1})[/bold {0}]".format(RED, status), box=SIMPLE, border_style=RED))
-                        console.print("[dim]Tekrar denemek icin Enter basin, cikmak icin Ctrl+C[/dim]")
-                        try:
-                            input()
-                        except KeyboardInterrupt:
-                            sys.exit(0)
-                        continue
-                    self.api_key = api_key
-                    console.print(Panel("[bold {0}]✓ OpenRouter API key dogrulandi![/bold {0}]".format(GREEN), box=SIMPLE, border_style=GREEN))
-                else:
-                    console.print(Panel("[bold {0}]API key girilmedi.[/bold {0}]".format(RED), box=SIMPLE, border_style=RED))
-                    sys.exit(0)
+            try:
+                sonuc = self.emir_cozumle(girdi)
+            except Exception as e:
+                print(patron_log("HATA", "Beklenmeyen hata", str(e)[:100]))
+                continue
 
-            if engine == "huggingface":
-                self.status = "CONNECTING"
-                self.status_detail = "Checking Hugging Face API key..."
-                api_key = os.environ.get("HUGGINGFACE_API_KEY") or os.environ.get("HF_TOKEN")
-                if not api_key:
-                    console.print()
-                    console.print(Panel(
-                        "[bold {0}]Hugging Face API Key gerekiyor[/bold {0}]\n[dim]https://huggingface.co/settings/tokens adresinden olusturabilirsiniz.[/dim]".format(YELLOW),
-                        box=SIMPLE,
-                        border_style=YELLOW,
-                        padding=(0, 2)
-                    ))
-                    api_key = Prompt.ask("[bold {0}]>> Hugging Face API Key girin[/bold {0}]".format(CYAN))
-                    api_key = api_key.strip()
-                if api_key:
-                    with Live(Spinner("dots", text="Hugging Face API kontrol ediliyor...", style=CYAN), refresh_per_second=10, transient=True):
-                        ok, status = EngineChecker.check_huggingface(api_key)
-                    if not ok:
-                        console.print(Panel("[bold {0}]Hugging Face API key gecersiz! (HTTP {1})[/bold {0}]".format(RED, status), box=SIMPLE, border_style=RED))
-                        console.print("[dim]Tekrar denemek icin Enter basin, cikmak icin Ctrl+C[/dim]")
-                        try:
-                            input()
-                        except KeyboardInterrupt:
-                            sys.exit(0)
-                        continue
-                    self.api_key = api_key
-                    console.print(Panel("[bold {0}]✓ Hugging Face API key dogrulandi![/bold {0}]".format(GREEN), box=SIMPLE, border_style=GREEN))
-                else:
-                    console.print(Panel("[bold {0}]API key girilmedi.[/bold {0}]".format(RED), box=SIMPLE, border_style=RED))
-                    sys.exit(0)
+            self.durum = "BEKLİYOR"
 
-            if engine == "ollama":
-                self.status = "CONNECTING"
-                self.status_detail = "Checking Ollama models..."
-                with Live(Spinner("dots", text="Ollama kontrol ediliyor...", style=CYAN), refresh_per_second=10, transient=True):
-                    ok, models = EngineChecker.check_ollama()
-                if not ok:
-                    console.print(Panel("[bold {0}]Ollama servisi calismiyor![/bold {0}]".format(RED), box=SIMPLE, border_style=RED))
-                    sys.exit(0)
-                if model not in models:
-                    console.print(Panel(
-                        "[bold {0}]Model '{1}' yerel yuklu degil![/bold {0}]".format(YELLOW, model),
-                        box=SIMPLE,
-                        border_style=YELLOW
-                    ))
-                    retry = Prompt.ask("[bold {0}]Simdi indirmek istiyor musunuz? (evet/hayir)[/bold {0}]".format(CYAN), default="hayir")
-                    if retry.lower() in ("evet", "e", "yes", "y"):
-                        console.print("[bold {0}]Model indiriliyor: {1}[/bold {0}]".format(YELLOW, model))
-                        with Live(Spinner("dots", text="{0} indiriliyor...".format(model), style=YELLOW), refresh_per_second=10, transient=True):
-                            try:
-                                subprocess.run(["ollama", "pull", model], capture_output=True, text=True, timeout=600)
-                                console.print(Panel("[bold {0}]✓ Model basariyla indirildi![/bold {0}]".format(GREEN), box=SIMPLE, border_style=GREEN))
-                            except Exception:
-                                console.print("[bold {0}]Indirme basarisiz.[/bold {0}]".format(RED))
-                                sys.exit(0)
+            # ── Sonuçları göster ─────────────────────────────
+            tur = sonuc.get("tur", "mesaj")
+            sonuc_icerik = sonuc.get("sonuc", "")
+            mesaj = sonuc.get("mesaj", "")
+
+            if tur == "gorsel":
+                print(patron_log("BASARI", f"Flux görseli hazır! Tarayıcınızda açıldı Berkay Patron.", sonuc_icerik))
+
+            elif tur == "mesaj":
+                print(f"\n  💠 {mesaj or sonuc_icerik}\n")
+
+            elif tur == "bilgi":
+                bilgi = sonuc_icerik
+                print(f"\n  💻 SİSTEM BİLGİSİ")
+                print(f"  ────────────────")
+                for anahtar, deger in bilgi.items():
+                    print(f"  {anahtar}: {deger}")
+                print()
+
+            elif tur == "durum":
+                s = sonuc_icerik
+                print(f"\n  ⏱  Çalışma Süresi: {s['calisma_suresi']}")
+                print(f"  📡 Motor: {s['motor']}")
+                print(f"  🤖 Model: {s['model']}")
+                print(f"  📊 İstek: {s['istek_sayisi']}")
+                print(f"  🧠 Hafıza: {s['hafiza_dosyasi']} kayıt")
+                print(f"  🆔 Oturum: {s['oturum']}\n")
+
+            elif tur == "yardim":
+                print(f"\n  {sonuc_icerik}\n")
+
+            elif tur == "hafiza":
+                kayitlar = sonuc_icerik
+                if mesaj:
+                    print(f"\n  {mesaj}\n")
+                for k in kayitlar[:5]:
+                    ozet = k.get("content_preview", "")[:120].replace("\n", " ")
+                    print(f"  📄 {k.get('path','?')}")
+                    print(f"     {ozet}...\n")
+
+            elif tur == "komut":
+                komut_sonuc = sonuc_icerik
+                if komut_sonuc.get("basari"):
+                    cikti = komut_sonuc.get("cikti", "").strip()
+                    if cikti:
+                        print(f"\n  ── KOMUT ÇIKTISI ──\n  {cikti}\n  ──\n")
                     else:
-                        sys.exit(0)
+                        print(f"  ✅ Komut başarıyla çalıştı (çıktı yok)\n")
+                else:
+                    hata = komut_sonuc.get("hata", "Bilinmeyen hata")
+                    print(f"  ❌ Komut hatası: {hata}\n")
 
-            break
-
-        self.engine = engine
-        self.model_name = model
-        self.status = "IDLE"
-        self.status_detail = ""
-        return model
-
-    def call_ollama(self, model, prompt):
-        url = "http://localhost:11434/api/generate"
-        payload = {"model": model, "prompt": prompt, "stream": False, "format": "json"}
-        response = requests.post(url, json=payload, timeout=120)
-        response.raise_for_status()
-        data = response.json()
-        return data.get("response", "")
-
-    def call_openrouter(self, model, prompt):
-        url = "https://openrouter.ai/api/v1/chat/completions"
-        headers = {
-            "Authorization": "Bearer {0}".format(self.api_key),
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://glassesvibe.local",
-            "X-Title": "GLASSES VIBE"
-        }
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt}
-        ]
-        payload = {"model": model, "messages": messages, "response_format": {"type": "json_object"}}
-        response = requests.post(url, json=payload, headers=headers, timeout=120)
-        response.raise_for_status()
-        data = response.json()
-        return data["choices"][0]["message"]["content"]
-
-    def call_huggingface(self, model, prompt):
-        url = "https://api-inference.huggingface.co/models/{0}".format(model)
-        headers = {"Authorization": "Bearer {0}".format(self.api_key), "Content-Type": "application/json"}
-        full_prompt = SYSTEM_PROMPT + "\n\nKullanici: " + prompt + "\nAsistan:"
-        payload = {"inputs": full_prompt, "parameters": {"return_full_text": False, "max_new_tokens": 2048, "temperature": 0.3, "do_sample": True}}
-        response = requests.post(url, json=payload, headers=headers, timeout=120)
-        response.raise_for_status()
-        data = response.json()
-        if isinstance(data, list):
-            text = data[0].get("generated_text", "")
-        elif isinstance(data, dict):
-            if "error" in data:
-                raise ValueError("Hugging Face API error: {0}".format(data.get("error", "Unknown")))
-            text = data.get("generated_text", "")
-        else:
-            text = str(data)
-        return text
-
-    def call_engine(self, prompt):
-        if self.engine == "ollama":
-            return self.call_ollama(self.model_name, prompt)
-        elif self.engine == "openrouter":
-            return self.call_openrouter(self.model_name, prompt)
-        elif self.engine == "huggingface":
-            return self.call_huggingface(self.model_name, prompt)
-        else:
-            raise ValueError("Unknown engine: {0}".format(self.engine))
-
-    def create_file(self, file_name, content):
-        try:
-            full_path = os.path.join(os.getcwd(), file_name)
-            dir_path = os.path.dirname(full_path)
-            if dir_path:
-                os.makedirs(dir_path, exist_ok=True)
-            with open(full_path, 'w', encoding='utf-8') as f:
-                f.write(content)
-            self.file_count += 1
-            return True, full_path
-        except Exception as e:
-            return False, str(e)
-
-    def read_file(self, file_name):
-        try:
-            full_path = os.path.join(os.getcwd(), file_name)
-            if not os.path.exists(full_path):
-                return False, "Dosya bulunamadi: {0}".format(file_name)
-            with open(full_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            return True, content
-        except Exception as e:
-            return False, str(e)
-
-    def run_command(self, command):
-        try:
-            result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=60, cwd=os.getcwd())
-            output = result.stdout
-            if result.stderr:
-                output += "\n[STDERR]\n" + result.stderr
-            if not output.strip():
-                output = "(cikti yok)"
-            return True, output
-        except subprocess.TimeoutExpired:
-            return False, "Komut zaman asimina ugradi (60s)"
-        except Exception as e:
-            return False, str(e)
-
-    def show_commands(self):
-        console.print()
-        console.print("  [bold {0}]/status[/bold {0}]     Show session status".format(CYAN))
-        console.print("  [bold {0}]/clear[/bold {0}]      Clear conversation history".format(CYAN))
-        console.print("  [bold {0}]/models[/bold {0}]     List available models".format(CYAN))
-        console.print("  [bold {0}]/engine[/bold {0}]     Change AI engine".format(CYAN))
-        console.print("  [bold {0}]/help[/bold {0}]       Show this help menu".format(CYAN))
-        console.print("  [bold {0}]/exit[/bold {0}]       Exit GLASSES VIBE".format(CYAN))
-        console.print()
-
-    def show_status_detail(self):
-        elapsed = time.time() - self.start_time
-        minutes = int(elapsed // 60)
-        seconds = int(elapsed % 60)
-        engine_label = self.engine or "not selected"
-        console.print()
-        console.print("  [dim]engine:[/dim] [bold]{0}[/bold]".format(engine_label))
-        console.print("  [dim]model:[/dim] [bold]{0}[/bold]".format(self.model_name))
-        console.print("  [dim]requests:[/dim] {0}".format(self.request_count))
-        console.print("  [dim]files created:[/dim] {0}".format(self.file_count))
-        console.print("  [dim]session:[/dim] {0}m {1}s".format(minutes, seconds))
-        console.print()
-
-    def get_chat_input_panel(self):
-        input_text = Text()
-        input_text.append("  💬 ", style="bold {0}".format(CYAN))
-        input_text.append("Mesajınızı yazın ve Enter'a basın...", style="dim #ffffff")
-        return Panel(
-            input_text,
-            box=SIMPLE,
-            border_style=CYAN,
-            padding=(0, 2)
-        )
-
-    def build_layout(self):
-        layout = Layout()
-        layout.split_column(
-            Layout(name="header", size=10),
-            Layout(name="main", ratio=1),
-            Layout(name="chat_input", size=3)
-        )
-        layout["header"].split_row(
-            Layout(self.get_logo_panel(), ratio=1)
-        )
-        layout["main"].split_row(
-            Layout(self.get_explorer_panel(), name="explorer", ratio=1),
-            Layout(name="right_panel", ratio=2)
-        )
-        layout["right_panel"].split_column(
-            Layout(self.get_workspace_panel(), name="workspace", ratio=1),
-            Layout(self.get_chat_history_panel(), name="chat_history", ratio=1)
-        )
-        layout["chat_input"].update(self.get_chat_input_panel())
-        return layout
-
-    def run(self):
-        self.show_banner()
-
-        console.print(Panel(
-            "[bold {0}]GLASSES VIBE IDE Agent v10.0.0[/bold {0}]\n[dim]Multi-Engine: Ollama + OpenRouter + Hugging Face[/dim]\n[dim]File Explorer + Workspace + Status Bar[/dim]".format(CYAN),
-            box=SIMPLE,
-            border_style=MAGENTA,
-            padding=(0, 2)
-        ))
-        console.print()
-
-        self.model_name = self.select_model()
-
-        console.print()
-        console.print(Rule("session started", style="dim {0}".format(CYAN)))
-        console.print()
-
-        while True:
-            self.explorer.scan(force=True)
-
-            layout = self.build_layout()
-
-            with Live(layout, refresh_per_second=4, screen=False):
+            elif tur == "ai":
+                # AI motoruna sor
+                prompt = sonuc_icerik
+                print(patron_log("BILGI", "AI motoruna danışılıyor..."))
+                yanit_json = self.ai.sor(prompt)
                 try:
-                    user_input = Prompt.ask("[bold {0}]>> GLASSES VIBE[/bold {0}]".format(CYAN))
-                except (EOFError, KeyboardInterrupt):
-                    console.print()
-                    console.print(Panel("[bold {0}]GLASSES VIBE kapatiliyor... Gule gule![/bold {0}]".format(MAGENTA), box=SIMPLE, border_style=MAGENTA))
-                    break
+                    yanit = json.loads(yanit_json)
+                    icerik = yanit.get("icerik", yanit_json)
+                    dusunce = yanit.get("dusunce", "")
+                    aksiyon = yanit.get("aksiyon", "")
+                    hedef = yanit.get("hedef", "")
 
-                if user_input is None:
-                    continue
+                    if dusunce:
+                        print(f"\n  💭 {dusunce}")
 
-                user_input = user_input.strip()
-                if not user_input:
-                    continue
-
-                self.user_input = user_input
-                self.chat_messages.append({"role": "user", "content": user_input})
-
-                if user_input.startswith("/"):
-                    cmd = user_input[1:].lower()
-                    if cmd in ("exit", "quit"):
-                        console.print()
-                        console.print(Panel("[bold {0}]GLASSES VIBE kapatiliyor... Gule gule![/bold {0}]".format(MAGENTA), box=SIMPLE, border_style=MAGENTA))
-                        break
-                    elif cmd == "help":
-                        self.show_commands()
-                        continue
-                    elif cmd == "status":
-                        self.show_status_detail()
-                        continue
-                    elif cmd == "clear":
-                        self.history.clear()
-                        self.thought_log = []
-                        self.output_log = []
-                        self.last_file_name = ""
-                        self.last_file_content = ""
-                        self.user_input = ""
-                        self.chat_messages = []
-                        console.print("[dim]Conversation history cleared.[/dim]")
-                        continue
-                    elif cmd == "models":
-                        if self.engine == "ollama":
-                            try:
-                                response = requests.get("http://localhost:11434/api/tags", timeout=5)
-                                data = response.json()
-                                console.print()
-                                console.print("  [bold]Ollama Modelleri[/bold]")
-                                console.print()
-                                for m in data.get("models", []):
-                                    size_gb = round(m.get("size", 0) / (1024**3), 1)
-                                    console.print("  {0}  [dim]({1} GB)[/dim]".format(m["name"], size_gb))
-                                console.print()
-                            except Exception:
-                                console.print("  [dim]No models found.[/dim]")
-                        else:
-                            console.print("  [dim]Current engine: {0} ({1})[/dim]".format(self.engine, self.model_name))
-                        continue
-                    elif cmd == "engine":
-                        self.model_name = self.select_model()
-                        console.print(Rule("engine changed", style="dim {0}".format(CYAN)))
-                        continue
+                    if aksiyon == "gorsel_uret" and hedef:
+                        NexusMotor.gorsel_uret_ve_ac(hedef)
+                    elif aksiyon == "komut_calistir" and hedef:
+                        komut_sonuc = SiberAjan.komut_calistir(hedef)
+                        if komut_sonuc["basari"]:
+                            print(f"\n  ── SİBER AJAN ÇIKTISI ──\n{komut_sonuc['cikti']}\n  ──\n")
+                    elif aksiyon == "dosya_yaz" and hedef and icerik:
+                        try:
+                            with open(hedef, "w", encoding="utf-8") as f:
+                                f.write(icerik)
+                            print(patron_log("BASARI", f"Dosya yazıldı: {hedef}", f"{len(icerik)} karakter"))
+                        except Exception as e:
+                            print(patron_log("HATA", "Dosya yazılamadı", str(e)[:80]))
+                    elif aksiyon == "dosya_oku" and hedef:
+                        try:
+                            with open(hedef, "r", encoding="utf-8") as f:
+                                icerik_oku = f.read()
+                            print(f"\n  ── {hedef} ──\n{icerik_oku}\n  ──\n")
+                        except Exception as e:
+                            print(patron_log("HATA", "Dosya okunamadı", str(e)[:80]))
                     else:
-                        console.print("  [dim]Unknown command: /{0}. Type /help.[/dim]".format(cmd))
-                        continue
+                        if icerik:
+                            print(f"\n  ✨ {icerik}\n")
 
-                self.status = "CONNECTING"
-                self.status_detail = "Connecting to {0}...".format(self.engine)
-                self.history.add("user", user_input)
-                self.request_count += 1
+                except json.JSONDecodeError:
+                    # Ham yanıt göster
+                    print(f"\n  ✨ {yanit_json}\n")
 
-                prompt = "{0}\n\nKullanici: {1}".format(self.history.get_system_prompt(), user_input)
+            self.sayfa_gecmisi.append((girdi, sonuc))
 
-                with Live(Spinner("dots", text="CONNECTING & CHECKING...", style=BLUE), refresh_per_second=10, transient=True):
-                    self.status = "CONNECTING"
-                    self.status_detail = "Connecting to {0}...".format(self.engine)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V5 BAĞIMSIZ GÖRSEL MOTORU (exports)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                self.status = "THINKING"
-                self.status_detail = "Processing with {0} ({1})".format(self.engine, self.model_name)
+def v5_gorsel_olustur(prompt: str, boyut: str = "genis") -> str:
+    """V5 dışa dönük görsel oluşturma fonksiyonu."""
+    return NexusMotor.gorsel_uret_ve_ac(prompt, boyut)
 
-                with Live(Spinner("dots", text="GLASSES VIBE dusunuyor...", style=YELLOW), refresh_per_second=10, transient=True):
-                    try:
-                        response = self.call_engine(prompt)
-                    except Exception as e:
-                        console.print(Panel("[bold {0}]Engine error: {1}[/bold {0}]".format(RED, e), box=SIMPLE, border_style=RED))
-                        self.status = "IDLE"
-                        self.status_detail = ""
-                        continue
+def v5_siber_komut(komut: str) -> Dict[str, Any]:
+    """V5 dışa dönük siber komut fonksiyonu."""
+    return SiberAjan.komut_calistir(komut)
 
-                if response is None:
-                    self.status = "IDLE"
-                    self.status_detail = ""
-                    continue
-
-                parsed = JSONParser.clean_and_parse(response)
-                self.history.add("assistant", response)
-                self.chat_messages.append({"role": "assistant", "content": response})
-
-                dusunce = parsed.get("dusunce", "")
-                aksiyon = parsed.get("aksiyon", "mesaj_gonder")
-                hedef = parsed.get("hedef", "")
-                icerik = parsed.get("icerik", "")
-
-                if dusunce:
-                    self.thought_log.append(dusunce)
-                    console.print(Panel(
-                        Text(dusunce, style="italic dim {0}".format(MAGENTA)),
-                        title="[bold {0}] thinking [/bold {0}]".format(MAGENTA),
-                        box=SIMPLE,
-                        border_style=MAGENTA,
-                        padding=(0, 1)
-                    ))
-
-                if aksiyon == "dosya_yarat" and hedef and icerik:
-                    self.status = "WRITING"
-                    self.status_detail = "Creating {0}...".format(hedef)
-                    with Live(Spinner("dots", text="Dosya yaziliyor: {0}".format(hedef), style=MAGENTA), refresh_per_second=10, transient=True):
-                        success, result = self.create_file(hedef, icerik)
-                    if success:
-                        self.status = "SUCCESS"
-                        self.status_detail = "BASARIYLA DOSYALANDI: {0}".format(hedef)
-                        self.last_file_name = hedef
-                        self.last_file_content = icerik
-                        self.output_log.append("[bold {0}]file created: {1}[/bold {0}]".format(GREEN, result))
-                        ext = hedef.split('.')[-1] if '.' in hedef else "text"
-                        lang_map = {"py": "python", "js": "javascript", "html": "html", "css": "css", "json": "json", "yaml": "yaml", "yml": "yaml", "toml": "toml", "sh": "bash", "ps1": "powershell", "cs": "csharp", "gd": "gdscript", "md": "markdown", "xml": "xml", "sql": "sql", "rb": "ruby", "go": "go", "rs": "rust", "ts": "typescript", "java": "java", "cpp": "cpp", "c": "c"}
-                        lang = lang_map.get(ext, "text")
-                        syntax = Syntax(icerik, lang, theme="monokai", line_numbers=True, word_wrap=True)
-                        console.print(Panel(
-                            syntax,
-                            title="[bold {0}] BASARIYLA DOSYALANDI: {1} [/bold {0}]".format(GREEN, hedef),
-                            box=SIMPLE,
-                            border_style=GREEN,
-                            padding=(0, 0)
-                        ))
-                        console.print(Panel(
-                            "[bold {0}]✓ DOSYA BASARIYLA OLUSTURULDU: {1}[/bold {0}]".format(GREEN, result),
-                            box=SIMPLE,
-                            border_style=GREEN
-                        ))
-                        self.explorer.scan(force=True)
-                    else:
-                        console.print(Panel("[bold {0}]File creation error: {1}[/bold {0}]".format(RED, result), box=SIMPLE, border_style=RED))
-                        self.status = "IDLE"
-                        self.status_detail = ""
-
-                elif aksiyon == "dosya_oku" and hedef:
-                    self.status = "THINKING"
-                    self.status_detail = "Reading {0}...".format(hedef)
-                    with Live(Spinner("dots", text="Dosya okunuyor: {0}".format(hedef), style=CYAN), refresh_per_second=10, transient=True):
-                        success, result = self.read_file(hedef)
-                    if success:
-                        self.status = "SUCCESS"
-                        self.status_detail = "DOSYA OKUNDU: {0}".format(hedef)
-                        self.last_file_name = hedef
-                        self.last_file_content = result
-                        self.output_log.append("[bold {0}]file read: {1}[/bold {0}]".format(CYAN, hedef))
-                        ext = hedef.split('.')[-1] if '.' in hedef else "text"
-                        lang_map = {"py": "python", "js": "javascript", "html": "html", "css": "css", "json": "json", "yaml": "yaml", "yml": "yaml", "toml": "toml", "sh": "bash", "ps1": "powershell", "cs": "csharp", "gd": "gdscript", "md": "markdown", "xml": "xml", "sql": "sql", "rb": "ruby", "go": "go", "rs": "rust", "ts": "typescript", "java": "java", "cpp": "cpp", "c": "c"}
-                        lang = lang_map.get(ext, "text")
-                        syntax = Syntax(result, lang, theme="monokai", line_numbers=True, word_wrap=True)
-                        console.print(Panel(
-                            syntax,
-                            title="[bold {0}] DOSYA ICERIGI: {1} [/bold {0}]".format(CYAN, hedef),
-                            box=SIMPLE,
-                            border_style=CYAN,
-                            padding=(0, 0)
-                        ))
-                    else:
-                        console.print(Panel("[bold {0}]File read error: {1}[/bold {0}]".format(RED, result), box=SIMPLE, border_style=RED))
-                        self.status = "IDLE"
-                        self.status_detail = ""
-
-                elif aksiyon == "terminal_komutu" and hedef:
-                    self.status = "WRITING"
-                    self.status_detail = "Running: {0}".format(hedef)
-                    with Live(Spinner("dots", text="Komut calistiriliyor: {0}".format(hedef), style=YELLOW), refresh_per_second=10, transient=True):
-                        success, result = self.run_command(hedef)
-                    if success:
-                        self.status = "SUCCESS"
-                        self.status_detail = "KOMUT CALISTIRILDI"
-                        self.output_log.append("[bold {0}]command: {1}[/bold {0}]".format(GREEN, hedef))
-                        console.print(Panel(
-                            Text(result.strip(), style="white"),
-                            title="[bold {0}] TERMINAL CIKTISI: {1} [/bold {0}]".format(YELLOW, hedef),
-                            box=SIMPLE,
-                            border_style=YELLOW,
-                            padding=(0, 1)
-                        ))
-                    else:
-                        console.print(Panel("[bold {0}]Command error: {1}[/bold {0}]".format(RED, result), box=SIMPLE, border_style=RED))
-                        self.status = "IDLE"
-                        self.status_detail = ""
-
-                else:
-                    if icerik:
-                        self.output_log.append(icerik[:500])
-                        console.print(Panel(
-                            Markdown(icerik),
-                            box=SIMPLE,
-                            border_style=CYAN,
-                            padding=(0, 1)
-                        ))
-
-                self.status = "IDLE"
-                self.status_detail = ""
-                console.print()
-
-
-# ═══════════════════════════════════════════════════════════════
-# GLASSESGLITCHSTUDIO / GULMZCETINER V4+ — Text-to-Image Motoru
-#═══════════════════════════════════════════════════════════════
-# Tamamen ücretsiz · Sınırsız kullanım · API anahtarı gerekmez
-# Hiçbir yerel kurulum yok · Donanım yükü SIFIR
-# Altyapı: https://image.pollinations.ai/p/ (halka açık bulut)
-#═══════════════════════════════════════════════════════════════
-
-def v4_gorsel_olustur(prompt):
-    """
-    Kullanıcının yazdığı prompt metnini alır,
-    Pollinations.ai üzerinden 1920×1080 Flux kalitesinde
-    görsel üretir ve tarayıcıda açar.
-
-    Parametre:
-        prompt (str): "bir kedi" gibi görsel açıklaması
-
-    Geri Döndürür:
-        str: Oluşturulan görselin tam URL'i
-    """
-    # Prompt'u URL güvenli hale getir (Türkçe karakterler, boşluklar vs.)
-    guvenli_prompt = urllib.parse.quote(prompt)
-
-    # V4+ görsel linkini oluştur: geniş ekran + Flux model
-    gorsel_url = (
-        "https://image.pollinations.ai/p/"
-        + guvenli_prompt
-        + "?width=1920&height=1080&model=flux"
-    )
-
-    # Görseli doğrudan Erkay patronun tarayıcısında aç
-    webbrowser.open(gorsel_url)
-
-    return gorsel_url
-
-def v4_gorsel_olustur_console(prompt):
-    """
-    V4+ motorunu konsoldan çalıştırır,
-    durumu Glasses Vibe arayüzüne uygun şekilde gösterir.
-    """
-    console.print("[bold {0}═══ V4+ GÖRSEL ÜRETİM MOTORU ═══[/bold {0}]".format(CYAN))
-    console.print("[dim]{0}[/dim]".format(prompt))
-    console.print()
-
-    with console.status("[bold {0}]Görsel oluşturuluyor...[/bold {0}]".format(YELLOW)):
-        url = v4_gorsel_olustur(prompt)
-        time.sleep(0.5)
-
-    console.print("[bold {0}✓[/bold {0}] [bold]V4+ Görsel hazır![/bold]".format(GREEN))
-    console.print("[dim]{0}[/dim]".format(url))
-    console.print("[bold {0}▶[/bold {0}] Tarayıcıda açıldı, Berkay patron!".format(MAGENTA))
-    console.print()
-
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# GİRİŞ NOKTASI
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 def main():
-    agent = GlassesVibeIDE()
-    agent.run()
+    print()
+    print(f"  ╔{'═'*50}╗")
+    print(f"  ║  V5_NEXUS_CORE — Glassesglitch Studio       ║")
+    print(f"  ║  gulmzcetiner:V5                     ║")
+    print(f"  ║  ~ Berkay Patron için inşa edildi ~         ║")
+    print(f"  ╚{'═'*50}╝")
+    print()
 
+    cekirdek = V5NexusCore()
+    cekirdek.calistir()
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        console.print()
-        console.print(Panel("[bold {0}]GLASSES VIBE kapatiliyor... Gule gule![/bold {0}]".format(MAGENTA), box=SIMPLE, border_style=MAGENTA))
+        print()
+        print(patron_log("ATEŞLEME", "✦ V5_NEXUS_CORE kapatıldı. Beklemedeyim Berkay Patron! ✦"))
         sys.exit(0)
+    except Exception as e:
+        print(patron_log("HATA", "Çekirdek kritik hata ile karşılaştı", str(e)[:200]))
+        sys.exit(1)
