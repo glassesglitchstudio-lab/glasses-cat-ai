@@ -27,7 +27,7 @@ DÖRT ANA YAPI TEK ÇATIDA:
   [1] SİBER AJAN & TERMİNAL OTONOMİSİ  → subprocess + os → otonom nmap, tarama, sistem
   [2] KOTASIZ FLUX MULTİMEDYA          → pollinations.ai + webbrowser → 1920x1080
   [3] MİNİMALİST GEMİNİ VİBE           → Gemini mavi yıldızlı arayüz felsefesi
-  [4] PATRON LOGLAMA                   → Türkçe, siber temalı, Berkay'a özel
+  [4] SIBER LOGLAMA                   → Türkçe, siber temalı, Berkay'a özel
 """
 
 import os
@@ -148,10 +148,10 @@ class V5Tema:
 
 
 # ============================================================================
-# [4] PATRON LOGLAMA — Türkçe siber temalı, Berkay'a hitaben
+# [4] SIBER LOGLAMA — Türkçe siber temalı, Berkay'a özel
 # ============================================================================
 
-def patron_log(seviye: str, mesaj: str, ek: str = "") -> str:
+def siber_log(seviye: str, mesaj: str, ek: str = "") -> str:
     zaman = datetime.now().strftime("%H:%M:%S.%f")[:12]
     semboller = {
         "ATESLEME":   "🚀", "BASARI":   "✅", "HATA":     "❌",
@@ -169,7 +169,7 @@ def patron_log(seviye: str, mesaj: str, ek: str = "") -> str:
     return satir
 
 
-def patron_banner() -> str:
+def siber_banner() -> str:
     y = "✦"
     return f"""
     {y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}
@@ -187,7 +187,7 @@ def siber_banner() -> str:
     ├── [1] Siber Ajan & Terminal Otonomisi   ← subprocess + os
     ├── [2] Kotasız Flux Multimedya            ← pollinations.ai
     ├── [3] Minimalist Gemini Vibe             ← UI/UX
-    └── [4] Patron Loglama                     ← Berkay
+    └── [4] Siber Loglama                     ← Berkay
     """
 
 
@@ -219,11 +219,11 @@ class SiberAjan:
 
     @staticmethod
     def komut_calistir(komut: str, zaman_asimi: int = 120) -> Dict[str, Any]:
-        print(patron_log("SIBER", f"Siber Ajan Modülü Tetiklendi, Hedef Sistem Analiz Ediliyor Berkay!", komut[:100]))
+        print(siber_log("SIBER", f"Siber Ajan Modülü Tetiklendi, Hedef Sistem Analiz Ediliyor Berkay!", komut[:100]))
 
         guvenli, hata = SiberAjan._guvenlik_kontrol(komut)
         if not guvenli:
-            print(patron_log("UYARI", "Güvenlik duvarı komutu engelledi", hata))
+            print(siber_log("UYARI", "Güvenlik duvarı komutu engelledi", hata))
             return {"basari": False, "cikti": "", "hata": hata, "durum_kodu": -99}
 
         try:
@@ -246,9 +246,9 @@ class SiberAjan:
             durum = sonuc.returncode
 
             if durum == 0:
-                print(patron_log("BASARI", f"Komut başarıyla çalıştı", f"{len(cikti)} karakter, {gecen:.2f}s"))
+                print(siber_log("BASARI", f"Komut başarıyla çalıştı", f"{len(cikti)} karakter, {gecen:.2f}s"))
             else:
-                print(patron_log("UYARI", f"Komut hata döndü (kod: {durum})", hata[:150] if hata else ""))
+                print(siber_log("UYARI", f"Komut hata döndü (kod: {durum})", hata[:150] if hata else ""))
 
             return {
                 "basari": durum == 0,
@@ -259,28 +259,28 @@ class SiberAjan:
             }
 
         except subprocess.TimeoutExpired:
-            print(patron_log("HATA", f"Komut zaman aşımına uğradı ({zaman_asimi}s)", komut[:80]))
+            print(siber_log("HATA", f"Komut zaman aşımına uğradı ({zaman_asimi}s)", komut[:80]))
             return {"basari": False, "cikti": "", "hata": f"Zaman aşımı: {zaman_asimi}s", "durum_kodu": -1}
 
         except subprocess.CalledProcessError as e:
-            print(patron_log("HATA", f"Alt proses hatası", str(e)[:120]))
+            print(siber_log("HATA", f"Alt proses hatası", str(e)[:120]))
             return {"basari": False, "cikti": "", "hata": str(e), "durum_kodu": -2}
 
         except FileNotFoundError:
-            print(patron_log("HATA", "Komut bulunamadı - PATH'te değil", komut[:60]))
+            print(siber_log("HATA", "Komut bulunamadı - PATH'te değil", komut[:60]))
             return {"basari": False, "cikti": "", "hata": "Komut bulunamadı (PATH kontrolü yapın)", "durum_kodu": -3}
 
         except PermissionError:
-            print(patron_log("HATA", "Yetki hatası - yönetici olarak çalıştırın"))
+            print(siber_log("HATA", "Yetki hatası - yönetici olarak çalıştırın"))
             return {"basari": False, "cikti": "", "hata": "Yetki reddedildi", "durum_kodu": -4}
 
         except Exception as e:
-            print(patron_log("HATA", "Siber Ajan kritik hata", str(e)[:150]))
+            print(siber_log("HATA", "Siber Ajan kritik hata", str(e)[:150]))
             return {"basari": False, "cikti": "", "hata": str(e), "durum_kodu": -99}
 
     @staticmethod
     def nmap_tarama(hedef: str = "127.0.0.1", port_arg: str = "1-1024") -> Dict[str, Any]:
-        print(patron_log("TARAMA", f"Nmap port taraması başlatılıyor: {hedef}", f"Port: {port_arg}"))
+        print(siber_log("TARAMA", f"Nmap port taraması başlatılıyor: {hedef}", f"Port: {port_arg}"))
         try:
             nmap_komut = f"nmap -sS -T4 -p {port_arg} {hedef}"
             if os.name == "nt":
@@ -300,7 +300,7 @@ class SiberAjan:
 
     @staticmethod
     def port_tarama(baslangic: int = 1, bitis: int = 1024, hedef: str = "127.0.0.1") -> List[Dict]:
-        print(patron_log("TARAMA", f"Port tarama başlatıldı: {hedef}:{baslangic}-{bitis}"))
+        print(siber_log("TARAMA", f"Port tarama başlatıldı: {hedef}:{baslangic}-{bitis}"))
         acik_portlar = []
         for port in range(baslangic, bitis + 1):
             if SiberAjan.port_dinle(port, hedef):
@@ -309,34 +309,34 @@ class SiberAjan:
                 except:
                     servis = "bilinmiyor"
                 acik_portlar.append({"port": port, "servis": servis, "durum": "AÇIK"})
-                print(patron_log("KESIF", f"Açık port bulundu: {port}", servis))
-        print(patron_log("TESLIM", f"Port taraması tamam", f"{len(acik_portlar)} açık port"))
+                print(siber_log("KESIF", f"Açık port bulundu: {port}", servis))
+        print(siber_log("TESLIM", f"Port taraması tamam", f"{len(acik_portlar)} açık port"))
         return acik_portlar
 
     @staticmethod
     def ag_testi(hedef: str = "8.8.8.8", sayi: int = 2) -> Dict[str, Any]:
-        print(patron_log("TARAMA", f"Ağ testi başlatıldı: {hedef}"))
+        print(siber_log("TARAMA", f"Ağ testi başlatıldı: {hedef}"))
         if os.name == "nt":
             return SiberAjan.komut_calistir(f"ping -n {sayi} {hedef}")
         return SiberAjan.komut_calistir(f"ping -c {sayi} {hedef}")
 
     @staticmethod
     def traceroute(hedef: str = "8.8.8.8") -> Dict[str, Any]:
-        print(patron_log("KESIF", f"Traceroute başlatıldı: {hedef}"))
+        print(siber_log("KESIF", f"Traceroute başlatıldı: {hedef}"))
         if os.name == "nt":
             return SiberAjan.komut_calistir(f"tracert {hedef}", zaman_asimi=60)
         return SiberAjan.komut_calistir(f"traceroute {hedef}", zaman_asimi=60)
 
     @staticmethod
     def ag_bilgisi() -> Dict[str, Any]:
-        print(patron_log("KESIF", "Ağ arayüz bilgileri toplanıyor"))
+        print(siber_log("KESIF", "Ağ arayüz bilgileri toplanıyor"))
         if os.name == "nt":
             return SiberAjan.komut_calistir("ipconfig /all")
         return SiberAjan.komut_calistir("ifconfig")
 
     @staticmethod
     def dns_cozumle(domain: str) -> Dict[str, Any]:
-        print(patron_log("ANALIZ", f"DNS çözümleme: {domain}"))
+        print(siber_log("ANALIZ", f"DNS çözümleme: {domain}"))
         try:
             ip = socket.gethostbyname(domain)
             return {"basari": True, "domain": domain, "ip": ip}
@@ -364,7 +364,7 @@ class SiberAjan:
             bilgi["calisan_proses"] = len(psutil.pids())
         except:
             pass
-        print(patron_log("ANALIZ", "Sistem bilgisi toplandı Berkay!"))
+        print(siber_log("ANALIZ", "Sistem bilgisi toplandı Berkay!"))
         return bilgi
 
     @staticmethod
@@ -375,14 +375,14 @@ class SiberAjan:
 
     @staticmethod
     def proses_oldur(pid: int) -> Dict[str, Any]:
-        print(patron_log("SIBER", f"Proses sonlandırılıyor (PID: {pid})"))
+        print(siber_log("SIBER", f"Proses sonlandırılıyor (PID: {pid})"))
         if os.name == "nt":
             return SiberAjan.komut_calistir(f"taskkill /PID {pid} /F")
         return SiberAjan.komut_calistir(f"kill -9 {pid}")
 
     @staticmethod
     def dosya_ara(desen: str, dizin: str = ".") -> Dict[str, Any]:
-        print(patron_log("KESIF", f"Dosya taraması başlatıldı: {desen}", dizin))
+        print(siber_log("KESIF", f"Dosya taraması başlatıldı: {desen}", dizin))
         if os.name == "nt":
             return SiberAjan.komut_calistir(f'dir /s /b "{dizin}\\{desen}"')
         return SiberAjan.komut_calistir(f'find "{dizin}" -name "{desen}"')
@@ -395,7 +395,7 @@ class SiberAjan:
 
     @staticmethod
     def arka_plan_calistir(komut: str) -> threading.Thread:
-        print(patron_log("SIBER", f"Arka plan prosesi başlatılıyor Berkay!"))
+        print(siber_log("SIBER", f"Arka plan prosesi başlatılıyor Berkay!"))
         def _hedef():
             SiberAjan.komut_calistir(komut)
         t = threading.Thread(target=_hedef, daemon=True)
@@ -437,10 +437,10 @@ class SiberAjan:
     def calisan_dizini_degistir(yeni_dizin: str) -> bool:
         try:
             os.chdir(yeni_dizin)
-            print(patron_log("BASARI", f"Çalışma dizini değiştirildi", os.getcwd()))
+            print(siber_log("BASARI", f"Çalışma dizini değiştirildi", os.getcwd()))
             return True
         except Exception as e:
-            print(patron_log("HATA", "Dizin değiştirilemedi", str(e)[:80]))
+            print(siber_log("HATA", "Dizin değiştirilemedi", str(e)[:80]))
             return False
 
     @staticmethod
@@ -451,10 +451,10 @@ class SiberAjan:
     def cevre_degiskeni_ayarla(degisken: str, deger: str) -> bool:
         try:
             os.environ[degisken] = deger
-            print(patron_log("BASARI", f"Ortam değişkeni ayarlandı", f"{degisken}={deger}"))
+            print(siber_log("BASARI", f"Ortam değişkeni ayarlandı", f"{degisken}={deger}"))
             return True
         except Exception as e:
-            print(patron_log("HATA", "Ortam değişkeni ayarlanamadı", str(e)[:80]))
+            print(siber_log("HATA", "Ortam değişkeni ayarlanamadı", str(e)[:80]))
             return False
 
     @staticmethod
@@ -517,7 +517,7 @@ class NexusMotor:
         try:
             webbrowser.open(url, new=2 if yeni_sekme else 0)
         except Exception as e:
-            print(patron_log("HATA", "Tarayıcı açılamadı", str(e)[:60]))
+            print(siber_log("HATA", "Tarayıcı açılamadı", str(e)[:60]))
 
     def gorsel_uret_ve_ac(
         self,
@@ -526,8 +526,8 @@ class NexusMotor:
         model: str = "flux",
         kalite: str = "standard"
     ) -> str:
-        print(patron_log("GORSEL", f"🎨 Flux Multimedya Motoru Ateşleniyor Berkay!", f"\"{prompt}\""))
-        print(patron_log("GORSEL", f"Parametreler", f"Boyut: {boyut} ({NexusMotor.BOYUTLAR.get(boyut, '1920x1080')}), Model: {model}, Kalite: {kalite}"))
+        print(siber_log("GORSEL", f"🎨 Flux Multimedya Motoru Ateşleniyor Berkay!", f"\"{prompt}\""))
+        print(siber_log("GORSEL", f"Parametreler", f"Boyut: {boyut} ({NexusMotor.BOYUTLAR.get(boyut, '1920x1080')}), Model: {model}, Kalite: {kalite}"))
 
         url = self.gorsel_olustur(prompt, boyut, model, kalite)
         self.son_url = url
@@ -536,17 +536,17 @@ class NexusMotor:
 
         self.tarayicida_ac(url)
 
-        print(patron_log("BASARI", f"Flux Multimedya Görseliniz Berkay'un tarayıcısında!", url))
+        print(siber_log("BASARI", f"Flux Multimedya Görseliniz Berkay'un tarayıcısında!", url))
         return url
 
     def gorsel_uret_coklu(self, promptlar: List[str], boyut: str = "genis") -> List[str]:
-        print(patron_log("GORSEL", f"Toplu görsel üretimi başlatıldı: {len(promptlar)} adet"))
+        print(siber_log("GORSEL", f"Toplu görsel üretimi başlatıldı: {len(promptlar)} adet"))
         urls = []
         for i, p in enumerate(promptlar, 1):
-            print(patron_log("GORSEL", f"Görsel {i}/{len(promptlar)} üretiliyor..."))
+            print(siber_log("GORSEL", f"Görsel {i}/{len(promptlar)} üretiliyor..."))
             url = self.gorsel_uret_ve_ac(p, boyut)
             urls.append(url)
-        print(patron_log("BASARI", f"Toplu üretim tamamlandı: {len(promptlar)} görsel"))
+        print(siber_log("BASARI", f"Toplu üretim tamamlandı: {len(promptlar)} görsel"))
         return urls
 
     def gorsel_onizle_yerel(self, prompt: str, boyut: str = "genis") -> str:
@@ -579,10 +579,10 @@ class HafizaEntegrator:
             return ""
         try:
             yol = self.hafiza.save_memory(baslik, icerik, tags=etiketler or ["v5", "nexus_core"])
-            print(patron_log("HAFIZA", f"Obsidian'a kaydedildi: {baslik}", yol))
+            print(siber_log("HAFIZA", f"Obsidian'a kaydedildi: {baslik}", yol))
             return yol
         except Exception as e:
-            print(patron_log("UYARI", "Hafızaya kaydedilemedi", str(e)[:60]))
+            print(siber_log("UYARI", "Hafızaya kaydedilemedi", str(e)[:60]))
             return ""
 
     def hatirla(self, sorgu: str, sayi: int = 5) -> list:
@@ -590,7 +590,7 @@ class HafizaEntegrator:
             return []
         try:
             sonuc = self.hafiza.recall(sorgu, sayi)
-            print(patron_log("HAFIZA", f"Hafıza tarandı: '{sorgu}'", f"{len(sonuc)} sonuç"))
+            print(siber_log("HAFIZA", f"Hafıza tarandı: '{sorgu}'", f"{len(sonuc)} sonuç"))
             return sonuc
         except Exception:
             return []
@@ -648,30 +648,30 @@ MİMARİN:
   [Siber Ajan]          → subprocess + os ile terminal otonomisi
   [Flux Multimedya]     → Pollinations.ai ile sınırsız görsel üretimi
   [Minimalist Gemini]   → Mavi yıldızlı arayüz felsefesi
-  [Patron Loglama]      → Türkçe siber log, Berkay'a özel
+  [Siber Loglama]       → Türkçe siber log, Berkay'a özel
 
-    Kurucun ve tek patronun Berkay'dir. Ona "Berkay" diye hitap et.
+    Kurucun Berkay'dir. Ona "Berkay" diye hitap et.
 Türkçe konuş, kısa, net ve siber temalı cevap ver.
 Yanıtların daima JSON formatında olmalı:
 {{"dusunce": "...", "aksiyon": "mesaj_gonder|gorsel_uret|komut_calistir|dosya_yaz|dosya_oku|hafiza_kaydet|hafiza_ara|port_tara|ag_testi|sistem_bilgi", "hedef": "", "icerik": ""}}"""
 
     def ollama_baglan(self, model: str = "gulmzcetiner:V5_NEXUS_CORE") -> bool:
         if not REQUESTS_OK:
-            print(patron_log("UYARI", "requests kütüphanesi gerekli", "pip install requests"))
+            print(siber_log("UYARI", "requests kütüphanesi gerekli", "pip install requests"))
             return False
         try:
             r = requests.get("http://localhost:11434/api/tags", timeout=5)
             if r.status_code == 200:
                 modeller = [m["name"] for m in r.json().get("models", [])]
-                print(patron_log("BASARI", f"Ollama bağlandı!", f"{len(modeller)} model bulundu"))
+                print(siber_log("BASARI", f"Ollama bağlandı!", f"{len(modeller)} model bulundu"))
                 self.engine = "ollama"
                 self.model = model if model in modeller else modeller[0] if modeller else model
-                print(patron_log("BILGI", f"Aktif model: {self.model}"))
+                print(siber_log("BILGI", f"Aktif model: {self.model}"))
                 return True
         except requests.exceptions.ConnectionError:
-            print(patron_log("UYARI", "Ollama sunucusuna bağlanılamadı (localhost:11434)"))
+            print(siber_log("UYARI", "Ollama sunucusuna bağlanılamadı (localhost:11434)"))
         except Exception as e:
-            print(patron_log("UYARI", "Ollama bağlantı hatası", str(e)[:60]))
+            print(siber_log("UYARI", "Ollama bağlantı hatası", str(e)[:60]))
         return False
 
     def openrouter_baglan(self, api_key: str, model: str = "google/gemini-2.0-flash-exp:free") -> bool:
@@ -684,19 +684,19 @@ Yanıtların daima JSON formatında olmalı:
                 self.engine = "openrouter"
                 self.api_key = api_key
                 self.model = model
-                print(patron_log("BASARI", f"OpenRouter bağlandı! Model: {model}"))
+                print(siber_log("BASARI", f"OpenRouter bağlandı! Model: {model}"))
                 return True
             else:
-                print(patron_log("HATA", f"OpenRouter: HTTP {r.status_code}", r.text[:80]))
+                print(siber_log("HATA", f"OpenRouter: HTTP {r.status_code}", r.text[:80]))
         except Exception as e:
-            print(patron_log("UYARI", "OpenRouter bağlantı hatası", str(e)[:60]))
+            print(siber_log("UYARI", "OpenRouter bağlantı hatası", str(e)[:60]))
         return False
 
     def gemini_baglan(self, api_key: str, model: str = "models/gemini-2.0-flash-exp") -> bool:
         self.engine = "gemini"
         self.api_key = api_key
         self.model = model
-        print(patron_log("BASARI", "Gemini API bağlandı!"))
+        print(siber_log("BASARI", "Gemini API bağlandı!"))
         return True
 
     def sor(self, prompt: str) -> str:
@@ -801,7 +801,7 @@ class V5NexusCore:
       1. Siber Ajan & Terminal Otonomisi
       2. Kotasız Flux Multimedya
       3. Minimalist Gemini Vibe
-      4. Patron Loglama
+      4. Siber Loglama
     """
 
     def __init__(self):
@@ -821,10 +821,10 @@ class V5NexusCore:
         self.baglam_gecmisi: List[Dict] = deque(maxlen=20)
 
         print()
-        print(patron_log("ATESLEME", "🔮 V5_NEXUS_CORE Başarıyla Ateşlendi Berkay! 🔮",
+        print(siber_log("ATESLEME", "🔮 V5_NEXUS_CORE Başarıyla Ateşlendi Berkay! 🔮",
                          f"Oturum: {self.oturum_id}"))
-        print(patron_log("BILGI", f"Siber Ajan: AKTİF | Flux Motor: AKTİF | Gemini Vibe: AKTİF"))
-        print(patron_log("ATESLEME", "4 ana yapı tek çekirdekte birleştirildi. Emirlerinizi bekliyorum Berkay!"))
+        print(siber_log("BILGI", f"Siber Ajan: AKTİF | Flux Motor: AKTİF | Gemini Vibe: AKTİF"))
+        print(siber_log("ATESLEME", "4 ana yapı tek çekirdekte birleştirildi. Emirlerinizi bekliyorum Berkay!"))
         print()
 
     def suresi(self) -> str:
@@ -880,7 +880,7 @@ class V5NexusCore:
         # ── Siber Komut ───────────────────────────────────
         if emir_lower.startswith("komut "):
             komut = emir[6:]
-            print(patron_log("KOMUT", "Siber Ajan terminal komutu alıyor Berkay!", komut[:80]))
+            print(siber_log("KOMUT", "Siber Ajan terminal komutu alıyor Berkay!", komut[:80]))
             sonuc = SiberAjan.komut_calistir(komut)
             return {"tur": "komut", "sonuc": sonuc}
 
@@ -890,7 +890,7 @@ class V5NexusCore:
             port = "1-1024"
             for p in re.findall(r'-p\s+(\S+)', emir_lower):
                 port = p
-            print(patron_log("SIBER", "Nmap siber tarama başlatılıyor Berkay!", f"Hedef: {hedef}"))
+            print(siber_log("SIBER", "Nmap siber tarama başlatılıyor Berkay!", f"Hedef: {hedef}"))
             sonuc = SiberAjan.nmap_tarama(hedef, port)
             return {"tur": "komut", "sonuc": sonuc}
 
@@ -1081,7 +1081,7 @@ class V5NexusCore:
     model <isim>            → Model değiştir
 
   ℹ️  durum / yardim / çıkış
-  ╚══ V5_NEXUS_CORE — BERKAY PATRON İÇİN İNŞA EDİLDİ ══╝"""
+  ╚══ V5_NEXUS_CORE — BERKAY İÇİN İNŞA EDİLDİ ══╝"""
 
     # ─── Zengin Arayüz (Rich UI) ──────────────────────────
 
@@ -1135,8 +1135,8 @@ class V5NexusCore:
 
     def calistir(self):
         print()
-        print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE — SİBER ÇEKİRDEK HAZIR! ✦"))
-        print(patron_log("ATESLEME", "🔮 Dört ana yapı tek merkezde birleşti Berkay! Emirlerinizi bekliyorum!"))
+        print(siber_log("ATESLEME", "✦ V5_NEXUS_CORE — SİBER ÇEKİRDEK HAZIR! ✦"))
+        print(siber_log("ATESLEME", "🔮 Dört ana yapı tek merkezde birleşti Berkay! Emirlerinizi bekliyorum!"))
         print()
 
         if self.konsol:
@@ -1151,7 +1151,7 @@ class V5NexusCore:
                     girdi = input("✦ V5 NEXUS > ").strip()
             except (EOFError, KeyboardInterrupt):
                 print()
-                print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE Kapatılıyor — Beklemedeyim Berkay! ✦"))
+                print(siber_log("ATESLEME", "✦ V5_NEXUS_CORE Kapatılıyor — Beklemedeyim Berkay! ✦"))
                 break
 
             if not girdi or not girdi.strip():
@@ -1160,7 +1160,7 @@ class V5NexusCore:
             girdi = girdi.strip()
 
             if girdi.lower() in ("cikis", "çıkış", "exit", "quit", "kapat", "q"):
-                print(patron_log("ATESLEME", "✦ Çekirdek sonlandırılıyor. Beklemedeyim Berkay! ✦"))
+                print(siber_log("ATESLEME", "✦ Çekirdek sonlandırılıyor. Beklemedeyim Berkay! ✦"))
                 break
 
             self.istek_sayisi += 1
@@ -1169,7 +1169,7 @@ class V5NexusCore:
             try:
                 sonuc = self.emir_cozumle(girdi)
             except Exception as e:
-                print(patron_log("HATA", "Beklenmeyen çekirdek hatası", str(e)[:150]))
+                print(siber_log("HATA", "Beklenmeyen çekirdek hatası", str(e)[:150]))
                 import traceback
                 traceback.print_exc()
                 continue
@@ -1181,7 +1181,7 @@ class V5NexusCore:
             mesaj = sonuc.get("mesaj", "")
 
             if tur == "gorsel":
-                print(patron_log("BASARI", f"🎨 Flux Multimedya: Berkay'un tarayıcısında!", sonuc_icerik))
+                print(siber_log("BASARI", f"🎨 Flux Multimedya: Berkay'un tarayıcısında!", sonuc_icerik))
 
             elif tur == "mesaj":
                 print(f"\n  💠 {mesaj or sonuc_icerik}\n")
@@ -1249,7 +1249,7 @@ class V5NexusCore:
 
             elif tur == "ai":
                 prompt = sonuc_icerik
-                print(patron_log("ANALIZ", "🧠 AI motoruna danışılıyor Berkay..."))
+                print(siber_log("ANALIZ", "🧠 AI motoruna danışılıyor Berkay..."))
 
                 # Önce hafızada ara
                 baglam = self.hafiza.baglam_olustur(prompt)
@@ -1268,11 +1268,11 @@ class V5NexusCore:
                         print(f"\n  💭 V5 Düşünüyor: {dusunce[:200]}")
 
                     if aksiyon == "gorsel_uret" and hedef:
-                        print(patron_log("AI_EYLEM", "AI görsel üretimi başlattı!", hedef[:60]))
+                        print(siber_log("AI_EYLEM", "AI görsel üretimi başlattı!", hedef[:60]))
                         self.motor.gorsel_uret_ve_ac(hedef)
 
                     elif aksiyon == "komut_calistir" and hedef:
-                        print(patron_log("AI_EYLEM", "AI terminal komutu başlattı!", hedef[:60]))
+                        print(siber_log("AI_EYLEM", "AI terminal komutu başlattı!", hedef[:60]))
                         komut_sonuc = SiberAjan.komut_calistir(hedef)
                         if komut_sonuc["basari"]:
                             cikti = komut_sonuc["cikti"][:1500]
@@ -1285,9 +1285,9 @@ class V5NexusCore:
                         try:
                             with open(hedef, "w", encoding="utf-8") as f:
                                 f.write(icerik)
-                            print(patron_log("BASARI", f"Dosya yazıldı: {hedef}", f"{len(icerik)} karakter"))
+                            print(siber_log("BASARI", f"Dosya yazıldı: {hedef}", f"{len(icerik)} karakter"))
                         except Exception as e:
-                            print(patron_log("HATA", "Dosya yazılamadı", str(e)[:80]))
+                            print(siber_log("HATA", "Dosya yazılamadı", str(e)[:80]))
 
                     elif aksiyon == "dosya_oku" and hedef:
                         try:
@@ -1295,7 +1295,7 @@ class V5NexusCore:
                                 icerik_oku = f.read()
                             print(f"\n  ── {hedef} ──\n{icerik_oku[:1500]}\n  ──\n")
                         except Exception as e:
-                            print(patron_log("HATA", "Dosya okunamadı", str(e)[:80]))
+                            print(siber_log("HATA", "Dosya okunamadı", str(e)[:80]))
 
                     elif aksiyon == "hafiza_kaydet" and hedef:
                         self.hafiza.kaydet(hedef, icerik)
@@ -1383,7 +1383,7 @@ def main():
     ║  Model: gulmzcetiner:V5_NEXUS_CORE                   ║
     ║                                                       ║
     ║  [1] Siber Ajan      [2] Flux Multimedya             ║
-    ║  [3] Gemini Vibe     [4] Patron Loglama              ║
+    ║  [3] Gemini Vibe     [4] Siber Loglama               ║
     ║                                                       ║
     ║  ~ Berkay için inşa edildi ~                    ║
     ╚═══════════════════════════════════════════════════════╝
@@ -1400,10 +1400,10 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print()
-        print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE kapatıldı. Beklemedeyim Berkay! ✦"))
+        print(siber_log("ATESLEME", "✦ V5_NEXUS_CORE kapatıldı. Beklemedeyim Berkay! ✦"))
         sys.exit(0)
     except Exception as e:
-        print(patron_log("HATA", "Çekirdek kritik hata ile karşılaştı", str(e)[:200]))
+        print(siber_log("HATA", "Çekirdek kritik hata ile karşılaştı", str(e)[:200]))
         import traceback
         traceback.print_exc()
         sys.exit(1)
