@@ -182,6 +182,9 @@ class GlassescatCore:
         # 5. Geri Bildirim Sistemi
         self._init_feedback()
         
+        # 6. Ultra_Agent Engine
+        self._init_ultra_agent()
+        
         logger.info(f"  ✅ GlassesCat Core v{VERSION} hazır!")
         logger.info("=" * 50)
         
@@ -509,6 +512,18 @@ class GlassescatCore:
         except Exception as e:
             logger.warning(f"  ⚠️ Feedback Loop başlatılamadı: {e}")
             self.feedback = None
+    
+    def _init_ultra_agent(self):
+        """Ultra_Agent Engine'i başlat"""
+        try:
+            from ultra_agent_engine import get_ultra_agent
+            self.ultra_agent = get_ultra_agent(core=self)
+            if self.toolformer:
+                self.ultra_agent.register_tools(self.toolformer)
+            logger.info("  🚀 Ultra_Agent Engine: 9 protokol aktif")
+        except Exception as e:
+            logger.warning(f"  ⚠️ Ultra_Agent Engine başlatılamadı: {e}")
+            self.ultra_agent = None
     
     # ─────────────────────────────────────────────────────────
     # ANA İŞLEME AKIŞI
