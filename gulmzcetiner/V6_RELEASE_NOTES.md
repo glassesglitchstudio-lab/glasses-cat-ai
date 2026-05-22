@@ -1,6 +1,6 @@
 # V6_OMNI_OVERLORD - glassesglitchstudio/gulmzcetiner:V6_OMNI_OVERLORD
 
-**Glassesglitch Studio / Niko Software** — Kurucu: Erkay Patron
+**Glassesglitch Studio / Niko Software** — Kurucu: Berkay Gülmez
 
 ## V6 OMNI OVERLORD (22 Mayis 2026)
 
