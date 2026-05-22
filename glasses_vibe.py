@@ -1081,7 +1081,7 @@ class V5NexusCore:
     model <isim>            → Model değiştir
 
   ℹ️  durum / yardim / çıkış
-  ╚══ V5_NEXUS_CORE — ERKAY PATRON İÇİN İNŞA EDİLDİ ══╝"""
+  ╚══ V5_NEXUS_CORE — BERKAY PATRON İÇİN İNŞA EDİLDİ ══╝"""
 
     # ─── Zengin Arayüz (Rich UI) ──────────────────────────
 
