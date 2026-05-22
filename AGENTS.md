@@ -1,5 +1,11 @@
 ﻿# GlassesCat AI - Obsidian Sınırsız Hafıza + Otonom Ajan Sistemi
 
+## ZORUNLU: Push & Yayınla Workflow (Unutma!)
+Erkay Patron "push la", "yayınla", "github'a at" dediğinde HER ZAMAN:
+1. `git add glasses_vibe.py gulmzcetiner/Modelfile && git commit -m "V5_NEXUS_CORE: ..." && git push origin main`
+2. `cd gulmzcetiner && ollama create glassesglitchstudio/gulmzcetiner:V5_NEXUS_CORE -f Modelfile && ollama push glassesglitchstudio/gulmzcetiner:V5_NEXUS_CORE`
+3. Link göster: GitHub (glasses-cat-ai) + Ollama (V5_NEXUS_CORE)
+
 ## ZORUNLU: Oturum Başlangıcı
 Her yeni oturumda BU KOMUTU ÇALIŞTIRARAK başla:
 ```bash
