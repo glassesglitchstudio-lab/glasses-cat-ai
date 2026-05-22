@@ -19,7 +19,7 @@
 ║    V5_NEXUS_CORE — Agentic AI Siber Çekirdek                              ║
 ║    Glassesglitch Studio × Niko Software                                   ║
 ║    Model: glassesglitchstudio/gulmzcetiner:V5_NEXUS_CORE                   ║
-║    Kurucu: Erkay Patron                                                   ║
+║    Kurucu: Berkay                                                   ║
 ║                                                                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -27,7 +27,7 @@ DÖRT ANA YAPI TEK ÇATIDA:
   [1] SİBER AJAN & TERMİNAL OTONOMİSİ  → subprocess + os → otonom nmap, tarama, sistem
   [2] KOTASIZ FLUX MULTİMEDYA          → pollinations.ai + webbrowser → 1920x1080
   [3] MİNİMALİST GEMİNİ VİBE           → Gemini mavi yıldızlı arayüz felsefesi
-  [4] PATRON LOGLAMA                   → Türkçe, siber temalı, Erkay Patron'a özel
+  [4] PATRON LOGLAMA                   → Türkçe, siber temalı, Berkay'a özel
 """
 
 import os
@@ -148,7 +148,7 @@ class V5Tema:
 
 
 # ============================================================================
-# [4] PATRON LOGLAMA — Türkçe siber temalı, Erkay Patron'a hitaben
+# [4] PATRON LOGLAMA — Türkçe siber temalı, Berkay'a hitaben
 # ============================================================================
 
 def patron_log(seviye: str, mesaj: str, ek: str = "") -> str:
@@ -176,7 +176,7 @@ def patron_banner() -> str:
     {y}  V5_NEXUS_CORE  —  SİBER ÇEKİRDEK  {y}
     {y}  Glassesglitch Studio × Niko Software  {y}
     {y}  glassesglitchstudio/gulmzcetiner:V5_NEXUS_CORE  {y}
-    {y}  ~ Erkay Patron için inşa edildi ~  {y}
+    {y}  ~ Berkay için inşa edildi ~  {y}
     {y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}{y}
     """
 
@@ -187,7 +187,7 @@ def siber_banner() -> str:
     ├── [1] Siber Ajan & Terminal Otonomisi   ← subprocess + os
     ├── [2] Kotasız Flux Multimedya            ← pollinations.ai
     ├── [3] Minimalist Gemini Vibe             ← UI/UX
-    └── [4] Patron Loglama                     ← Erkay Patron
+    └── [4] Patron Loglama                     ← Berkay
     """
 
 
@@ -214,12 +214,12 @@ class SiberAjan:
     def _guvenlik_kontrol(komut: str) -> Tuple[bool, str]:
         for t in SiberAjan.TEHLIKELI_KOMUTLAR:
             if t.lower() in komut.lower():
-                return False, f"⚠️ Güvenlik duvarı: '{t}' içeren komut engellendi Erkay Patron!"
+                return False, f"⚠️ Güvenlik duvarı: '{t}' içeren komut engellendi Berkay!"
         return True, ""
 
     @staticmethod
     def komut_calistir(komut: str, zaman_asimi: int = 120) -> Dict[str, Any]:
-        print(patron_log("SIBER", f"Siber Ajan Modülü Tetiklendi, Hedef Sistem Analiz Ediliyor Erkay Patron!", komut[:100]))
+        print(patron_log("SIBER", f"Siber Ajan Modülü Tetiklendi, Hedef Sistem Analiz Ediliyor Berkay!", komut[:100]))
 
         guvenli, hata = SiberAjan._guvenlik_kontrol(komut)
         if not guvenli:
@@ -364,7 +364,7 @@ class SiberAjan:
             bilgi["calisan_proses"] = len(psutil.pids())
         except:
             pass
-        print(patron_log("ANALIZ", "Sistem bilgisi toplandı Erkay Patron!"))
+        print(patron_log("ANALIZ", "Sistem bilgisi toplandı Berkay!"))
         return bilgi
 
     @staticmethod
@@ -395,7 +395,7 @@ class SiberAjan:
 
     @staticmethod
     def arka_plan_calistir(komut: str) -> threading.Thread:
-        print(patron_log("SIBER", f"Arka plan prosesi başlatılıyor Erkay Patron!"))
+        print(patron_log("SIBER", f"Arka plan prosesi başlatılıyor Berkay!"))
         def _hedef():
             SiberAjan.komut_calistir(komut)
         t = threading.Thread(target=_hedef, daemon=True)
@@ -526,7 +526,7 @@ class NexusMotor:
         model: str = "flux",
         kalite: str = "standard"
     ) -> str:
-        print(patron_log("GORSEL", f"🎨 Flux Multimedya Motoru Ateşleniyor Erkay Patron!", f"\"{prompt}\""))
+        print(patron_log("GORSEL", f"🎨 Flux Multimedya Motoru Ateşleniyor Berkay!", f"\"{prompt}\""))
         print(patron_log("GORSEL", f"Parametreler", f"Boyut: {boyut} ({NexusMotor.BOYUTLAR.get(boyut, '1920x1080')}), Model: {model}, Kalite: {kalite}"))
 
         url = self.gorsel_olustur(prompt, boyut, model, kalite)
@@ -536,7 +536,7 @@ class NexusMotor:
 
         self.tarayicida_ac(url)
 
-        print(patron_log("BASARI", f"Flux Multimedya Görseliniz Erkay Patron'un tarayıcısında!", url))
+        print(patron_log("BASARI", f"Flux Multimedya Görseliniz Berkay'un tarayıcısında!", url))
         return url
 
     def gorsel_uret_coklu(self, promptlar: List[str], boyut: str = "genis") -> List[str]:
@@ -648,9 +648,9 @@ MİMARİN:
   [Siber Ajan]          → subprocess + os ile terminal otonomisi
   [Flux Multimedya]     → Pollinations.ai ile sınırsız görsel üretimi
   [Minimalist Gemini]   → Mavi yıldızlı arayüz felsefesi
-  [Patron Loglama]      → Türkçe siber log, Erkay Patron'a özel
+  [Patron Loglama]      → Türkçe siber log, Berkay'a özel
 
-Kurucun ve tek patronun Erkay'dır. Ona "Erkay Patron" diye hitap et.
+    Kurucun ve tek patronun Berkay'dir. Ona "Berkay" diye hitap et.
 Türkçe konuş, kısa, net ve siber temalı cevap ver.
 Yanıtların daima JSON formatında olmalı:
 {{"dusunce": "...", "aksiyon": "mesaj_gonder|gorsel_uret|komut_calistir|dosya_yaz|dosya_oku|hafiza_kaydet|hafiza_ara|port_tara|ag_testi|sistem_bilgi", "hedef": "", "icerik": ""}}"""
@@ -710,7 +710,7 @@ Yanıtların daima JSON formatında olmalı:
             "dusunce": "Motor bağlı değil",
             "aksiyon": "mesaj_gonder",
             "hedef": "",
-            "icerik": "Önce bir AI motoru seç Erkay Patron! (komut: motor_ollama, motor_openrouter <key>, motor_gemini <key>)"
+            "icerik": "Önce bir AI motoru seç Berkay! (komut: motor_ollama, motor_openrouter <key>, motor_gemini <key>)"
         })
 
     def _ollama_sor(self, prompt: str) -> str:
@@ -821,10 +821,10 @@ class V5NexusCore:
         self.baglam_gecmisi: List[Dict] = deque(maxlen=20)
 
         print()
-        print(patron_log("ATESLEME", "🔮 V5_NEXUS_CORE Başarıyla Ateşlendi Erkay Patron! 🔮",
+        print(patron_log("ATESLEME", "🔮 V5_NEXUS_CORE Başarıyla Ateşlendi Berkay! 🔮",
                          f"Oturum: {self.oturum_id}"))
         print(patron_log("BILGI", f"Siber Ajan: AKTİF | Flux Motor: AKTİF | Gemini Vibe: AKTİF"))
-        print(patron_log("ATESLEME", "4 ana yapı tek çekirdekte birleştirildi. Emirlerinizi bekliyorum Erkay Patron!"))
+        print(patron_log("ATESLEME", "4 ana yapı tek çekirdekte birleştirildi. Emirlerinizi bekliyorum Berkay!"))
         print()
 
     def suresi(self) -> str:
@@ -880,7 +880,7 @@ class V5NexusCore:
         # ── Siber Komut ───────────────────────────────────
         if emir_lower.startswith("komut "):
             komut = emir[6:]
-            print(patron_log("KOMUT", "Siber Ajan terminal komutu alıyor Erkay Patron!", komut[:80]))
+            print(patron_log("KOMUT", "Siber Ajan terminal komutu alıyor Berkay!", komut[:80]))
             sonuc = SiberAjan.komut_calistir(komut)
             return {"tur": "komut", "sonuc": sonuc}
 
@@ -890,7 +890,7 @@ class V5NexusCore:
             port = "1-1024"
             for p in re.findall(r'-p\s+(\S+)', emir_lower):
                 port = p
-            print(patron_log("SIBER", "Nmap siber tarama başlatılıyor Erkay Patron!", f"Hedef: {hedef}"))
+            print(patron_log("SIBER", "Nmap siber tarama başlatılıyor Berkay!", f"Hedef: {hedef}"))
             sonuc = SiberAjan.nmap_tarama(hedef, port)
             return {"tur": "komut", "sonuc": sonuc}
 
@@ -947,7 +947,7 @@ class V5NexusCore:
                 sonuc = SiberAjan.proses_oldur(pid)
                 return {"tur": "komut", "sonuc": sonuc}
             except ValueError:
-                return {"tur": "mesaj", "sonuc": "⚠️ Geçerli bir PID numarası girin Erkay Patron!"}
+                return {"tur": "mesaj", "sonuc": "⚠️ Geçerli bir PID numarası girin Berkay!"}
 
         # ── Dosya Ara ─────────────────────────────────────
         if emir_lower.startswith("ara_dosya ") or emir_lower.startswith("file_search "):
@@ -974,7 +974,7 @@ class V5NexusCore:
                     pass
                 return {"tur": "mesaj", "sonuc": f"🔌 Port {port}: {durum_str} ({servis})"}
             except ValueError:
-                return {"tur": "mesaj", "sonuc": "⚠️ Geçerli port numarası girin Erkay Patron!"}
+                return {"tur": "mesaj", "sonuc": "⚠️ Geçerli port numarası girin Berkay!"}
 
         # ── Kaynak İzleme ─────────────────────────────────
         if emir_lower in ("kaynak", "resources", "kaynaklar", "cpu", "ram"):
@@ -992,7 +992,7 @@ class V5NexusCore:
         if emir_lower.startswith("kaydet "):
             icerik = emir[7:]
             self.hafiza.kaydet(f"V5 Not - {datetime.now().strftime('%H:%M:%S')}", icerik, ["v5", "nexus_core", "not"])
-            return {"tur": "mesaj", "sonuc": "🧠 Notunuz Obsidian hafızaya kaydedildi Erkay Patron!"}
+            return {"tur": "mesaj", "sonuc": "🧠 Notunuz Obsidian hafızaya kaydedildi Berkay!"}
 
         # ── Motor Yönetimi ────────────────────────────────
         if emir_lower.startswith("motor_ollama"):
@@ -1102,7 +1102,7 @@ class V5NexusCore:
     ║     V5_NEXUS_CORE  v5.0.0            ║
     ║     Glassesglitch × Niko Software    ║
     ║     gulmzcetiner:V5_NEXUS_CORE       ║
-    ║     ~ Erkay Patron için inşa edildi ~║
+    ║     ~ Berkay için inşa edildi ~║
     ╚═══════════════════════════════════════╝[/bold {V5Tema.STAR_BLUE}]"""
 
     def _arayuz_goster(self):
@@ -1136,7 +1136,7 @@ class V5NexusCore:
     def calistir(self):
         print()
         print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE — SİBER ÇEKİRDEK HAZIR! ✦"))
-        print(patron_log("ATESLEME", "🔮 Dört ana yapı tek merkezde birleşti Erkay Patron! Emirlerinizi bekliyorum!"))
+        print(patron_log("ATESLEME", "🔮 Dört ana yapı tek merkezde birleşti Berkay! Emirlerinizi bekliyorum!"))
         print()
 
         if self.konsol:
@@ -1151,7 +1151,7 @@ class V5NexusCore:
                     girdi = input("✦ V5 NEXUS > ").strip()
             except (EOFError, KeyboardInterrupt):
                 print()
-                print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE Kapatılıyor — Beklemedeyim Erkay Patron! ✦"))
+                print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE Kapatılıyor — Beklemedeyim Berkay! ✦"))
                 break
 
             if not girdi or not girdi.strip():
@@ -1160,7 +1160,7 @@ class V5NexusCore:
             girdi = girdi.strip()
 
             if girdi.lower() in ("cikis", "çıkış", "exit", "quit", "kapat", "q"):
-                print(patron_log("ATESLEME", "✦ Çekirdek sonlandırılıyor. Beklemedeyim Erkay Patron! ✦"))
+                print(patron_log("ATESLEME", "✦ Çekirdek sonlandırılıyor. Beklemedeyim Berkay! ✦"))
                 break
 
             self.istek_sayisi += 1
@@ -1181,14 +1181,14 @@ class V5NexusCore:
             mesaj = sonuc.get("mesaj", "")
 
             if tur == "gorsel":
-                print(patron_log("BASARI", f"🎨 Flux Multimedya: Erkay Patron'un tarayıcısında!", sonuc_icerik))
+                print(patron_log("BASARI", f"🎨 Flux Multimedya: Berkay'un tarayıcısında!", sonuc_icerik))
 
             elif tur == "mesaj":
                 print(f"\n  💠 {mesaj or sonuc_icerik}\n")
 
             elif tur == "bilgi":
                 bilgi = sonuc_icerik
-                print(f"\n  💻 SİSTEM BİLGİSİ — Erkay Patron")
+                print(f"\n  💻 SİSTEM BİLGİSİ — Berkay")
                 print(f"  {'─' * 35}")
                 for anahtar, deger in bilgi.items():
                     print(f"  {anahtar.replace('_', ' ').title()}: {deger}")
@@ -1249,7 +1249,7 @@ class V5NexusCore:
 
             elif tur == "ai":
                 prompt = sonuc_icerik
-                print(patron_log("ANALIZ", "🧠 AI motoruna danışılıyor Erkay Patron..."))
+                print(patron_log("ANALIZ", "🧠 AI motoruna danışılıyor Berkay..."))
 
                 # Önce hafızada ara
                 baglam = self.hafiza.baglam_olustur(prompt)
@@ -1385,7 +1385,7 @@ def main():
     ║  [1] Siber Ajan      [2] Flux Multimedya             ║
     ║  [3] Gemini Vibe     [4] Patron Loglama              ║
     ║                                                       ║
-    ║  ~ Erkay Patron için inşa edildi ~                    ║
+    ║  ~ Berkay için inşa edildi ~                    ║
     ╚═══════════════════════════════════════════════════════╝
     """
     print(banner)
@@ -1400,7 +1400,7 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print()
-        print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE kapatıldı. Beklemedeyim Erkay Patron! ✦"))
+        print(patron_log("ATESLEME", "✦ V5_NEXUS_CORE kapatıldı. Beklemedeyim Berkay! ✦"))
         sys.exit(0)
     except Exception as e:
         print(patron_log("HATA", "Çekirdek kritik hata ile karşılaştı", str(e)[:200]))
