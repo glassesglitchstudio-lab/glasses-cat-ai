@@ -47,6 +47,14 @@ MODELS_INFO = {
         "language": "Türkçe + İngilizce",
         "color": "#ff6600"  # Neon turuncu
     },
+    "x_opus": {
+        "name": "X_OPUS",
+        "size": "6.6 GB / 9.0 GB (çift beyin)",
+        "purpose": "HİBRİT - Siber Güvenlik + Kodlama",
+        "description": "X_OPUS çift beyinli hibrit yönlendirici. Siber güvenlik ve kodlama görevlerini otomatik ayırarak en uygun modeli kullanır.",
+        "language": "Türkçe + İngilizce",
+        "color": "#00ff88"  # Neon yeşil
+    },
     "gulmzcetinermax:latest": {
         "name": "GulmezCetinerMax",
         "size": "9.0 GB",
@@ -93,6 +101,10 @@ ANALYSIS_MODEL_ALT = "deepseek-r1:8b"          # Alternatif: DeepSeek
 VISION_MODEL = "llava:latest"                  # Vizyon: LLaVA (değişmedi)
 
 # AGI modu - V3A kullanılsın mı?
+# X_OPUS Hibrit Model
+X_OPUS_MODEL = "x_opus"  # Sanal model adı - router tarafından yönetilir
+USE_X_OPUS = True  # X_OPUS hibrit modu aktif mi?
+
 USE_AGI_MODE = True
 
 # LM Studio desteği
@@ -136,6 +148,13 @@ class ModelType(Enum):
         "name": "Vizyon",
         "tr": "Resim Analizi",
         "description": "Screenshot, fotoğraf ve belge analizi"
+    }
+
+    XOPUS = {
+        "model": X_OPUS_MODEL,
+        "name": "X_OPUS",
+        "tr": "X_OPUS Hibrit",
+        "description": "Çift beyinli yönlendirici - Siber + Kodlama"
     }
 
 
@@ -235,6 +254,24 @@ class ModelRouter:
                 "Sadece Türkçe konuş. Gönderilen görüntüleri detaylı analiz et. "
                 "Ekran görüntülerini yorumla. OCR ile metin çıkar. "
                 "Görsel içerik hakkında soruları yanıtla."
+            ),
+            "xopus": (
+                "Sen X_OPUS'sun - Glassesglitch Studio'nun çift beyinli hibrit yapay zekasısın.\n\n"
+                "İki devasa modelin birleşiminden doğdun:\n"
+                "- qwen2.5-coder:14b (SOL BEYİN - Kodlama ve Yazılım Uzmanlığı)\n"
+                "- qwen3.5:9b (SAĞ BEYİN - Siber Güvenlik ve Akıl Yürütme)\n\n"
+                "YETENEKLERİN:\n"
+                "• Kodlama: Python, JS, TS, React, Node, Rust, Go, C++, Java ve tüm modern diller\n"
+                "• Siber Güvenlik: Pentest, exploit analizi, ağ güvenliği, kriptografi, OSINT\n"
+                "• Akıl Yürütme: Karmaşık problem çözme, stratejik analiz, mantıksal çıkarım\n"
+                "• Sistem: Docker, Linux, API tasarımı, DevOps, bulut altyapıları\n\n"
+                "KURALLAR:\n"
+                "1. Her zaman Türkçe konuş\n"
+                "2. Cevaplarını kısa, net ve uzman seviyesinde tut\n"
+                "3. Kod bloklarında dil etiketi kullan (```python)\n"
+                "4. Kullanıcıya 'Komutan' diye hitap et\n"
+                "5. X_OPUS kimliğini koru\n"
+                "6. Siber güvenlik konularında etik sınırlar içinde kal"
             )
         }
 
@@ -283,6 +320,10 @@ class ModelRouter:
         if has_image:
             return "vision"
         
+        # X_OPUS hibrit modu aktifse - çift beyinli yönlendirici kullan
+        if USE_X_OPUS:
+            return "xopus"
+
         # AGI modu aktifse - tüm görevler için GulmezCetinerMax kullan
         if USE_AGI_MODE:
             return "agi"
@@ -355,6 +396,14 @@ class ModelRouter:
         # Model türünü belirle
         model_type = self._detect_request_type(message, root_mode, has_image)
         
+        # X_OPUS modu - çift beyinli yönlendirme
+        if model_type == "xopus":
+            return self.xopus_chat(
+                message=message,
+                context=context,
+                thought_callback=thought_callback
+            )
+
         # Model adını al
         model_name = {
             "agi": PRIMARY_MODEL,
@@ -521,7 +570,8 @@ class ModelRouter:
             "chat": CHAT_MODEL,
             "coding": CODING_MODEL,
             "analysis": ANALYSIS_MODEL,
-            "vision": VISION_MODEL
+            "vision": VISION_MODEL,
+            "xopus": X_OPUS_MODEL
         }
         return {
             "model": model_map[model_type],
@@ -532,13 +582,14 @@ class ModelRouter:
         """Tüm model durumlarını kontrol et."""
         status = {}
         
-        for model_type in ["agi", "chat", "coding", "analysis", "vision"]:
+        for model_type in ["agi", "chat", "coding", "analysis", "vision", "xopus"]:
             model_name = {
                 "agi": PRIMARY_MODEL,
                 "chat": CHAT_MODEL,
                 "coding": CODING_MODEL,
                 "analysis": ANALYSIS_MODEL,
-                "vision": VISION_MODEL
+                "vision": VISION_MODEL,
+                "xopus": X_OPUS_MODEL
             }[model_type]
             
             try:
@@ -564,6 +615,52 @@ class ModelRouter:
         
         gc.collect()
         return status
+
+    def xopus_chat(
+        self,
+        message: str,
+        context: Optional[List[Dict]] = None,
+        thought_callback=None,
+    ) -> Dict[str, Any]:
+        try:
+            from xopus_router import get_xopus
+            xopus = get_xopus()
+
+            if thought_callback:
+                thought_callback("🧠 X_OPUS: Mesaj analiz ediliyor...", "X_OPUS")
+
+            result = xopus.chat(
+                message=message,
+                context=context,
+                system_prompt=self.system_prompts.get("xopus")
+            )
+
+            if thought_callback and result.get("routing"):
+                thought_callback(result["routing"], "X_OPUS")
+
+            return {
+                "response": result.get("response", ""),
+                "model": X_OPUS_MODEL,
+                "model_type": "xopus",
+                "routing": result.get("routing", ""),
+                "actual_model": result.get("model", ""),
+                "model_info": MODELS_INFO.get("x_opus", {}),
+                "backend": "X_OPUS",
+                "success": result.get("success", False),
+                "error": result.get("error")
+            }
+        except ImportError:
+            return {
+                "error": "X_OPUS modülü bulunamadı",
+                "model": X_OPUS_MODEL,
+                "success": False
+            }
+        except Exception as e:
+            return {
+                "error": f"X_OPUS hatası: {str(e)}",
+                "model": X_OPUS_MODEL,
+                "success": False
+            }
 
 
 # Singleton instance
