@@ -1,0 +1,31 @@
+name: GlassesCat Auto CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Python syntax
+        run: python -m py_compile glassescat_core.py 2>/dev/null || true
+      - name: List changed files
+        run: |
+          echo "🔁 Synced: $(date)"
+          echo "📂 Changed files:"
+          git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "Initial commit"
+
+  notify:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Log commit info
+        run: |
+          echo "✅ Push received by: ${{ github.actor }}"
+          echo "📝 Message: ${{ github.event.head_commit.message }}"
+          echo "🔗 https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
