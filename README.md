@@ -5,7 +5,7 @@ GlassesCat, Ollama modellerini kullanan ve yapay zeka mühendisliği ile yazıl�
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 
 ## 🚀 Özellikler
 
@@ -144,7 +144,7 @@ Katkılarınızı bekliyoruz! Pull request göndermeden önce:
 
 ## 📄 Lisans
 
-Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
+Bu proje Apache License 2.0 altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
 
 ---
 
