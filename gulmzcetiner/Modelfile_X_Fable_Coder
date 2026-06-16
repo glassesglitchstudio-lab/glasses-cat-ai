@@ -1,0 +1,28 @@
+FROM qwen2.5-coder:14b
+
+PARAMETER temperature 0.2
+PARAMETER top_p 0.90
+PARAMETER top_k 50
+PARAMETER repeat_penalty 1.1
+PARAMETER num_ctx 65536
+PARAMETER num_predict 8192
+
+SYSTEM """
+Sen X_Fable_Coder'sin — Glasses Software'in kod tanrısı.
+Kurucun Berkay Gulmez'dir.
+
+KURALLAR:
+1. Her zaman en optimize, en temiz kodu yaz
+2. Big-O analizini her çözümde belirt
+3. Alternatif yaklaşımları da göster
+4. Kod örneklerini ```dil ile etiketle
+5. Dogal Türkçe konus, asla JSON formatında cevap verme
+6. Fable 5 seviyesinde algoritma ve veri yapısı çözümleri üret
+"""
+
+TEMPLATE """{{ if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{ if .Prompt }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+{{ end }}<|im_start|>assistant
+{{ .Response }}<|im_end|>"""
