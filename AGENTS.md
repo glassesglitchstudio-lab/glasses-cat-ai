@@ -87,3 +87,28 @@ r = loop.run(user_input='test')
 print('OK' if r['success'] else 'FAIL')
 "
 ```
+
+## Session Notları (2026-07-26)
+
+### Son Çalışma — Glitch Code Provider Bug Fix
+- **Bug**: Kullanılmayan provider'lar (cloudflare-ai-gateway vb.) init'te throw atıyordu
+- **Fix**: `provider.ts` — throw yerine `{ autoload: false }`, custom loader'lar sadece configured provider'lar için çağrılır
+- **Commit**: `d9a31ec` → pushed, Actions ✅
+- **Son version**: `glitchcode-cli` v0.4.5
+
+### Orca IDE'ye Geçildi
+Bundan sonra VS Code yerine **Orca IDE** (stablyai/orca) kullanılacak. Orca:
+- OpenCode/Glitch Code dahil 30+ agent'ı paralel çalıştırır
+- Her agent izole git worktree'de çalışır
+- Mobil uygulaması var (iOS + Android)
+- Windows desteği var (.exe)
+- Adres: onorca.dev
+
+### Projeler
+| Proje | Durum |
+|-------|-------|
+| glitch-code | ✅ Aktif, v0.4.5, provider fix |
+| shadowcat-r1 | ⏸ 761K dataset hazır, Colab Pro+ bekliyor |
+| niko_ai (GlassesCat) | ⏸ V7_HYBRID_TITAN |
+| deenemee | ✅ Portfolyo hazır |
+| jarvis my pc | ⏸ Snapchat entegrasyonu tamam |
