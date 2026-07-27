@@ -1,156 +1,140 @@
-# 🐱 GlassesCat AI
-### 🎮 by GlassescatSoftware | Arda Burak Çetiner
+# Niko AI (GlassesCat)
 
-GlassesCat, Ollama modellerini kullanan ve yapay zeka mühendisliği ile yazılım mühendisliği alanlarında eğitim ve geliştirme amaçlı tasarlanmış bir AI asistanıdır.
+Ollama tabanlı otonom AI asistanı. FastAPI backend, WebSocket streaming, RAG, task scheduler ve plugin sistemi.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 
-## 🚀 Özellikler
+## Özellikler
 
-- 💬 **AI Sohbet** - GulmezCetinerMax
-- 🌐 **Web Arayüzü** - Modern ve responsive tasarım
-- 🧠 **Obsidian Hafıza** - Sınırsız .md hafıza sistemi
-- 🤖 **Otonom Ajan** - ReAct: Düşün + Karar Ver + Uygula
-- 📋 **Görev Planlama** - Çok adımlı otonom görevler
-- 🔍 **RAG Sistemi** - Bilgi geri kazanımı
+- **AI Sohbet** — WebSocket ile token-token streaming yanıt
+- **RAG Sistemi** — PDF/TXT/MD belgeleri yükle, AI'a okut
+- **Task Scheduler** — Otonom görevleri zamanla, web'den yönet
+- **Plugin Sistemi** — 15 hook, hot-reload, çok dilli
+- **Obsidian Hafıza** — Sınırsız .md hafıza sistemi
+- **Model Routing** — Görev türüne göre otomatik model seçimi
+- **Güvenlik** — AES-256 model şifreleme, brute-force koruması
 
-## 📦 Kurulum
+## Mimari
+
+```
+main.py (FastAPI, port 8000)
+├── routes/
+│   ├── chat.py          → /api/chat, /api/chat/ws (WebSocket)
+│   ├── memory.py        → /api/memory/*
+│   ├── auth.py          → /api/auth/*
+│   ├── admin.py         → /api/admin/*
+│   ├── rag.py           → /api/rag/*
+│   ├── scheduler.py     → /api/scheduler/*
+│   ├── vision.py        → /api/vision/*
+│   ├── tts.py           → /api/tts/*
+│   ├── code_agent.py    → /api/agent/*
+│   ├── qwen.py          → /api/qwen/*
+│   ├── sandbox.py       → /api/sandbox/*
+│   ├── venv.py          → /api/venv/*
+│   ├── code.py          → /api/code/*
+│   ├── files.py         → /api/files/*
+│   ├── search.py        → /api/search/*
+│   ├── models.py        → /api/models/*
+│   ├── plugins.py       → /api/plugins/*
+│   ├── skills.py        → /api/skills/*
+│   ├── theme.py         → /api/theme/*
+│   ├── tools.py         → /api/tools/*
+│   └── system.py        → /api/system/*
+├── middleware/
+│   └── auth.py          → Oturum yönetimi
+├── glassescat_core.py   → Ana AI motoru
+├── model_router.py      → Akıllı model seçimi
+├── toolformer.py        → 24 araçlı fonksiyon çağırma
+├── obsidian_memory.py   → Sınırsız .md hafıza
+├── rag_system.py        → FAISS + sentence-transformers
+├── task_scheduler.py    → Zamanlanmış görevler
+├── plugin_system.py     → 15 hook plugin motoru
+└── web/templates/       → Frontend (HTML/CSS/JS)
+```
+
+## Kurulum
 
 ### 1. Ollama Kurulumu
 
-**Windows:**
-1. https://ollama.com/download adresine git
-2. Windows installer'ı indir ve çalıştır
-3. Kurulum tamamlandıktan sonra terminalde doğrula:
-   ```bash
-   ollama --version
-   ```
-
-**Linux/Mac:**
 ```bash
+# Windows
+https://ollama.com/download adresinden indir
+
+# Linux/Mac
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### 2. AI Modelini İndir
-
-GlassesCat'in özel modeli **GulmezCetinerMax**'i Ollama Library'den indirin:
+### 2. Model İndirme
 
 ```bash
-ollama pull glassesglitchstudio/GulmezCetinerMax:latest
+ollama pull glassesglitchstudio/gulmzcetiner:V3A
 ```
 
-> **Model:** 9.0 GB | **Namespace:** glassesglitchstudio
-> Profil: https://ollama.com/glassesglitchstudio
-
-### 3. Modeli Çalıştır
+### 3. Bağımlılıklar
 
 ```bash
-ollama run glassesglitchstudio/GulmezCetinerMax
+pip install -r requirements.txt
 ```
 
-### 4. Repoyu Klonla
+### 4. Çalıştırma
 
 ```bash
-git clone https://github.com/glassesglitchstudio-lab/glasses-cat-ai.git
-cd glasses-cat-ai
+python main.py
 ```
 
-### 5. Bağımlılıkları Yükle
+Sunucu `http://localhost:8000` adresinde başlar.
 
-```bash
-python -m pip install -r requirements.txt
-```
+## API Endpoint'leri
 
-### 6. Web Uygulamasını Çalıştır
+| Kategori | Endpoint Sayısı | Örnekler |
+|----------|----------------|----------|
+| Chat (WebSocket) | 3 | `/api/chat`, `/api/chat/ws` |
+| Auth | 6 | `/api/auth/login`, `/api/auth/register` |
+| Admin | 12 | `/api/admin/keys`, `/api/admin/stats` |
+| Memory | 4 | `/api/memory/search`, `/api/memory/stats` |
+| RAG | 7 | `/api/rag/upload`, `/api/rag/search` |
+| Scheduler | 10 | `/api/scheduler/tasks`, `/api/scheduler/history` |
+| Vision | 6 | `/api/vision/analyze`, `/api/vision/ocr` |
+| Code Agent | 9 | `/api/agent/analyze`, `/api/agent/generate` |
+| Dosya İşlemleri | 9 | `/api/files/read`, `/api/files/write` |
+| Arama | 4 | `/api/search`, `/api/search/news` |
+| Diğer | 30+ | models, plugins, skills, theme, tools, tts, sandbox, venv, code |
 
-```bash
-python web/app.py
-```
+**Toplam: 124+ endpoint**
 
-### 7. Tarayıcıda Aç
+## Modeller
 
-```
-http://localhost:5000
-```
+| Model | Boyut | Görev |
+|-------|-------|-------|
+| gulmzcetiner:V3A | 8.0 GB | Ana AGI |
+| GulmezCetinerMax | 9.0 GB | Alternatif AGI |
+| qwen2.5-coder:14b | 9.0 GB | Kodlama |
+| deepseek-r1:8b | 5.2 GB | Analiz |
+| llava:latest | 4.7 GB | Görsel |
 
-## 🎯 Kullanım
-
-### CLI Modu
-```bash
-python glassescat_agent.py
-```
-
-### Web Modu
-```bash
-python web/app.py
-```
-
-### Doğrudan Ollama ile
-```bash
-ollama run glassesglitchstudio/GulmezCetinerMax
-```
-
-### Komutlar
-| Komut | Açıklama |
-|-------|----------|
-| `yardim` | Yardım menüsü |
-| `durum` | Sistem durumu |
-| `istatistik` | Performans istatistikleri |
-| `planla <görev>` | Çok adımlı görev |
-| `ara <sorgu>` | Web'de ara |
-| `hafizada ara <s>` | Hafızada ara |
-| `ogren` | AI öğrenme istatistikleri |
-
-## 🏗️ Proje Yapısı
+## Dizin Yapısı
 
 ```
-glasses-cat-ai/
-├── glassescat_core.py           # Ana motor
-├── glassescat_agent_loop.py     # ReAct ajan döngüsü
-├── glassescat_task_planner.py   # Görev planlama
-├── glassescat_state_manager.py  # Durum yönetimi
-├── glassescat_web_agent.py      # Otonom web ajanı
-├── glassescat_feedback.py       # Öğrenme ve hata analizi
-├── model_router.py              # Akıllı model seçimi
-├── rag_system.py                # RAG bilgi geri kazanımı
-├── toolformer.py                # 24 araçlı fonksiyon çağırma
-├── obsidian_memory.py           # Sınırsız .md hafıza
-├── gulmzcetiner/                # GulmezCetinerMax model dosyaları
-│   ├── Modelfile
-│   └── setup_ollama.py
-├── web/                         # Web arayüzü
-│   ├── app.py
-│   └── templates/
-├── skills/                      # Yetenek sistemi
-└── plugins/                     # Eklenti sistemi
+niko_ai/
+├── main.py              → FastAPI giriş noktası
+├── routes/              → API endpoint'leri (22 dosya)
+├── middleware/           → Auth middleware
+├── web/templates/       → Frontend HTML
+├── web/static/          → CSS, JS, görseller
+├── glassescat_core.py   → Ana AI motoru (869 satır)
+├── model_router.py      → Model yönlendirici (725 satır)
+├── toolformer.py        → Araç sistemi (2088 satır)
+├── obsidian_memory.py   → Hafıza sistemi (879 satır)
+├── rag_system.py        → RAG motoru (2243 satır)
+├── task_scheduler.py    → Görev zamanlayıcı (590 satır)
+├── plugin_system.py     → Plugin motoru (1700+ satır)
+├── model_security/      → AES-256 model şifreleme
+├── gulmzcetiner/        → Model fine-tune dosyaları
+└── plugins/             → Plugin dosyaları
 ```
 
-## 👥 GlassescatSoftware Hakkında
+## Lisans
 
-**GlassescatSoftware**, Berkay Gülmez tarafından kurulan; yapay zeka mühendisliği ve yazılım mühendisliği alanlarında yenilikçi projeler üreten bir geliştirici stüdyosudur.
-
-🎮 **Misyon**: Teknolojiyi eğlenceli ve erişilebilir kılmak
-🚀 **Vizyon**: Yapay zeka ve yazılım mühendisliğinde öncü olmak
-💻 **Alanlar**: Yapay zeka mühendisliği, yazılım mühendisliği
-
-## 🤝 Katkıda Bulunma
-
-Katkılarınızı bekliyoruz! Pull request göndermeden önce:
-1. Değişikliklerinizi açıklayan bir issue açın
-2. Kod stiline uygun olduğundan emin olun
-3. Testleri çalıştırın
-
-## 📄 Lisans
-
-Bu proje Apache License 2.0 altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
-
----
-
-> ⚠️ **Uyarı:** Bu proje daha fazla geliştirilecektir. Raporlarınızı bekliyoruz!
-
-<p align="center">
-  <b>🎮 GlassescatSoftware - Arda Burak Çetiner 🎮</b><br>
-  <i>"Kod yaz, AI öğren, geleceği inşa et!"</i>
-</p>
+Apache License 2.0

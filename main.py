@@ -94,6 +94,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Modüler route'ları dahil et
+try:
+    from routes import router as api_router
+    app.include_router(api_router)
+    logger.info("Modüler route'lar yüklendi")
+except Exception as e:
+    logger.warning(f"Route yükleme hatası: {e}")
+
 # Hibrit Zeka Yapılandırması
 AI_CONFIG = {
     "primary": {
@@ -237,19 +245,17 @@ async def root(request: Request):
         return templates.TemplateResponse(
             request=request,
             name="index.html",
-            context={}
+            context={"request": request}
         )
     except Exception as e:
         logger.error(f"Error: {type(e).__name__}: {str(e)}")
-        logger.error(f"Templates directory: web/templates")
-        logger.error(f"Working directory: {os.getcwd()}")
-        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e)}")
+        return HTMLResponse(content="<h1>GlassesCat AI</h1><p>Template yüklenemedi</p>")
 
 
 @app.get("/status")
-async def status():
+def status():
     """Sistem durumu - CPU, RAM, sıcaklık"""
-    return await get_system_status()
+    return get_system_status()
 
 
 @app.get("/screen_status")
@@ -462,7 +468,9 @@ async def preview():
 
 
 # Admin Paneli Endpoint'leri
-ADMIN_PASSWORD = "admin123"
+from dotenv import load_dotenv
+load_dotenv()
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Degistirilmeli123!")
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_panel(request: Request):
@@ -470,7 +478,7 @@ async def admin_panel(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
-        context={}
+        context={"request": request}
     )
 
 

@@ -782,6 +782,24 @@
         const inp = document.getElementById('inp');
         const mdl = document.getElementById('mdl');
 
+        // WebSocket streaming
+        let ws = null;
+        let wsConnected = false;
+        let wsReconnectTimer = null;
+
+        function connectWS() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = protocol + '//' + location.host + '/api/chat/ws';
+            try {
+                ws = new WebSocket(wsUrl);
+                ws.onopen = () => { wsConnected = true; };
+                ws.onclose = () => { wsConnected = false; wsReconnectTimer = setTimeout(connectWS, 3000); };
+                ws.onerror = () => { wsConnected = false; };
+            } catch(e) { wsConnected = false; }
+        }
+        connectWS();
+
         function showPanel(name) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelector('.panel-' + name).classList.add('active');
@@ -821,26 +839,70 @@
             if (!t && !pendingImage) return;
             add(t, 'end');
             inp.value = '';
+            document.getElementById('thinkText').textContent = '\u00A0';
+
+            // Görsel varsa HTTP POST kullan (WebSocket base64 desteklemez)
+            if (pendingImage) {
+                await sendHTTP(t || 'Goruntuyu analiz et');
+                return;
+            }
+
+            // WebSocket bağlanıysa streaming kullan
+            if (wsConnected && ws && ws.readyState === WebSocket.OPEN) {
+                await sendWS(t);
+            } else {
+                await sendHTTP(t);
+            }
+        }
+
+        async function sendWS(message) {
+            let streamingMsg = null;
+            let fullText = '';
+
+            const handler = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.type === 'start') {
+                    streamingMsg = add('', 'start');
+                    fullText = '';
+                } else if (data.type === 'token' && streamingMsg) {
+                    fullText += data.content;
+                    const bub = streamingMsg.querySelector('.bub');
+                    if (bub) {
+                        const content = fullText.replace(/</g, '&lt;').replace(/\n/g, '<br>');
+                        bub.innerHTML = '<button class="copy-btn" onclick="copyMsg(this)">📋</button>' + content + '<div class="msg-time">' + new Date().getHours().toString().padStart(2,'0') + ':' + new Date().getMinutes().toString().padStart(2,'0') + '</div>';
+                    }
+                    msgs.scrollTop = msgs.scrollHeight;
+                } else if (data.type === 'done') {
+                    ws.removeEventListener('message', handler);
+                } else if (data.type === 'error') {
+                    if (streamingMsg) streamingMsg.remove();
+                    add('Hata: ' + data.content, 'start');
+                    ws.removeEventListener('message', handler);
+                }
+            };
+
+            ws.addEventListener('message', handler);
+            ws.send(JSON.stringify({message: message, model: model}));
+        }
+
+        async function sendHTTP(message) {
             const d = dot();
             try {
                 const r = await fetch('/chat', {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({message: t || 'Goruntuyu analiz et', model: model, image: pendingImage})
+                    body: JSON.stringify({message: message, model: model, image: pendingImage})
                 });
                 pendingImage = null;
                 const j = await r.json();
                 d.remove();
-                document.getElementById('thinkText').textContent = '\u00A0';
                 if (j.response) {
                     add(j.response, 'start');
                     if (j.model) mdl.textContent = j.model;
-                    if (j.theme) { document.body.className = j.theme === 'default' ? '' : 'theme-' + j.theme; }
                 } else if (j.error) {
                     add('Hata: ' + j.error, 'start');
                 }
             } catch(e) {
                 d.remove();
-                document.getElementById('thinkText').textContent = '\u00A0';
                 add('Baglanti hatasi.', 'start');
             }
             msgs.scrollTop = msgs.scrollHeight;

@@ -9,6 +9,7 @@ build/
 
 # Virtual env
 .venv/
+.venv_cuda/
 venv/
 env/
 
@@ -58,3 +59,21 @@ notes/
 
 # Test files
 test_*.py
+
+# Local Netlify folder
+.netlify
+
+# Model Security
+model_security/.key
+model_security/encrypted_models/
+*.enc
+model_key.json
+
+# RAG storage
+rag_storage/
+
+# Old Flask server (kept as backup)
+web/app.py
+
+# Users database
+users.json

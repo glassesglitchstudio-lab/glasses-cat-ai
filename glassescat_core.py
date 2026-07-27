@@ -1,4 +1,4 @@
-﻿"""
+"""
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
 ║          🐱 NIKO AI CORE - MERKEZİ ÇEKİRDEK 🐱              ║
@@ -59,6 +59,12 @@ try:
     MODEL_ROUTER_OK = True
 except ImportError:
     MODEL_ROUTER_OK = False
+
+try:
+    from model_security.encrypted_model_provider import get_encrypted_provider
+    MODEL_SECURITY_OK = True
+except ImportError:
+    MODEL_SECURITY_OK = False
 
 # ─────────────────────────────────────────────────────────────
 # SABİTLER
@@ -149,6 +155,7 @@ class GlassescatCore:
         self.toolformer = None
         self.memory = None
         self.model_router = None
+        self.encrypted_provider = None
         self.agent_loop = None
         self.task_planner = None
         self.state_manager = None
@@ -479,6 +486,23 @@ class GlassescatCore:
             try:
                 self.model_router = get_model_router()
                 logger.info("  🧠 Model Router: aktif")
+                
+                # Encrypted model desteği
+                if MODEL_SECURITY_OK:
+                    try:
+                        self.encrypted_provider = get_encrypted_provider()
+                        encrypted_count = len(self.encrypted_provider.list_encrypted())
+                        if encrypted_count > 0:
+                            logger.info(f"  🔐 Model Security: {encrypted_count} şifreli model bulundu")
+                        else:
+                            logger.info("  🔐 Model Security: aktif (şifreli model yok)")
+                    except Exception as e:
+                        logger.warning(f"  ⚠️ Model Security başlatılamadı: {e}")
+                        self.encrypted_provider = None
+                else:
+                    logger.info("  🔐 Model Security: modül bulunamadı")
+                    self.encrypted_provider = None
+                    
             except Exception as e:
                 logger.warning(f"  ⚠️ Model Router başlatılamadı: {e}")
                 self.model_router = None
@@ -684,21 +708,11 @@ class GlassescatCore:
             }
         
         # LLM çağrısı simülasyonu
-        try:
-            from glassescat_ai_engine import get_glassescat_ai
-            engine = get_glassescat_ai()
-            # TODO: Buraya LLM entegrasyonu gelecek
-            return {
-                "response": "Toolformer ile işleniyor...",
-                "tool_calls": [],
-                "thoughts": [{"type": "system", "content": "Toolformer modunda çalışıyor"}]
-            }
-        except:
-            return {
-                "response": f"Mesajınız alındı. (Henüz tam AI entegrasyonu bekleniyor)",
-                "tool_calls": [],
-                "thoughts": []
-            }
+        return {
+            "response": "Toolformer ile işleniyor...",
+            "tool_calls": [],
+            "thoughts": [{"type": "system", "content": "Toolformer modunda çalışıyor"}]
+        }
     
     def _save_conversation_to_memory(self, session_id: str, user_input: str, response: str):
         """Konuşmayı Obsidian'a kaydet"""
@@ -779,6 +793,7 @@ class GlassescatCore:
                 "memory": OBSIDIAN_OK and self.memory is not None,
                 "toolformer": TOOLFORMER_OK and self.toolformer is not None,
                 "model_router": MODEL_ROUTER_OK,
+                "model_security": MODEL_SECURITY_OK and self.encrypted_provider is not None,
                 "state_manager": self.state_manager is not None,
                 "feedback": self.feedback is not None
             },
@@ -786,7 +801,8 @@ class GlassescatCore:
                 "commands_executed": self.state.commands_executed,
                 "errors_fixed": self.state.errors_fixed,
                 "conversation_count": len(self.conversation_history),
-                "tools_available": self.toolformer.registry.count() if self.toolformer else 0
+                "tools_available": self.toolformer.registry.count() if self.toolformer else 0,
+                "encrypted_models": len(self.encrypted_provider.list_encrypted()) if self.encrypted_provider else 0
             }
         }
     
@@ -806,6 +822,43 @@ class GlassescatCore:
         if self.toolformer:
             self.toolformer.reset()
         logger.info("🔄 Sistem sıfırlandı")
+    
+    def load_encrypted_model(self, model_name: str, password: str) -> Dict:
+        """
+        Şifreli bir modeli Ollama'ya yükle.
+        
+        Args:
+            model_name: Yüklenecek model adı (örn: x_fable_coder)
+            password: Şifre çözme anahtarı
+        
+        Returns:
+            Dict: Yükleme sonucu
+        """
+        if not self.encrypted_provider:
+            return {"success": False, "error": "Model Security modülü aktif değil"}
+        
+        try:
+            success = self.encrypted_provider.load_model(model_name, tag="secure")
+            if success:
+                return {
+                    "success": True,
+                    "model": model_name,
+                    "tag": "secure",
+                    "message": f"{model_name}:secure Ollama'ya yüklendi"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": f"{model_name} yüklenemedi"
+                }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def list_encrypted_models(self) -> List[str]:
+        """Mevcut şifreli modelleri listele."""
+        if not self.encrypted_provider:
+            return []
+        return self.encrypted_provider.list_encrypted()
 
 
 # ─────────────────────────────────────────────────────────────

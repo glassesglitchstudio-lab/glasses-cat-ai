@@ -111,7 +111,9 @@ BASE_URL = "" # Dinamik URL için boş bırakıldı
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True  # Template değişikliklerini anında yansıt
 CORS(app, supports_credentials=True) # CORS desteği eklendi
-app.secret_key = "glassescat_secret_key_fixed_2024"  # Sabit key
+from dotenv import load_dotenv
+load_dotenv()
+app.secret_key = os.getenv("FLASK_SECRET_KEY", os.urandom(24).hex())
 app.permanent_session_lifetime = timedelta(days=7)  # 7 günlük oturum
 
 # Memory instance
@@ -781,7 +783,7 @@ def get_current_user():
 
 
 # ==================== GELİŞTİRİCİ MODU ====================
-DEV_MODE_KEY = "GLASSES-DEV-2024"  # Geliştirici anahtarı
+DEV_MODE_KEY = os.getenv("DEV_MODE_KEY", os.urandom(16).hex())
 
 @app.route('/api/auth/dev-login', methods=['POST'])
 def dev_login():
@@ -980,6 +982,10 @@ def index():
         return render_template('simple_login.html')
     except Exception as e:
         return f"Template Hatası: {str(e)}", 500
+
+@app.route('/glitch')
+def glitch_landing():
+    return render_template('glitch_landing.html')
 
 @app.route('/login')
 def login_page():

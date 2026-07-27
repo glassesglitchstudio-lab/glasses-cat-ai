@@ -1,4 +1,4 @@
-﻿"""
+"""
 ModelRouter - GlassesCat AI Model Yönlendirici
 Ollama tabanlı akıllı model seçimi sistemi
 
@@ -26,6 +26,8 @@ import gc
 import json
 import base64
 import os
+import subprocess
+import tempfile
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from pathlib import Path
@@ -91,9 +93,9 @@ MODELS_INFO = {
 
 # Model tanımları - V3A birincil model, GulmezCetinerMax alternatif
 PRIMARY_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"       # ANA AGI - Tüm görevler
-PRIMARY_MODEL_ALT = "gulmzcetinermax:latest"   # Alternatif AGI
+PRIMARY_MODEL_ALT = "GulmezCetinerMax:latest"   # Alternatif AGI
 CHAT_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"          # Birincil: V3A
-CHAT_MODEL_ALT = "gulmzcetinermax:latest"      # Alternatif: GulmezCetinerMax
+CHAT_MODEL_ALT = "GulmezCetinerMax:latest"      # Alternatif: GulmezCetinerMax
 CODING_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"        # Birincil: V3A
 CODING_MODEL_ALT = "qwen2.5-coder:14b"         # Alternatif: Qwen Coder
 ANALYSIS_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"      # Birincil: V3A
@@ -162,6 +164,7 @@ class ModelRouter:
     """
     Istek turune gore prompt secer ve Ollama'ya yonlendirir.
     Akıllı model seçimi ile en uygun modeli kullanır.
+    Şifreli model desteği dahil.
     """
 
     def __init__(
@@ -175,6 +178,10 @@ class ModelRouter:
         del config_file
 
         self.ollama_url = ollama_url or "http://localhost:11434/api/chat"
+
+        # Encrypted model desteği
+        self._encrypted_provider = None
+        self._secure_models_loaded = False
 
         # System promptlar - Türkçe
         self.system_prompts = {
@@ -279,6 +286,40 @@ class ModelRouter:
         """Tüm model bilgilerini getir."""
         return MODELS_INFO
 
+    def _get_encrypted_provider(self):
+        """Encrypted model provider'ı al (lazy init)."""
+        if self._encrypted_provider is None:
+            try:
+                from model_security.encrypted_model_provider import get_encrypted_provider
+                self._encrypted_provider = get_encrypted_provider()
+            except ImportError:
+                pass
+        return self._encrypted_provider
+
+    def load_secure_models(self, password: str) -> Dict[str, bool]:
+        """Şifreli modelleri Ollama'ya yükle."""
+        provider = self._get_encrypted_provider()
+        if not provider:
+            return {"error": "model_security modülü bulunamadı"}
+
+        results = {}
+        for name in provider.list_encrypted():
+            success = provider.load_model(name, tag="secure")
+            results[name] = success
+
+        self._secure_models_loaded = any(results.values())
+        return results
+
+    def try_secure_fallback(self, model_name: str) -> str:
+        """Model Ollama'da yoksa şifreli versiyonunu dene."""
+        if not self._check_model(model_name):
+            provider = self._get_encrypted_provider()
+            if provider and model_name in provider.list_encrypted():
+                secure_name = f"{model_name}:secure"
+                if self._check_model(secure_name):
+                    return secure_name
+        return model_name
+
     def get_available_models(self) -> List[Dict]:
         """Kullanılabilir model listesini getir."""
         available = []
@@ -302,7 +343,7 @@ class ModelRouter:
                 "stream": False,
                 "options": {"num_predict": 1}
             }
-            response = requests.post(self.ollama_url, json=payload, timeout=5)
+            response = requests.post(self.ollama_url, json=payload, timeout=60)
             return response.status_code == 200
         except:
             return False
@@ -412,6 +453,9 @@ class ModelRouter:
             "analysis": ANALYSIS_MODEL,
             "vision": VISION_MODEL
         }[model_type]
+        
+        # Secure fallback dene
+        model_name = self.try_secure_fallback(model_name)
         
         if thought_callback:
             thought_callback(f"{MODELS_INFO.get(model_name, {}).get('name', model_name)} modeli seçildi", "Router")
