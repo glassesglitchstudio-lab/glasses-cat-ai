@@ -53,6 +53,18 @@ try:
 except ImportError:
     WEBBROWSER_OK = False
 
+try:
+    from duckduckgo_search import DDGS
+    DDGS_OK = True
+except ImportError:
+    DDGS_OK = False
+
+try:
+    from playwright.sync_api import sync_playwright
+    PLAYWRIGHT_OK = True
+except ImportError:
+    PLAYWRIGHT_OK = False
+
 # ─────────────────────────────────────────────────────────────
 # VERİ SINIFLARI
 # ─────────────────────────────────────────────────────────────
@@ -217,6 +229,43 @@ class WebAgent:
         
         return page
     
+    def fetch_page_js(self, url: str, timeout: int = 30) -> PageInfo:
+        """
+        Playwright ile JS-render edilmiş sayfayı getir.
+        Normal fetch_page JS içeriğini alamazsa bunu dene.
+        """
+        if not PLAYWRIGHT_OK:
+            return self.fetch_page(url, timeout)
+        
+        page = PageInfo(url=url)
+        start_time = time.time()
+        
+        try:
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch(headless=True)
+                context = browser.new_context(
+                    user_agent=self.user_agent,
+                    viewport={"width": 1280, "height": 720}
+                )
+                ctx = context.new_page()
+                ctx.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+                page.html = ctx.content()
+                page.title = ctx.title()
+                browser.close()
+            
+            page.status_code = 200
+            page.load_time = time.time() - start_time
+            self._parse_html(page)
+            
+            if not page.text:
+                self._regex_parse(page)
+            
+            return page
+        except Exception as e:
+            page.error = f"Playwright hatası: {e}"
+            page.load_time = time.time() - start_time
+            return page
+    
     def _parse_html(self, page: PageInfo):
         """HTML sayfasını parse et"""
         if not BS4_OK:
@@ -300,24 +349,42 @@ class WebAgent:
             
             page.links.append(PageLink(url=href, text=text[:100], is_internal=is_internal))
     
-    def search(self, query: str, max_results: int = 10, engine: str = "duckduckgo") -> List[Dict]:
+    def search(self, query: str, max_results: int = 10, engine: str = "auto") -> List[Dict]:
         """
         Web'de arama yap.
         
         Args:
             query: Arama sorgusu
             max_results: Maksimum sonuç sayısı
-            engine: Arama motoru (duckduckgo, google)
+            engine: Arama motoru (auto, duckduckgo, google)
         
         Returns:
             List[Dict]: Arama sonuçları
         """
+        # Önce duckduckgo_search kütüphanesini dene
+        if DDGS_OK:
+            try:
+                return self._search_ddgs(query, max_results)
+            except Exception as e:
+                logger.debug(f"DDGS hatası, scraping fallback: {e}")
         if engine == "google":
             return self._search_google(query, max_results)
         return self._search_duckduckgo(query, max_results)
     
+    def _search_ddgs(self, query: str, max_results: int) -> List[Dict]:
+        """duckduckgo_search kütüphanesi ile ara (sağlam API)"""
+        results = []
+        with DDGS() as ddgs:
+            for r in ddgs.text(query, max_results=max_results):
+                results.append({
+                    "title": r.get("title", ""),
+                    "url": r.get("href", ""),
+                    "snippet": r.get("body", "")
+                })
+        return results
+    
     def _search_duckduckgo(self, query: str, max_results: int) -> List[Dict]:
-        """DuckDuckGo'da ara"""
+        """DuckDuckGo'da ara (HTML scraping yedek)"""
         if not REQUESTS_OK:
             return [{"error": "requests modülü gerekli"}]
         

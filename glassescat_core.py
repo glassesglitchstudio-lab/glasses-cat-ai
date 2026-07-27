@@ -192,6 +192,9 @@ class GlassescatCore:
         # 6. Ultra_Agent Engine
         self._init_ultra_agent()
         
+        # 7. MCP Bridge (arka planda MCP sunucusu)
+        self._init_mcp_bridge()
+        
         logger.info(f"  ✅ GlassesCat Core v{VERSION} hazır!")
         logger.info("=" * 50)
         
@@ -549,6 +552,18 @@ class GlassescatCore:
             logger.warning(f"  ⚠️ Ultra_Agent Engine başlatılamadı: {e}")
             self.ultra_agent = None
     
+    def _init_mcp_bridge(self):
+        """MCP Bridge'i başlat"""
+        try:
+            from mcp_bridge import get_mcp_bridge
+            self.mcp_bridge = get_mcp_bridge(core=self)
+            self.mcp_bridge.initialize()
+            status = self.mcp_bridge.get_status()
+            logger.info(f"  🌉 MCP Bridge: {status['tools_served']} tool, {len(status['connected_servers'])} dış sunucu")
+        except Exception as e:
+            logger.warning(f"  ⚠️ MCP Bridge başlatılamadı: {e}")
+            self.mcp_bridge = None
+    
     # ─────────────────────────────────────────────────────────
     # ANA İŞLEME AKIŞI
     # ─────────────────────────────────────────────────────────
@@ -783,6 +798,12 @@ class GlassescatCore:
     
     def get_status(self) -> Dict:
         """Sistem durum raporu"""
+        mcp_status = {}
+        if hasattr(self, 'mcp_bridge') and self.mcp_bridge:
+            try:
+                mcp_status = self.mcp_bridge.get_status()
+            except:
+                pass
         return {
             "name": AGENT_NAME,
             "version": VERSION,
@@ -795,7 +816,8 @@ class GlassescatCore:
                 "model_router": MODEL_ROUTER_OK,
                 "model_security": MODEL_SECURITY_OK and self.encrypted_provider is not None,
                 "state_manager": self.state_manager is not None,
-                "feedback": self.feedback is not None
+                "feedback": self.feedback is not None,
+                "mcp_bridge": mcp_status.get("server_running", False) if mcp_status else False
             },
             "stats": {
                 "commands_executed": self.state.commands_executed,

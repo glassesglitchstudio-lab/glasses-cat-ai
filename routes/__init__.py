@@ -24,8 +24,10 @@ from routes.plugins import router as plugins_router
 from routes.skills import router as skills_router
 from routes.theme import router as theme_router
 from routes.tools import router as tools_router
+from routes.mcp import router as mcp_router
 
 router.include_router(chat_router, prefix="/api/chat", tags=["chat"])
+router.include_router(mcp_router, prefix="/api/mcp", tags=["mcp"])
 router.include_router(memory_router, prefix="/api/memory", tags=["memory"])
 router.include_router(system_router, prefix="/api/system", tags=["system"])
 router.include_router(auth_router, prefix="/api/auth", tags=["auth"])

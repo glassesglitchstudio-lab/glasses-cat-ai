@@ -31,6 +31,22 @@ from dataclasses import dataclass, field, asdict
 logger = logging.getLogger("GlassescatAgentLoop")
 
 # ─────────────────────────────────────────────────────────────
+# PLUGIN & SKILL SİSTEMLERİ (opsiyonel)
+# ─────────────────────────────────────────────────────────────
+
+try:
+    from plugin_system import PluginManager, HookPoint
+    PLUGIN_OK = True
+except ImportError:
+    PLUGIN_OK = False
+
+try:
+    from skill_system import SkillManager
+    SKILL_OK = True
+except ImportError:
+    SKILL_OK = False
+
+# ─────────────────────────────────────────────────────────────
 # SABİTLER
 # ─────────────────────────────────────────────────────────────
 
@@ -138,6 +154,25 @@ class AgentLoop:
         
         # LLM istemci referansı (opsiyonel)
         self._llm_client = None
+        
+        # Plugin & Skill sistemleri
+        self._plugin_manager = None
+        self._skill_manager = None
+        if PLUGIN_OK:
+            try:
+                self._plugin_manager = PluginManager.get_instance()
+                self._plugin_manager.load_all_plugins()
+                logger.info(f"🔌 Plugin sistemi: {self._plugin_manager.get_plugin_count()} eklenti yüklendi")
+            except Exception as e:
+                logger.warning(f"Plugin sistemi başlatılamadı: {e}")
+        if SKILL_OK:
+            try:
+                self._skill_manager = SkillManager.get_instance()
+                self._skill_manager.discover_skills()
+                enabled = self._skill_manager.get_enabled_skills()
+                logger.info(f"🧠 Skill sistemi: {len(enabled)} yetenek aktif")
+            except Exception as e:
+                logger.warning(f"Skill sistemi başlatılamadı: {e}")
     
     def run(self, user_input: str, conversation_history: List = None,
             memory_context: str = "", session_id: str = None) -> Dict:
@@ -164,11 +199,17 @@ class AgentLoop:
         
         logger.info(f"🤔 Agent Loop başladı: '{user_input[:50]}...'")
         
-        # Sistem prompt'unu oluştur
+        # --- PLUGIN: ON_USER_INPUT ---
+        self._run_plugin_hook(HookPoint.ON_USER_INPUT, user_input=user_input, session_id=session_id)
+        
+        # Sistem prompt'unu oluştur (skill'ler dahil)
         system_prompt = self._build_system_prompt()
         
         # Kullanıcı prompt'unu oluştur (hafıza bağlamıyla)
         user_prompt = self._build_user_prompt(user_input, memory_context, conversation_history)
+        
+        # --- PLUGIN: before_chat ---
+        self._run_plugin_hook(HookPoint.BEFORE_CHAT, user_input=user_input, system_prompt=system_prompt)
         
         # ReAct Döngüsü
         for iteration in range(self.max_iterations):
@@ -191,6 +232,7 @@ class AgentLoop:
                     type="error",
                     content="LLM yanıt vermedi"
                 ))
+                self._run_plugin_hook(HookPoint.ON_ERROR, error="LLM yanıt vermedi", user_input=user_input)
                 break
             
             # LLM yanıtını logla
@@ -240,6 +282,9 @@ class AgentLoop:
                 content=llm_response[:200]
             ))
             
+            # --- PLUGIN: after_chat ---
+            self._run_plugin_hook(HookPoint.AFTER_CHAT, response=llm_response, tool_calls=tool_calls)
+            
             return {
                 "response": llm_response,
                 "thoughts": [asdict(t) for t in self.thoughts],
@@ -247,6 +292,9 @@ class AgentLoop:
                 "iterations": self.iteration,
                 "success": True
             }
+        
+        # --- PLUGIN: after_chat (max iter) ---
+        self._run_plugin_hook(HookPoint.AFTER_CHAT, response=final_response, tool_calls=tool_calls, max_iterations_reached=True)
         
         # Maksimum iterasyon aşıldıysa
         final_response = "Bu görevi tamamlamak için daha fazla adıma ihtiyacım var. Kaldığım yerden devam edebilirim."
@@ -285,6 +333,11 @@ class AgentLoop:
                           conversation_history: List = None) -> str:
         """Kullanıcı prompt'unu oluştur (bağlamla zenginleştirilmiş)"""
         parts = []
+        
+        # Skill bağlamı
+        skill_context = self._get_skill_context()
+        if skill_context:
+            parts.append(skill_context + "\n")
         
         # Hafıza bağlamı
         if memory_context:
@@ -334,6 +387,45 @@ class AgentLoop:
             parts.append(f"  {status} | {tool}: {output}")
         return "\n".join(parts)
     
+    def _run_plugin_hook(self, hook_point, **kwargs):
+        """Plugin hook'larını güvenli bir şekilde çalıştır."""
+        if not self._plugin_manager:
+            return []
+        try:
+            return self._plugin_manager.execute_hooks(hook_point, **kwargs)
+        except Exception as e:
+            logger.debug(f"Plugin hook {hook_point} hatası: {e}")
+            return []
+
+    def _get_skill_context(self) -> str:
+        """Skill'lerden birleşik prompt bağlamı oluştur."""
+        if not self._skill_manager:
+            return ""
+        try:
+            enabled = self._skill_manager.get_enabled_skills()
+            if not enabled:
+                return ""
+            prompt = self._skill_manager.get_combined_prompt(list(enabled.keys()))
+            tools = self._skill_manager.get_combined_tools(list(enabled.keys()))
+            examples = self._skill_manager.get_combined_examples(list(enabled.keys()))
+            parts = []
+            if prompt:
+                parts.append(f"## 🎯 Aktif Yeteneklerin\n{prompt}")
+            if tools:
+                tool_lines = []
+                for t in tools:
+                    name = t.get("name", "?")
+                    desc = t.get("description", "")[:60]
+                    tool_lines.append(f"  • {name} - {desc}")
+                if tool_lines:
+                    parts.append("## 🛠️ Skill Araçları\n" + "\n".join(tool_lines))
+            if examples:
+                parts.append("## 📚 Örnek Kullanımlar\n" + str(examples)[:300])
+            return "\n\n".join(parts)
+        except Exception as e:
+            logger.debug(f"Skill bağlamı alınamadı: {e}")
+            return ""
+
     def _call_llm(self, system_prompt: str, user_prompt: str) -> Optional[str]:
         """
         LLM'den yanıt al - hızlı başarısız ol.

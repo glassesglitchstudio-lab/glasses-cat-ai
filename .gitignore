@@ -77,3 +77,9 @@ web/app.py
 
 # Users database
 users.json
+
+# External tools / embedded repos
+.glitchcode/
+.opencode/skills/
+free-claude-code/
+model-site/
