@@ -529,31 +529,75 @@ class UltraAgentEngine:
         logger.info(f"  Ultra_Agent araclari kaydedildi ({len(tools)} yeni arac)")
 
     def process(self, user_input: str) -> str:
-        lower = user_input.lower()
+        """LLM destekli process - dogal dili anla ve dogru alt sisteme yonlendir"""
+        if self.core and self.core.model_router:
+            system_prompt = """Sen Ultra_Agent'in karar motorusun. Kullanıcının isteğini analiz et ve sadece bir KATEGORİ adı döndür.
 
-        if "swarm" in lower or "swarm" in lower or "ajan" in lower or ("planla" in lower and "yap" in lower):
+Kategoriler:
+- SWARM: çoklu-ajan, swarm, planla+yap, otomasyon, koordineli iş
+- CODE: kod yaz/üret/düzenle/düzelt, python, script
+- WEB: web'den veri çek/indir, API çağrısı, scraping
+- FILE: dosya oku/yaz/kopyala/sil, dizin listele
+- PROJECT: proje iskeleti kur/scaffold, dosya yapısı oluştur
+- SCHEDULER: zamanlanmış görev, periyodik iş, cron, tekrarla
+- MEMORY: hafızada ara, hatırla, kaydet, unutma
+- HEAL: kod kontrol et, sentaks hatası düzelt, self-healing
+- UNKNOWN: hiçbiri değilse
+
+Sadece kategori adını yaz, başka hiçbir şey yazma."""
+            try:
+                response = self.core.model_router.chat(
+                    message=user_input,
+                    root_mode=False,
+                    context=[{"role": "system", "content": system_prompt}]
+                )
+                if response:
+                    if isinstance(response, dict):
+                        category = response.get('response', '') or response.get('text', '')
+                    else:
+                        category = str(response)
+                    category = category.strip().upper()
+                else:
+                    category = "UNKNOWN"
+            except Exception:
+                category = "UNKNOWN"
+        else:
+            category = "UNKNOWN"
+
+        if category == "SWARM":
             result = self.swarm.run_swarm(user_input)
             return f"Swarm tamamlandi: {result['summary']}"
-
-        if "kod" in lower and ("yaz" in lower or "uret" in lower or "olustur" in lower):
-            return "Kodu yazip kaydedeyim. Hangi dil ve ne yapmasi gerekiyor?"
-
-        if "oku" in lower and "dosya" in lower:
-            return "Hangi dosyayi okumami istersin? Dosya yolunu soyle."
-
-        if "proje" in lower and ("kur" in lower or "iskelet" in lower or "olustur" in lower):
-            return "Proje iskeleti kurmaya hazirim. Proje adi ve dosya yapisini soyle."
-
-        if "zamanla" in lower or "her" in lower and "saniye" in lower or "periyodik" in lower:
+        elif category == "CODE":
+            return "Kodu yazip kaydedeyim. Hangi dil ve ne yapmasi gerekiyor? Alternatif olarak 'swarm' ile tam otomasyon da baslatabilirim."
+        elif category == "WEB":
+            return "Web'den veri cekmeye hazirim. Hangi site ve hangi bilgi? Adim adim zincir de kurabilirim (web_chain)."
+        elif category == "FILE":
+            return "Dosya islemine hazirim. Oku/yaz/kopyala/listele. Dosya yolunu ve islemi soyle."
+        elif category == "PROJECT":
+            return "Proje iskeleti kurmaya hazirim. Proje adi ve JSON dosya yapisini soyle."
+        elif category == "SCHEDULER":
             return "Zamanlanmis gorev eklemeye hazirim. Hangi islem kac saniyede bir tekrar etsin?"
-
-        if "hafiza" in lower or "hatirla" in lower:
-            return "Hafizami taramaya hazirim. Ne hakkinda bilgi istiyorsun?"
-
-        if "web" in lower and ("cek" in lower or "indir" in lower or "getir" in lower):
-            return "Web'den veri cekmeye hazirim. Hangi site ve hangi bilgi?"
-
-        return ""
+        elif category == "MEMORY":
+            return "Hafizami taramaya hazirim. Ne hakkinda bilgi istiyorsun? Ya da kaydetmek istedigin bir sey var mi?"
+        elif category == "HEAL":
+            return "Kod kontrol ve onarma motoru hazir. Python kodunu gonder, sentaksini kontrol edip hatalari duzelteyim."
+        else:
+            # LLM yoksa eski keyword fallback
+            lower = user_input.lower()
+            if "swarm" in lower or "ajan" in lower or ("planla" in lower and "yap" in lower):
+                result = self.swarm.run_swarm(user_input)
+                return f"Swarm tamamlandi: {result['summary']}"
+            if "kod" in lower and ("yaz" in lower or "uret" in lower or "olustur" in lower):
+                return "Kodu yazip kaydedeyim. Hangi dil?"
+            if "oku" in lower and "dosya" in lower:
+                return "Hangi dosyayi okumami istersin?"
+            if "proje" in lower and ("kur" in lower or "iskelet" in lower):
+                return "Proje iskeleti kurmaya hazirim. Proje adi ve JSON yapiyi soyle."
+            if "zamanla" in lower or ("her" in lower and "saniye" in lower):
+                return "Zamanlanmis gorev eklemeye hazirim."
+            if "hafiza" in lower or "hatirla" in lower:
+                return "Hafizami taramaya hazirim."
+            return ""
 
 
 _ultra_agent_instance = None

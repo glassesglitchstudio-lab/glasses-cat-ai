@@ -482,6 +482,29 @@ async def admin_panel(request: Request):
     )
 
 
+@app.get("/manage", response_class=HTMLResponse)
+async def manage_panel(request: Request):
+    """Yönetim paneli"""
+    return templates.TemplateResponse(
+        request=request,
+        name="manage.html",
+        context={"request": request}
+    )
+
+
+@app.post("/api/settings/mode")
+async def set_mode(data: dict):
+    """Agent modunu değiştir"""
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        mode = data.get("mode", "normal")
+        c.set_mode(mode)
+        return {"success": True, "mode": mode}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 @app.post("/admin/keys")
 async def get_keys(request: Request):
     """Erişim kodlarını listele"""

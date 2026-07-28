@@ -1003,6 +1003,11 @@ def admin_panel():
     """Admin paneli HTML sayfası - Oturum kontrollü"""
     return render_template('admin.html')
 
+@app.route('/manage')
+def manage_panel():
+    """Yönetim paneli"""
+    return render_template('manage.html')
+
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
     """Admin girişi"""

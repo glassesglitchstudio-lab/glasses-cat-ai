@@ -189,7 +189,10 @@ class GlassescatCore:
         # 5. Geri Bildirim Sistemi
         self._init_feedback()
         
-        # 6. Ultra_Agent Engine
+        # 6. Görev Zamanlayıcı
+        self._init_scheduler()
+        
+        # 7. Ultra_Agent Engine
         self._init_ultra_agent()
         
         # 7. MCP Bridge (arka planda MCP sunucusu)
@@ -540,6 +543,18 @@ class GlassescatCore:
             logger.warning(f"  ⚠️ Feedback Loop başlatılamadı: {e}")
             self.feedback = None
     
+    def _init_scheduler(self):
+        """Görev zamanlayıcıyı başlat"""
+        try:
+            from task_scheduler import get_scheduler
+            self.scheduler = get_scheduler()
+            self.scheduler.start()
+            count = len(self.scheduler.list_tasks())
+            logger.info(f"  ⏰ Task Scheduler: başlatıldı ({count} görev)")
+        except Exception as e:
+            logger.warning(f"  ⚠️ Task Scheduler başlatılamadı: {e}")
+            self.scheduler = None
+    
     def _init_ultra_agent(self):
         """Ultra_Agent Engine'i başlat"""
         try:
@@ -817,6 +832,7 @@ class GlassescatCore:
                 "model_security": MODEL_SECURITY_OK and self.encrypted_provider is not None,
                 "state_manager": self.state_manager is not None,
                 "feedback": self.feedback is not None,
+                "scheduler": self.scheduler is not None,
                 "mcp_bridge": mcp_status.get("server_running", False) if mcp_status else False
             },
             "stats": {

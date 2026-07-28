@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat - Yönetim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07070d;
+            --surface: rgba(139, 92, 246, 0.08);
+            --border: rgba(139, 92, 246, 0.20);
+            --accent: #8b5cf6;
+            --text: #f1f0ff;
+            --text2: #9492b0;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #ff6b00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; padding: 20px;
+        }
+        .nav {
+            display: flex; gap: 8px; margin-bottom: 24px;
+            padding: 8px; border-radius: 12px;
+            background: rgba(139, 92, 246, 0.06);
+            border: 1px solid rgba(139, 92, 246, 0.12);
+        }
+        .nav a {
+            padding: 8px 20px; border-radius: 8px; text-decoration: none;
+            color: var(--text2); font-size: 14px; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav a:hover, .nav a.active { background: var(--accent); color: #fff; }
+        h1 { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+        h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+        .panel {
+            display: none; padding: 20px; border-radius: 14px;
+            background: rgba(139, 92, 246, 0.06);
+            border: 1px solid rgba(139, 92, 246, 0.12);
+        }
+        .panel.active { display: block; }
+        .card { padding: 14px; border-radius: 10px; margin-bottom: 10px;
+            background: rgba(139, 92, 246, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.08); }
+        .flex { display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-green { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+        .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+        .badge-yellow { background: rgba(255, 107, 0, 0.15); color: var(--orange); }
+        button {
+            padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 13px; font-weight: 500; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); }
+        .btn-danger:hover { background: rgba(239,68,68,0.25); }
+        input, select {
+            width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+            background: rgba(139, 92, 246, 0.06); color: var(--text); font-size: 14px;
+            margin-bottom: 10px;
+        }
+        input:focus { outline: none; border-color: var(--accent); }
+        .mt-10 { margin-top: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat { text-align: center; padding: 16px; border-radius: 10px;
+            background: rgba(139, 92, 246, 0.04); border: 1px solid rgba(139, 92, 246, 0.08); }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+        .toggle { width: 44px; height: 24px; border-radius: 12px; cursor: pointer; border: none;
+            transition: all 0.2s; position: relative; }
+        .toggle.on { background: var(--accent); }
+        .toggle.off { background: rgba(139, 92, 246, 0.15); }
+        .toggle::after { content: ''; width: 18px; height: 18px; border-radius: 50%;
+            background: #fff; position: absolute; top: 3px; left: 3px; transition: all 0.2s; }
+        .toggle.on::after { left: 23px; }
+        .empty { text-align: center; padding: 30px; color: var(--text2); font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/" class="active">Sohbet</a>
+        <a href="/manage" class="active">Yönetim</a>
+        <a href="/admin">Admin</a>
+    </div>
+    <h1>⚙️ Yönetim Paneli</h1>
+
+    <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <button class="btn-primary" onclick="showTab('status')" id="tab-status">📊 Durum</button>
+        <button class="btn-primary" onclick="showTab('tasks')" id="tab-tasks">⏰ Görevler</button>
+        <button class="btn-primary" onclick="showTab('plugins')" id="tab-plugins">🔌 Eklentiler</button>
+        <button class="btn-primary" onclick="showTab('settings')" id="tab-settings">⚙️ Ayarlar</button>
+    </div>
+
+    <!-- Status -->
+    <div class="panel active" id="panel-status">
+        <h2>📊 Sistem Durumu</h2>
+        <div class="grid-2" id="stats-grid">
+            <div class="stat"><div class="stat-value" id="stat-tools">-</div><div class="stat-label">Araç</div></div>
+            <div class="stat"><div class="stat-value" id="stat-memory">-</div><div class="stat-label">Hafıza</div></div>
+            <div class="stat"><div class="stat-value" id="stat-tasks">-</div><div class="stat-label">Görev</div></div>
+            <div class="stat"><div class="stat-value" id="stat-mcp">-</div><div class="stat-label">MCP Tool</div></div>
+        </div>
+        <div class="card mt-10">
+            <div class="flex"><span>🧠 Core</span><span class="badge badge-green" id="core-status">Kontrol...</span></div>
+        </div>
+        <div class="card"><div class="flex"><span>📚 Hafıza</span><span class="badge badge-green" id="memory-status">Kontrol...</span></div></div>
+        <div class="card"><div class="flex"><span>🌉 MCP Bridge</span><span class="badge badge-green" id="mcp-status">Kontrol...</span></div></div>
+        <div class="card"><div class="flex"><span>⏰ Task Scheduler</span><span class="badge badge-green" id="scheduler-status">Kontrol...</span></div></div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="panel" id="panel-tasks">
+        <div class="flex"><h2>⏰ Görevler</h2><button class="btn-primary btn-sm" onclick="showNewTask()">+ Yeni</button></div>
+        <div id="new-task-form" style="display:none" class="card">
+            <input id="task-name" placeholder="Görev adı">
+            <input id="task-command" placeholder="Komut (örn: echo merhaba)">
+            <select id="task-type">
+                <option value="COMMAND">Komut</option>
+                <option value="NOTIFICATION">Bildirim</option>
+                <option value="API_CALL">API Çağrısı</option>
+            </select>
+            <div style="display:flex;gap:10px;">
+                <button class="btn-primary" onclick="createTask()">Oluştur</button>
+                <button onclick="document.getElementById('new-task-form').style.display='none'" style="background:transparent;color:var(--text2)">İptal</button>
+            </div>
+        </div>
+        <div id="task-list"><div class="empty">Yükleniyor...</div></div>
+    </div>
+
+    <!-- Plugins -->
+    <div class="panel" id="panel-plugins">
+        <h2>🔌 Eklentiler</h2>
+        <div id="plugin-list"><div class="empty">Yükleniyor...</div></div>
+    </div>
+
+    <!-- Settings -->
+    <div class="panel" id="panel-settings">
+        <h2>⚙️ Ayarlar</h2>
+        <div class="card">
+            <label style="font-size:14px;color:var(--text2);display:block;margin-bottom:6px;">Agent Modu</label>
+            <select id="agent-mode">
+                <option value="normal">Normal</option>
+                <option value="developer">Geliştirici</option>
+                <option value="silent">Sessiz</option>
+                <option value="game">Oyun</option>
+            </select>
+            <button class="btn-primary" onclick="setMode()">Uygula</button>
+        </div>
+    </div>
+
+    <script>
+        function showTab(name) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-' + name).classList.add('active');
+        }
+        function showNewTask() {
+            document.getElementById('new-task-form').style.display = 'block';
+        }
+
+        async function loadStatus() {
+            try {
+                const r = await fetch('/api/system/core');
+                if (!r.ok) throw new Error('API hatası');
+                const d = await r.json();
+                const s = await fetch('/api/system/status').then(x => x.json()).catch(() => ({}));
+                document.getElementById('stat-tools').textContent = d.tools || '?';
+                document.getElementById('stat-memory').textContent = '30';
+                document.getElementById('stat-tasks').textContent = d.scheduler ? 'Aktif' : 'Pasif';
+                document.getElementById('stat-mcp').textContent = d.encrypted_models || '0';
+                document.getElementById('core-status').textContent = '✅ Çalışıyor';
+                document.getElementById('mcp-status').textContent = d.modules?.mcp_bridge ? '✅ Aktif' : '❌ Pasif';
+                document.getElementById('scheduler-status').textContent = d.modules?.scheduler ? '✅ Aktif' : '❌ Pasif';
+                document.getElementById('memory-status').textContent = d.modules?.memory ? '✅ Aktif' : '❌ Pasif';
+            } catch(e) {
+                document.getElementById('core-status').textContent = '❌ Hata';
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const r = await fetch('/api/scheduler/tasks');
+                const d = await r.json();
+                const list = document.getElementById('task-list');
+                const tasks = d.tasks || [];
+                if (tasks.length === 0) {
+                    list.innerHTML = '<div class="empty">Henüz görev yok</div>';
+                    return;
+                }
+                list.innerHTML = tasks.map(t => {
+                    const id = t.id || '';
+                    const name = t.name || 'İsimsiz';
+                    const cmd = t.command || '';
+                    const status = t.status || 'pending';
+                    const badge = status === 'running' ? 'badge-green' : status === 'paused' ? 'badge-yellow' : 'badge-green';
+                    return `<div class="card"><div class="flex">
+                        <div><strong>${name}</strong><br><span style="font-size:12px;color:var(--text2)">${cmd}</span></div>
+                        <div style="display:flex;gap:6px;align-items:center">
+                            <span class="badge ${badge}">${status}</span>
+                            <button class="btn-primary btn-sm" onclick="runTask('${id}')">▶</button>
+                            <button class="btn-danger btn-sm" onclick="deleteTask('${id}')">✕</button>
+                        </div>
+                    </div></div>`;
+                }).join('');
+            } catch(e) {
+                document.getElementById('task-list').innerHTML = '<div class="empty">Yüklenemedi</div>';
+            }
+        }
+
+            async function loadPlugins() {
+            try {
+                const r = await fetch('/api/plugins');
+                const d = await r.json();
+                const list = document.getElementById('plugin-list');
+                const plugins = d.plugins || [];
+                if (plugins.length === 0) {
+                    list.innerHTML = '<div class="empty">Eklenti bulunamadı. Plugin sistemi harici eklentiler için tasarlandı.</div>';
+                    return;
+                }
+                list.innerHTML = plugins.map(p => {
+                    const name = p.name || 'İsimsiz';
+                    const enabled = p.enabled !== false;
+                    return `<div class="card"><div class="flex">
+                        <span>${name}</span>
+                        <button class="toggle ${enabled ? 'on' : 'off'}" onclick="togglePlugin('${name}')"></button>
+                    </div></div>`;
+                }).join('');
+            } catch(e) {
+                document.getElementById('plugin-list').innerHTML = '<div class="empty">Yüklenemedi</div>';
+            }
+        }
+
+        async function createTask() {
+            const name = document.getElementById('task-name').value;
+            const command = document.getElementById('task-command').value;
+            const task_type = document.getElementById('task-type').value;
+            if (!name || !command) return alert('Ad ve komut gerekli');
+            try {
+                const r = await fetch('/api/scheduler/tasks', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, command, task_type, repeat: 'ONCE'})
+                });
+                if (r.ok) {
+                    document.getElementById('new-task-form').style.display = 'none';
+                    document.getElementById('task-name').value = '';
+                    document.getElementById('task-command').value = '';
+                    loadTasks();
+                }
+            } catch(e) { alert('Hata: ' + e.message); }
+        }
+
+        async function deleteTask(id) {
+            try { await fetch('/api/scheduler/tasks/' + id, {method: 'DELETE'}); loadTasks(); }
+            catch(e) {}
+        }
+
+        async function runTask(id) {
+            try { await fetch('/api/scheduler/tasks/' + id + '/run', {method: 'POST'}); loadTasks(); }
+            catch(e) {}
+        }
+
+        async function setMode() {
+            const mode = document.getElementById('agent-mode').value;
+            try {
+                await fetch('/api/settings/mode', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({mode})
+                });
+            } catch(e) {}
+        }
+
+        loadStatus();
+        loadTasks();
+        loadPlugins();
+        setInterval(loadStatus, 10000);
+    </script>
+</body>
+</html>
