@@ -341,6 +341,17 @@
                     <span class="spec">Akıllı Routing</span>
                 </div>
             </div>
+            <div class="model-card">
+                <span class="tag orange">R1</span>
+                <h3>ShadowCat R:1</h3>
+                <p>761K entry dataset ile hazırlanan reasoning modeli. Colab Pro+ ile fine-tune edilecek. Derin mantıksal akıl yürütme ve analiz.</p>
+                <div class="specs">
+                    <span class="spec">761K Dataset</span>
+                    <span class="spec">Reasoning</span>
+                    <span class="spec">Colab Pro+</span>
+                    <span class="spec">Derin Analiz</span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -391,6 +402,155 @@
                 <div class="feat-icon" style="background: rgba(34,211,238,0.10); color: #22d3ee;"><i class="fa-solid fa-clock"></i></div>
                 <h3>Görev Zamanlayıcı</h3>
                 <p>16 zamanlanmış görev, periyodik işlemler, cron benzeri programlama.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Demo Chat -->
+<section id="demo" style="background: var(--bg2);">
+    <div class="container">
+        <div class="section-label"><i class="fa-solid fa-comment-dots"></i> Canlı Demo</div>
+        <h2 class="section-title">GlassesCat ile Neler Yapabilirsin?</h2>
+        <p class="section-desc">Gerçek kullanım senaryolarından örnekler. Her biri farklı bir yeteneği gösterir.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;">
+            <!-- Chat 1: Code -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+                <div style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff6b00;"></span>
+                    <span style="font-size: 0.8125rem; font-weight: 600;">Kod Yazma</span>
+                </div>
+                <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); padding: 10px 14px; border-radius: 12px 12px 4px 12px; max-width: 85%; font-size: 0.8125rem;">
+                        Python ile bir dosya okuyucu yaz
+                    </div>
+                    <div style="align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); padding: 10px 14px; border-radius: 12px 12px 12px 4px; max-width: 100%; font-size: 0.8125rem;">
+                        <div style="color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px;">GlassesCat</div>
+                        <pre style="background: #0d0d14; border-radius: 8px; padding: 10px; font-size: 0.75rem; overflow-x: auto; margin: 0;"><code style="font-family: 'JetBrains Mono', monospace;">def read_file(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+print(read_file('ornek.txt'))</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat 2: Web Search -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+                <div style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #60a5fa;"></span>
+                    <span style="font-size: 0.8125rem; font-weight: 600;">Web Araması</span>
+                </div>
+                <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); padding: 10px 14px; border-radius: 12px 12px 4px 12px; max-width: 85%; font-size: 0.8125rem;">
+                        Bugünkü teknoloji haberlerini ara
+                    </div>
+                    <div style="align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); padding: 10px 14px; border-radius: 12px 12px 12px 4px; max-width: 100%; font-size: 0.8125rem;">
+                        <div style="color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px;">GlassesCat</div>
+                        <div style="margin-bottom: 6px;">Web'de arıyorum... 🔍</div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+                            <span style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.04); font-size: 0.7rem;">Yapay zeka</span>
+                            <span style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.04); font-size: 0.7rem;">Teknoloji</span>
+                            <span style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.04); font-size: 0.7rem;">2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat 3: Memory -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+                <div style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #34d399;"></span>
+                    <span style="font-size: 0.8125rem; font-weight: 600;">Hafıza Sorgulama</span>
+                </div>
+                <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); padding: 10px 14px; border-radius: 12px 12px 4px 12px; max-width: 85%; font-size: 0.8125rem;">
+                        Geçen haftaki proje notlarımı hatırla
+                    </div>
+                    <div style="align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); padding: 10px 14px; border-radius: 12px 12px 12px 4px; max-width: 100%; font-size: 0.8125rem;">
+                        <div style="color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px;">GlassesCat</div>
+                        <div>Obsidian hafızamda buldum 📂</div>
+                        <div style="margin-top: 6px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #ff6b00;">
+                            <div style="font-size: 0.7rem; color: #ff6b00; font-weight: 600;">proje_notlari.md</div>
+                            <div style="font-size: 0.75rem; margin-top: 4px;">• V7_HYBRID_TITAN testleri tamamlandı<br>• MCP bridge entegrasyonu yapıldı<br>• Yeni plugin sistemi eklendi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat 4: System -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+                <div style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #f472b6;"></span>
+                    <span style="font-size: 0.8125rem; font-weight: 600;">Sistem Yönetimi</span>
+                </div>
+                <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); padding: 10px 14px; border-radius: 12px 12px 4px 12px; max-width: 85%; font-size: 0.8125rem;">
+                        Sistem durumunu göster
+                    </div>
+                    <div style="align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); padding: 10px 14px; border-radius: 12px 12px 12px 4px; max-width: 100%; font-size: 0.8125rem;">
+                        <div style="color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px;">GlassesCat</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px;">
+                            <span style="padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.7rem;">CPU: %23</span>
+                            <span style="padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.7rem;">RAM: %45</span>
+                            <span style="padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.7rem;">37 araç aktif</span>
+                            <span style="padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.7rem;">31 hafıza dosyası</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat 5: Plugin -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+                <div style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #a855f7;"></span>
+                    <span style="font-size: 0.8125rem; font-weight: 600;">Plugin Yönetimi</span>
+                </div>
+                <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); padding: 10px 14px; border-radius: 12px 12px 4px 12px; max-width: 85%; font-size: 0.8125rem;">
+                        Pluginleri listele
+                    </div>
+                    <div style="align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); padding: 10px 14px; border-radius: 12px 12px 12px 4px; max-width: 100%; font-size: 0.8125rem;">
+                        <div style="color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px;">GlassesCat</div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <span style="padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between;">
+                                <span>Qwen Assistant</span>
+                                <span style="color: #34d399;">● aktif</span>
+                            </span>
+                            <span style="padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between;">
+                                <span>Web Scraper</span>
+                                <span style="color: #34d399;">● aktif</span>
+                            </span>
+                            <span style="padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between;">
+                                <span>Security Analyst</span>
+                                <span style="color: #6a6a7a;">○ pasif</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat 6: Multi-step Task -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+                <div style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #22d3ee;"></span>
+                    <span style="font-size: 0.8125rem; font-weight: 600;">Çok Adımlı Görev</span>
+                </div>
+                <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); padding: 10px 14px; border-radius: 12px 12px 4px 12px; max-width: 85%; font-size: 0.8125rem;">
+                        Chrome'u aç, YouTube'a gir, Mavislime ara
+                    </div>
+                    <div style="align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); padding: 10px 14px; border-radius: 12px 12px 12px 4px; max-width: 100%; font-size: 0.8125rem;">
+                        <div style="color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px;">GlassesCat</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size: 0.75rem; color: #34d399;">✓ Chrome başlatıldı</span>
+                            <span style="font-size: 0.75rem; color: #34d399;">✓ YouTube açıldı</span>
+                            <span style="font-size: 0.75rem; color: #34d399;">✓ "Mavislime" aranıyor...</span>
+                            <span style="font-size: 0.75rem; color: #8a8a9a;">⏳ 3 sonuç bulundu</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
