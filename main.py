@@ -240,7 +240,20 @@ async def get_ai_response(message: str, model: Optional[str] = None) -> str:
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    """Ana sayfa - HTML arayüzü"""
+    """Ana sayfa - Claude tarzı sohbet arayüzü"""
+    try:
+        return templates.TemplateResponse(
+            request=request,
+            name="chat.html",
+            context={"request": request}
+        )
+    except Exception as e:
+        logger.error(f"Error: {type(e).__name__}: {str(e)}")
+        return HTMLResponse(content="<h1>GlassesCat AI</h1><p>Template yüklenemedi</p>")
+
+@app.get("/legacy", response_class=HTMLResponse)
+async def legacy_root(request: Request):
+    """Eski ana sayfa"""
     try:
         return templates.TemplateResponse(
             request=request,

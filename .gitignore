@@ -81,5 +81,9 @@ users.json
 # External tools / embedded repos
 .glitchcode/
 .opencode/skills/
+.opencode/node_modules/
+.opencode/.opencode/
+.opencode/package.json
+.opencode/package-lock.json
 free-claude-code/
 model-site/
