@@ -44,21 +44,14 @@
         }
         nav .container { display: flex; align-items: center; justify-content: space-between; height: 56px; }
         .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .nav-logo svg { width: 28px; height: 28px; }
-        .cat-ear { transform-origin: bottom; }
-        @keyframes earTwitch {
-            0%, 90%, 100% { transform: rotate(0deg); }
-            92%, 94% { transform: rotate(-8deg); }
-            96% { transform: rotate(4deg); }
-        }
-        .nav-logo:hover .cat-ear { animation: earTwitch 0.4s ease-in-out; }
+        .nav-logo img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; transition: transform 0.3s cubic-bezier(.22,1,.36,1); }
+        .nav-logo:hover img { transform: scale(1.15) rotate(-8deg); }
         .nav-logo-text { font-weight: 700; font-size: 0.95rem; color: var(--text); }
-        .nav-logo-dot { display: inline-block; width: 5px; height: 5px; background: var(--orange); border-radius: 50%; margin-left: 1px; }
+        .nav-logo-dot { display: inline-block; width: 5px; height: 5px; background: var(--orange); border-radius: 50%; margin-left: 1px; animation: dotPulse 2s ease-in-out infinite; }
         @keyframes dotPulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.6); }
         }
-        .nav-logo-dot { animation: dotPulse 2s ease-in-out infinite; }
         .nav-links { display: flex; align-items: center; gap: 20px; }
         .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; position: relative; }
         .nav-links a:hover { color: var(--text); }
@@ -219,17 +212,7 @@
 <nav>
     <div class="container">
         <a href="#" class="nav-logo">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path class="cat-ear" d="M12 22 L8 4 L20 14" stroke="#ff6b00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path class="cat-ear" d="M28 22 L32 4 L20 14" stroke="#ff6b00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="20" cy="26" r="10" stroke="#e8e8e8" stroke-width="1.5" fill="none"/>
-                <circle cx="14" cy="26" r="4" stroke="#ff6b00" stroke-width="1.2" fill="none"/>
-                <circle cx="26" cy="26" r="4" stroke="#ff6b00" stroke-width="1.2" fill="none"/>
-                <line x1="18" y1="26" x2="22" y2="26" stroke="#ff6b00" stroke-width="1.2"/>
-                <circle cx="14" cy="26" r="1.2" fill="#ff6b00"/>
-                <circle cx="26" cy="26" r="1.2" fill="#ff6b00"/>
-                <path d="M17 30 Q20 33 23 30" stroke="#e8e8e8" stroke-width="1" fill="none" stroke-linecap="round"/>
-            </svg>
+            <img src="glassescat-logo.png" alt="GlassesCat">
             <span class="nav-logo-text">GlassesCat<span class="nav-logo-dot"></span></span>
         </a>
         <div class="nav-links" id="navLinks">
