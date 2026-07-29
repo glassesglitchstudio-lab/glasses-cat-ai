@@ -26,10 +26,16 @@
             background: var(--black);
             color: var(--text);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
 
+        /* ===== REVEAL ===== */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ===== NAV ===== */
         nav {
             position: fixed; top: 0; left: 0; right: 0; z-index: 100;
             background: rgba(10,10,10,0.85);
@@ -37,49 +43,79 @@
             border-bottom: 1px solid #1a1a1a;
         }
         nav .container { display: flex; align-items: center; justify-content: space-between; height: 56px; }
-        .nav-logo { font-weight: 700; font-size: 0.95rem; text-decoration: none; color: var(--text); }
+        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-logo svg { width: 28px; height: 28px; }
+        .cat-ear { transform-origin: bottom; }
+        @keyframes earTwitch {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            92%, 94% { transform: rotate(-8deg); }
+            96% { transform: rotate(4deg); }
+        }
+        .nav-logo:hover .cat-ear { animation: earTwitch 0.4s ease-in-out; }
+        .nav-logo-text { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+        .nav-logo-dot { display: inline-block; width: 5px; height: 5px; background: var(--orange); border-radius: 50%; margin-left: 1px; }
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.6); }
+        }
+        .nav-logo-dot { animation: dotPulse 2s ease-in-out infinite; }
         .nav-links { display: flex; align-items: center; gap: 20px; }
-        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; position: relative; }
         .nav-links a:hover { color: var(--text); }
+        .nav-links a::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1.5px; background: var(--orange); transition: width 0.3s cubic-bezier(.22,1,.36,1); }
+        .nav-links a:hover::after { width: 100%; }
         .nav-gh {
             padding: 6px 14px; border-radius: 6px;
-            background: #1a1a1a; color: var(--text);
-            text-decoration: none; font-size: 0.85rem;
+            background: #1a1a1a; color: var(--text); text-decoration: none; font-size: 0.85rem;
+            transition: background 0.2s;
         }
         .nav-gh:hover { background: #222; }
         .mobile-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.2rem; cursor: pointer; }
 
-        .hero { padding: 140px 0 80px; }
-        .hero-content { max-width: 720px; }
+        /* ===== HERO ===== */
+        .hero { padding: 140px 0 80px; position: relative; overflow: hidden; }
+        .hero::before {
+            content: '';
+            position: absolute; top: -50%; right: -20%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle at center, rgba(255,107,0,0.03), transparent 70%);
+            pointer-events: none;
+        }
+        .hero-content { max-width: 720px; position: relative; }
         .hero-badge {
             display: inline-block;
             padding: 4px 12px; border-radius: 4px;
             background: #1a1a1a; color: var(--orange);
             font-size: 0.75rem; margin-bottom: 24px;
+            border: 1px solid rgba(255,107,0,0.1);
         }
         .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
         .hero h1 span { color: var(--orange); }
         .hero p { font-size: 1rem; color: var(--text2); max-width: 560px; margin-bottom: 28px; }
         .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
         .btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 12px 24px; border-radius: 6px;
             font-size: 0.9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+            transition: all 0.25s cubic-bezier(.22,1,.36,1);
         }
         .btn.primary { background: var(--orange); color: #fff; }
-        .btn.primary:hover { background: var(--orange-light); }
+        .btn.primary:hover { background: var(--orange-light); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,107,0,0.25); }
         .btn.secondary { background: #1a1a1a; color: var(--text); border: 1px solid #2a2a2a; }
-        .btn.secondary:hover { background: #222; }
+        .btn.secondary:hover { background: #222; transform: translateY(-2px); border-color: #3a3a3a; }
 
         section { padding: 80px 0; }
         .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
 
-        .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        /* ===== MODELS ===== */
+        .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .model-card {
             padding: 24px; border-radius: 8px;
             background: #111; border: 1px solid #1a1a1a;
+            transition: border-color 0.3s, transform 0.3s cubic-bezier(.22,1,.36,1);
         }
-        .model-card:hover { border-color: #2a2a2a; }
+        .model-card:hover { border-color: #333; transform: translateY(-4px); }
         .model-card .tag {
             display: inline-block; padding: 2px 8px; border-radius: 4px;
             font-size: 0.7rem; font-weight: 600; margin-bottom: 12px;
@@ -91,32 +127,54 @@
         .model-card .spec {
             padding: 3px 8px; border-radius: 4px;
             background: #0a0a0a; color: var(--text3);
-            font-size: 0.7rem;
+            font-size: 0.7rem; transition: color 0.2s;
         }
+        .model-card:hover .spec { color: var(--text2); }
 
+        /* ===== FEATURES ===== */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-        .feat-card { padding: 24px; border-radius: 8px; background: #111; border: 1px solid #1a1a1a; }
-        .feat-card .icon { font-size: 1.2rem; margin-bottom: 12px; }
+        .feat-card { padding: 24px; border-radius: 8px; background: #111; border: 1px solid #1a1a1a; transition: border-color 0.3s, transform 0.3s cubic-bezier(.22,1,.36,1); }
+        .feat-card:hover { border-color: #333; transform: translateY(-3px); }
+        .feat-card .icon { font-size: 1.4rem; margin-bottom: 12px; display: inline-block; }
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .feat-card:hover .icon { animation: iconBounce 0.4s cubic-bezier(.22,1,.36,1); }
+
         .feat-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
         .feat-card p { font-size: 0.8rem; color: var(--text2); }
 
+        /* ===== STATS ===== */
         .stats { border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 24px; text-align: center; padding: 48px 0; }
-        .stat-num { font-size: 2rem; font-weight: 700; }
+        .stat-num { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
         .stat-label { color: var(--text2); font-size: 0.8rem; margin-top: 4px; }
+        @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-num.visible { animation: countUp 0.5s ease-out forwards; }
 
+        /* ===== ARCHITECTURE ===== */
         .arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
         .arch-item {
             padding: 14px 18px; border-radius: 6px;
             background: #111; border: 1px solid #1a1a1a;
-            font-size: 0.85rem;
+            font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;
+            transition: border-color 0.3s, transform 0.3s cubic-bezier(.22,1,.36,1);
         }
+        .arch-item:hover { border-color: #333; transform: translateX(4px); }
         .arch-item .arr { color: var(--orange); }
 
+        /* ===== DEMO ===== */
         .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
-        .demo-card { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+        .demo-card { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; transition: border-color 0.3s, transform 0.3s cubic-bezier(.22,1,.36,1); }
+        .demo-card:hover { border-color: #333; transform: translateY(-3px); }
         .demo-hdr { padding: 12px 16px; border-bottom: 1px solid #1a1a1a; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .demo-hdr .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        @keyframes dotFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .demo-card:hover .dot { animation: dotFloat 1s ease-in-out infinite; }
         .demo-body { padding: 16px; }
         .msg { padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; line-height: 1.5; margin-bottom: 8px; }
         .msg.user { background: rgba(255,107,0,0.06); border: 1px solid rgba(255,107,0,0.08); }
@@ -128,16 +186,24 @@
         .sys-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
         .sys-row span { padding: 4px 10px; background: #0a0a0a; border-radius: 4px; font-size: 0.7rem; }
 
-        .cta-box { text-align: center; padding: 56px 32px; background: #111; border: 1px solid #1a1a1a; border-radius: 8px; }
+        /* ===== COMING SOON ===== */
+        .coming-msg { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; }
+        .warning-icon { font-size: 0.9rem; }
+
+        /* ===== CTA ===== */
+        .cta-box { text-align: center; padding: 56px 32px; background: #111; border: 1px solid #1a1a1a; border-radius: 8px; transition: border-color 0.3s; }
+        .cta-box:hover { border-color: #2a2a2a; }
         .cta-box h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
         .cta-box p { color: var(--text2); font-size: 0.9rem; margin-bottom: 24px; }
         .cta-box .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
+        /* ===== FOOTER ===== */
         footer { border-top: 1px solid #1a1a1a; padding: 32px 0; font-size: 0.8rem; color: var(--text3); }
         footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        footer a { color: var(--text2); text-decoration: none; }
+        footer a { color: var(--text2); text-decoration: none; transition: color 0.2s; }
         footer a:hover { color: var(--text); }
 
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .mobile-menu-btn { display: block; }
@@ -152,7 +218,20 @@
 
 <nav>
     <div class="container">
-        <a href="#" class="nav-logo">GlassesCat</a>
+        <a href="#" class="nav-logo">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="cat-ear" d="M12 22 L8 4 L20 14" stroke="#ff6b00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="cat-ear" d="M28 22 L32 4 L20 14" stroke="#ff6b00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="20" cy="26" r="10" stroke="#e8e8e8" stroke-width="1.5" fill="none"/>
+                <circle cx="14" cy="26" r="4" stroke="#ff6b00" stroke-width="1.2" fill="none"/>
+                <circle cx="26" cy="26" r="4" stroke="#ff6b00" stroke-width="1.2" fill="none"/>
+                <line x1="18" y1="26" x2="22" y2="26" stroke="#ff6b00" stroke-width="1.2"/>
+                <circle cx="14" cy="26" r="1.2" fill="#ff6b00"/>
+                <circle cx="26" cy="26" r="1.2" fill="#ff6b00"/>
+                <path d="M17 30 Q20 33 23 30" stroke="#e8e8e8" stroke-width="1" fill="none" stroke-linecap="round"/>
+            </svg>
+            <span class="nav-logo-text">GlassesCat<span class="nav-logo-dot"></span></span>
+        </a>
         <div class="nav-links" id="navLinks">
             <a href="#models">Modeller</a>
             <a href="#features">Özellikler</a>
@@ -165,10 +244,10 @@
 
 <section class="hero">
     <div class="container hero-content">
-        <div class="hero-badge">v3.0.0 — 37 Araç, Sınırsız Hafıza</div>
-        <h1>Otonom AI <span>Ajan Sistemi</span></h1>
-        <p>GlassesCat; ReAct döngüsü, Obsidian tabanlı sınırsız bellek, 24+ araç ve çoklu model yönlendirici. Berkay tarafından geliştiriliyor.</p>
-        <div class="hero-btns">
+        <div class="hero-badge reveal">v3.0.0 — 37 Araç, Sınırsız Hafıza</div>
+        <h1 class="reveal">Otonom AI <span>Ajan Sistemi</span></h1>
+        <p class="reveal">GlassesCat; ReAct döngüsü, Obsidian tabanlı sınırsız bellek, 24+ araç ve çoklu model yönlendirici. Berkay tarafından geliştiriliyor.</p>
+        <div class="hero-btns reveal">
             <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn primary">GitHub'da Gör</a>
             <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn secondary">Ollama Modeller</a>
         </div>
@@ -177,18 +256,18 @@
 
 <section class="stats">
     <div class="container stats-grid">
-        <div><div class="stat-num">37</div><div class="stat-label">Entegre Araç</div></div>
-        <div><div class="stat-num">∞</div><div class="stat-label">Obsidian Hafıza</div></div>
-        <div><div class="stat-num">16</div><div class="stat-label">Zamanlanmış Görev</div></div>
-        <div><div class="stat-num">9</div><div class="stat-label">UltraAgent Protokolü</div></div>
+        <div class="reveal"><div class="stat-num" data-target="37">37</div><div class="stat-label">Entegre Araç</div></div>
+        <div class="reveal"><div class="stat-num">∞</div><div class="stat-label">Obsidian Hafıza</div></div>
+        <div class="reveal"><div class="stat-num" data-target="16">16</div><div class="stat-label">Zamanlanmış Görev</div></div>
+        <div class="reveal"><div class="stat-num" data-target="9">9</div><div class="stat-label">UltraAgent Protokolü</div></div>
     </div>
 </section>
 
 <section id="models">
     <div class="container">
-        <h2 class="section-title">Modeller</h2>
+        <h2 class="section-title reveal">Modeller</h2>
         <div class="models-grid">
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">V7</span>
                 <h3>V7_HYBRID_TITAN</h3>
                 <p>En güncel. Hibrit karar motoru, UltraAgent, MCP bridge, 37 araç, plugin/skill sistemi, AES-256.</p>
@@ -199,7 +278,7 @@
                     <span class="spec">Swarm</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">V6</span>
                 <h3>V6_OMNI_OVERLORD</h3>
                 <p>128K context, Multi-State Autonomous Swarm Node, düşük sıcaklık (0.2) ile yüksek deterministik çıktı.</p>
@@ -209,7 +288,7 @@
                     <span class="spec">Temp 0.2</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">V5</span>
                 <h3>V5_NEXUS_CORE</h3>
                 <p>Doğal Türkçe konuşma, JSON/parantez içermeyen akıcı çıktı, hızlı task'lar için optimize.</p>
@@ -219,7 +298,7 @@
                     <span class="spec">Hızlı Task</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">X</span>
                 <h3>X_FABLE_CODER_V1</h3>
                 <p>361-entry dataset ile fine-tune kodlama modeli. Berkay'ın kişisel modeli, birincil model router.</p>
@@ -229,7 +308,7 @@
                     <span class="spec">Model Router</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">X</span>
                 <h3>X_GLITCH_OPUS_V2</h3>
                 <p>500-entry dataset, Colab + QLoRA pipeline ile fine-tune. Kimlik mühürleme.</p>
@@ -239,7 +318,7 @@
                     <span class="spec">Colab</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">X</span>
                 <h3>X_OPUS Router</h3>
                 <p>Çift beyinli hibrit yönlendirici. Qwen 3.5 9B + Qwen 2.5 Coder 14B arasında akıllı routing.</p>
@@ -249,7 +328,7 @@
                     <span class="spec">Akıllı Routing</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">S</span>
                 <h3>ShadowCat R:1 Singularity</h3>
                 <p>1.5B router/classifier. Wake word tespiti, 12 intent, Matrix/Pulse'a routing. DeepSeek-R1-Distill-Qwen-1.5B.</p>
@@ -260,7 +339,7 @@
                     <span class="spec">~30dk Train</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">MAT</span>
                 <h3>ShadowCat R:1 Matrix</h3>
                 <p>7B thinking engine. Konu anlatımı, BFCL tool calling, Türkçe/İngilizce çeviri. DeepSeek-R1-Distill-Qwen-7B.</p>
@@ -271,7 +350,7 @@
                     <span class="spec">~6-8sa Train</span>
                 </div>
             </div>
-            <div class="model-card">
+            <div class="model-card reveal">
                 <span class="tag">R1</span>
                 <h3>ShadowCat R:1 Pulse</h3>
                 <p>14B kod üretim. Production-ready kod, güvenlik denetimi, code review, UE5 Blueprint. DeepSeek-R1-Distill-Qwen-14B.</p>
@@ -288,86 +367,48 @@
 
 <section id="features">
     <div class="container">
-        <h2 class="section-title">Özellikler</h2>
+        <h2 class="section-title reveal">Özellikler</h2>
         <div class="features-grid">
-            <div class="feat-card">
-                <div class="icon">🔄</div>
-                <h3>ReAct Agent Loop</h3>
-                <p>Düşün → Karar ver → Uygula. Çok adımlı görevleri otonom çözer.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">📖</div>
-                <h3>Obsidian Hafıza</h3>
-                <p>Her konuşmayı hatırlar. Markdown formatında sınırsız kalıcı bellek.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">🧩</div>
-                <h3>Plugin & Skill Sistemi</h3>
-                <p>Python, JS, Lua, Ruby, Bash, Go dillerinde plugin. Hot-reload.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">🔀</div>
-                <h3>Akıllı Model Router</h3>
-                <p>Göreve göre doğru model: kod için X_FABLE_CODER, reasoning için V7.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">🌐</div>
-                <h3>Otonom Web Agent</h3>
-                <p>Playwright + DDGS ile web'de gezinme, veri çekme, API çağrıları.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">🔒</div>
-                <h3>AES-256 Güvenlik</h3>
-                <p>Şifreli model sağlayıcı. Enterprise seviye güvenlik.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">❤️</div>
-                <h3>Kendini İyileştirme</h3>
-                <p>Feedback Loop ile hataları otomatik tespit eder ve düzeltir.</p>
-            </div>
-            <div class="feat-card">
-                <div class="icon">⏰</div>
-                <h3>Görev Zamanlayıcı</h3>
-                <p>16 zamanlanmış görev, periyodik işlemler, cron benzeri programlama.</p>
-            </div>
+            <div class="feat-card reveal"><div class="icon">🔄</div><h3>ReAct Agent Loop</h3><p>Düşün → Karar ver → Uygula. Çok adımlı görevleri otonom çözer.</p></div>
+            <div class="feat-card reveal"><div class="icon">📖</div><h3>Obsidian Hafıza</h3><p>Her konuşmayı hatırlar. Markdown formatında sınırsız kalıcı bellek.</p></div>
+            <div class="feat-card reveal"><div class="icon">🧩</div><h3>Plugin & Skill Sistemi</h3><p>Python, JS, Lua, Ruby, Bash, Go dillerinde plugin. Hot-reload.</p></div>
+            <div class="feat-card reveal"><div class="icon">🔀</div><h3>Akıllı Model Router</h3><p>Göreve göre doğru model: kod için X_FABLE_CODER, reasoning için V7.</p></div>
+            <div class="feat-card reveal"><div class="icon">🌐</div><h3>Otonom Web Agent</h3><p>Playwright + DDGS ile web'de gezinme, veri çekme, API çağrıları.</p></div>
+            <div class="feat-card reveal"><div class="icon">🔒</div><h3>AES-256 Güvenlik</h3><p>Şifreli model sağlayıcı. Enterprise seviye güvenlik.</p></div>
+            <div class="feat-card reveal"><div class="icon">❤️</div><h3>Kendini İyileştirme</h3><p>Feedback Loop ile hataları otomatik tespit eder ve düzeltir.</p></div>
+            <div class="feat-card reveal"><div class="icon">⏰</div><h3>Görev Zamanlayıcı</h3><p>16 zamanlanmış görev, periyodik işlemler, cron benzeri programlama.</p></div>
         </div>
     </div>
 </section>
 
 <section id="demo">
     <div class="container">
-        <h2 class="section-title">Demo</h2>
+        <h2 class="section-title reveal">Demo</h2>
         <div class="demo-grid">
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Kod Yazma · V7</div>
                 <div class="demo-body">
                     <div class="msg user">Python ile bir dosya okuyucu yaz</div>
                     <div class="msg ai">
                         <div class="label">GlassesCat V7</div>
                         <code>def read_file(path):
-    with open(path, 'r', encoding='utf-8') as f:
-        return f.read()
-
-print(read_file('ornek.txt'))</code>
+    with open(path, 'r') as f:
+        return f.read()</code>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#60a5fa"></span>Web Araması · V6</div>
                 <div class="demo-body">
                     <div class="msg user">Bugünkü teknoloji haberlerini ara</div>
                     <div class="msg ai">
                         <div class="label">GlassesCat V6</div>
                         <div>🔍 Web'de arıyorum...</div>
-                        <div class="tags">
-                            <span>Yapay zeka</span>
-                            <span>Teknoloji</span>
-                            <span>2026</span>
-                        </div>
+                        <div class="tags"><span>Yapay zeka</span><span>Teknoloji</span></div>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#34d399"></span>Hafıza · V5</div>
                 <div class="demo-body">
                     <div class="msg user">Geçen haftaki proje notlarımı hatırla</div>
@@ -376,12 +417,12 @@ print(read_file('ornek.txt'))</code>
                         <div>📂 Obsidian hafızamda buldum</div>
                         <div style="margin-top:6px;padding:8px 12px;background:#0a0a0a;border-radius:6px;border-left:3px solid var(--orange);font-size:0.75rem;">
                             <div style="font-weight:600;font-size:0.7rem;color:var(--orange);">proje_notlari.md</div>
-                            <div style="margin-top:4px;">• V7_HYBRID_TITAN testleri tamamlandı<br>• MCP bridge entegrasyonu yapıldı<br>• Yeni plugin sistemi eklendi</div>
+                            <div style="margin-top:4px;">• V7_HYBRID_TITAN testleri tamamlandı<br>• MCP bridge entegrasyonu yapıldı</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Intent Routing · Singularity</div>
                 <div class="demo-body">
                     <div class="msg user">hey shadow, bana bir API yaz</div>
@@ -391,70 +432,49 @@ print(read_file('ornek.txt'))</code>
                         <div style="margin-top:4px;font-size:0.75rem;">
                             <div style="color:#34d399;">✓ Intent: CODE_TASK</div>
                             <div style="color:#34d399;">✓ Routing: ShadowCat R:1 Pulse</div>
-                            <div style="color:var(--text3);">⏳ Yönlendiriliyor...</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#c47bff"></span>Reasoning · Matrix</div>
                 <div class="demo-body">
                     <div class="msg user">2x+5=13 denklemini çöz</div>
                     <div class="msg ai">
                         <div class="label">Matrix · 7B</div>
-                        <div>🧠 Adım adım:</div>
-                        <div style="margin-top:4px;font-size:0.75rem;color:var(--text2);">
-                            <div>1. 2x + 5 = 13</div>
-                            <div>2. 2x = 13 - 5 = 8</div>
-                            <div>3. x = 8 / 2 = 4</div>
-                        </div>
-                        <div style="margin-top:6px;font-weight:500;">✓ x = 4</div>
+                        <div>🧠 2x + 5 = 13 → 2x = 8 → x = 4</div>
+                        <div style="margin-top:4px;font-weight:500;">✓ x = 4</div>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Code Generation · Pulse</div>
                 <div class="demo-body">
                     <div class="msg user">FastAPI ile bir REST API yaz</div>
                     <div class="msg ai">
                         <div class="label">Pulse · 14B</div>
-                        <div style="margin-bottom:6px;">⚡ Production-ready kod üretiliyor...</div>
                         <code>from fastapi import FastAPI
-from pydantic import BaseModel
 
 app = FastAPI()
 
-class Item(BaseModel):
-    name: str
-    price: float
-
 @app.get("/items")
 async def list_items():
-    return [{"name": "Laptop", "price": 1500}]
-
-@app.post("/items")
-async def create_item(item: Item):
-    return {"ok": True, "item": item}</code>
+    return [{"name": "Laptop", "price": 1500}]</code>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#f472b6"></span>Sistem · Core</div>
                 <div class="demo-body">
                     <div class="msg user">Sistem durumunu göster</div>
                     <div class="msg ai">
                         <div class="label">GlassesCat</div>
-                        <div class="sys-row">
-                            <span>CPU: %23</span>
-                            <span>RAM: %45</span>
-                            <span>37 araç</span>
-                            <span>31 hafıza</span>
-                        </div>
+                        <div class="sys-row"><span>CPU: %23</span><span>RAM: %45</span><span>37 araç</span><span>31 hafıza</span></div>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
-                <div class="demo-hdr"><span class="dot" style="background:#a855f7"></span>Pluginler · X_FABLE_CODER</div>
+            <div class="demo-card reveal">
+                <div class="demo-hdr"><span class="dot" style="background:#a855f7"></span>Pluginler</div>
                 <div class="demo-body">
                     <div class="msg user">Pluginleri listele</div>
                     <div class="msg ai">
@@ -462,19 +482,18 @@ async def create_item(item: Item):
                         <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;font-size:0.75rem;">
                             <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#0a0a0a;border-radius:4px;">Qwen Assistant <span style="color:#34d399;">● aktif</span></div>
                             <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#0a0a0a;border-radius:4px;">Web Scraper <span style="color:#34d399;">● aktif</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#0a0a0a;border-radius:4px;">Security Analyst <span style="color:var(--text3);">○ pasif</span></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="demo-card">
+            <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#22d3ee"></span>Canlı Sohbet</div>
                 <div class="demo-body" style="text-align:center;padding:32px 20px;">
                     <div style="font-size:2rem;margin-bottom:8px;">💬</div>
-                    <div style="font-weight:600;margin-bottom:4px;">GlassesCat Sohbet</div>
-                    <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px;">Sidebar, mesaj geçmişi, plugin/tool paneli</div>
-                    <button onclick="showComingSoon()" class="btn primary">Sohbete Başla</button>
-                    <div id="comingSoonMsg" style="display:none;margin-top:16px;padding:16px;background:#1a1a1a;border-radius:8px;text-align:left;font-size:0.8rem;">
+                    <div style="font-weight:600;margin-bottom:4px;">GlassesCat'i Dene</div>
+                    <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px;">Sidebar, mesaj geçmişi, plugin paneli</div>
+                    <button onclick="toggleComing()" class="btn primary">Sohbete Başla</button>
+                    <div id="comingSoonWrap" style="display:none;margin-top:16px;padding:16px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;text-align:left;font-size:0.8rem;">
                         <div style="font-weight:600;margin-bottom:8px;color:#fbbf24;">🚧 Henüz Kullanıma Açık Değil</div>
                         <p style="color:var(--text2);margin-bottom:8px;">Gerçek zamanlı sohbet için sunucu tarafında çalışan bir AI modeli gerekir. Home server altyapımız kurulum aşamasında.</p>
                         <p style="color:var(--text2);">Home server hazır olduğunda GlassesCat ve ShadowCat modelleri canlı kullanılabilecek.</p>
@@ -485,40 +504,33 @@ async def create_item(item: Item):
     </div>
 </section>
 
-<script>
-function showComingSoon() {
-    var msg = document.getElementById('comingSoonMsg');
-    msg.style.display = msg.style.display === 'none' ? 'block' : 'none';
-}
-</script>
-
 <section id="architecture">
     <div class="container">
-        <h2 class="section-title">Mimari</h2>
+        <h2 class="section-title reveal">Mimari</h2>
         <div class="arch-grid">
-            <div class="arch-item"><span class="arr">└─</span>Glassescat Core</div>
-            <div class="arch-item"><span class="arr">├─</span>AgentLoop (ReAct)</div>
-            <div class="arch-item"><span class="arr">├─</span>TaskPlanner</div>
-            <div class="arch-item"><span class="arr">├─</span>StateManager</div>
-            <div class="arch-item"><span class="arr">├─</span>WebAgent</div>
-            <div class="arch-item"><span class="arr">├─</span>FeedbackLoop</div>
-            <div class="arch-item"><span class="arr">├─</span>Toolformer (24 araç)</div>
-            <div class="arch-item"><span class="arr">├─</span>ObsidianMemory</div>
-            <div class="arch-item"><span class="arr">├─</span>ModelRouter</div>
-            <div class="arch-item"><span class="arr">├─</span>UltraAgent (9 protokol)</div>
-            <div class="arch-item"><span class="arr">├─</span>MCP Bridge (37 tool)</div>
-            <div class="arch-item"><span class="arr">├─</span>Plugin/Skill Manager</div>
+            <div class="arch-item reveal"><span class="arr">└─</span>Glassescat Core</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>AgentLoop (ReAct)</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>TaskPlanner</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>StateManager</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>WebAgent</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>FeedbackLoop</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>Toolformer (24 araç)</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>ObsidianMemory</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>ModelRouter</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>UltraAgent (9 protokol)</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>MCP Bridge</div>
+            <div class="arch-item reveal"><span class="arr">├─</span>Plugin/Skill Manager</div>
         </div>
     </div>
 </section>
 
 <section>
     <div class="container">
-        <div class="cta-box">
+        <div class="cta-box reveal">
             <h2>Hemen Başla</h2>
             <p>GlassesCat'i yerel ortamında çalıştır, modelleri Ollama'dan çek.</p>
             <div class="btns">
-                <button onclick="showComingSoon()" class="btn primary">Canlı Sohbet</button>
+                <button onclick="toggleComing()" class="btn primary">Canlı Sohbet</button>
                 <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn secondary">GitHub</a>
                 <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn secondary">Ollama</a>
             </div>
@@ -535,6 +547,39 @@ function showComingSoon() {
         </div>
     </div>
 </footer>
+
+<script>
+function toggleComing() {
+    var el = document.getElementById('comingSoonWrap');
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// scroll reveal
+(function(){
+    var els = document.querySelectorAll('.reveal');
+    var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                // count-up for stat nums
+                var num = e.target.querySelector('.stat-num[data-target]');
+                if (num && !num.dataset.done) {
+                    num.dataset.done = '1';
+                    var target = parseInt(num.dataset.target);
+                    var current = 0;
+                    var step = Math.ceil(target / 20);
+                    var iv = setInterval(function(){
+                        current += step;
+                        if (current >= target) { current = target; clearInterval(iv); }
+                        num.textContent = current;
+                    }, 40);
+                }
+            }
+        });
+    }, { threshold: 0.15 });
+    els.forEach(function(el){ obs.observe(el); });
+})();
+</script>
 
 </body>
 </html>
