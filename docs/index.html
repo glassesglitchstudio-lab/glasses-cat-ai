@@ -11,287 +11,170 @@
         html { scroll-behavior: smooth; }
 
         :root {
-            --bg: #07070d;
-            --bg2: #0a0a12;
-            --surface: rgba(255,255,255,0.03);
-            --surface2: rgba(255,255,255,0.06);
-            --border: rgba(255,255,255,0.06);
-            --border2: rgba(255,255,255,0.12);
+            --black: #0a0a0a;
+            --black2: #111;
+            --black3: #1a1a1a;
             --orange: #ff6b00;
-            --orange-dim: rgba(255,107,0,0.15);
-            --orange-glow: rgba(255,107,0,0.25);
-            --purple: #c47bff;
-            --purple-dim: rgba(196,123,255,0.12);
-            --text: #f0f0f5;
-            --text2: #8a8a9a;
-            --text3: #5a5a6a;
-            --radius: 12px;
-            --radius-lg: 20px;
+            --orange-light: #ff8c38;
+            --text: #e8e8e8;
+            --text2: #999;
+            --text3: #666;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            background: var(--black);
             color: var(--text);
-            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
 
-        /* Nav */
         nav {
             position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            background: rgba(7,7,13,0.75);
-            border-bottom: 1px solid var(--border);
+            background: rgba(10,10,10,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #1a1a1a;
         }
-        nav .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-        .nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; text-decoration: none; color: var(--text); }
-        .nav-logo img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-        .nav-links { display: flex; align-items: center; gap: 24px; }
-        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.15s; }
+        nav .container { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+        .nav-logo { font-weight: 700; font-size: 0.95rem; text-decoration: none; color: var(--text); }
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; }
         .nav-links a:hover { color: var(--text); }
         .nav-gh {
-            display: flex; align-items: center; gap: 6px;
-            padding: 8px 16px; border-radius: 8px;
-            background: var(--orange-dim); color: var(--orange);
-            text-decoration: none; font-size: 0.8125rem; font-weight: 600;
-            transition: all 0.15s;
+            padding: 6px 14px; border-radius: 6px;
+            background: #1a1a1a; color: var(--text);
+            text-decoration: none; font-size: 0.85rem;
         }
-        .nav-gh:hover { background: rgba(255,107,0,0.25); transform: translateY(-1px); }
+        .nav-gh:hover { background: #222; }
         .mobile-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.2rem; cursor: pointer; }
 
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex; align-items: center;
-            position: relative;
-            overflow: hidden;
-            padding-top: 64px;
-        }
-        .hero::before {
-            content: '';
-            position: absolute; inset: 0;
-            background:
-                radial-gradient(ellipse at 30% 40%, rgba(255,107,0,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 60%, rgba(196,123,255,0.06) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        .hero-grid {
-            position: absolute; inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-        }
-        .hero-content { position: relative; z-index: 2; padding: 80px 0; }
+        .hero { padding: 140px 0 80px; }
+        .hero-content { max-width: 720px; }
         .hero-badge {
+            display: inline-block;
+            padding: 4px 12px; border-radius: 4px;
+            background: #1a1a1a; color: var(--orange);
+            font-size: 0.75rem; margin-bottom: 24px;
+        }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+        .hero h1 span { color: var(--orange); }
+        .hero p { font-size: 1rem; color: var(--text2); max-width: 560px; margin-bottom: 28px; }
+        .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
             display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 14px; border-radius: 20px;
-            background: var(--orange-dim); color: var(--orange);
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em;
-            margin-bottom: 24px; border: 1px solid rgba(255,107,0,0.15);
+            padding: 12px 24px; border-radius: 6px;
+            font-size: 0.9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer;
         }
-        .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.08; margin-bottom: 20px; letter-spacing: -0.02em; }
-        .hero h1 span { background: linear-gradient(135deg, var(--orange), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { font-size: 1.125rem; color: var(--text2); line-height: 1.7; max-width: 600px; margin-bottom: 32px; }
-        .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 14px 28px; border-radius: var(--radius);
-            background: var(--orange); color: #fff;
-            font-weight: 600; font-size: 0.9375rem; text-decoration: none;
-            transition: all 0.15s; border: none; cursor: pointer;
-        }
-        .btn-primary:hover { background: #ff7a1a; transform: translateY(-2px); box-shadow: 0 8px 30px var(--orange-glow); }
-        .btn-secondary {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 14px 28px; border-radius: var(--radius);
-            border: 1px solid var(--border2); color: var(--text);
-            font-weight: 500; font-size: 0.9375rem; text-decoration: none;
-            transition: all 0.15s;
-        }
-        .btn-secondary:hover { border-color: var(--orange); background: var(--orange-dim); }
+        .btn.primary { background: var(--orange); color: #fff; }
+        .btn.primary:hover { background: var(--orange-light); }
+        .btn.secondary { background: #1a1a1a; color: var(--text); border: 1px solid #2a2a2a; }
+        .btn.secondary:hover { background: #222; }
 
-        /* Sections */
-        section { padding: 100px 0; }
-        .section-label {
-            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.1em; color: var(--orange); margin-bottom: 12px;
-        }
-        .section-title { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; margin-bottom: 16px; letter-spacing: -0.01em; }
-        .section-desc { color: var(--text2); font-size: 1.0625rem; line-height: 1.7; max-width: 600px; margin-bottom: 48px; }
+        section { padding: 80px 0; }
+        .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
 
-        /* Models */
-        .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
         .model-card {
-            padding: 28px; border-radius: var(--radius-lg);
-            background: var(--surface); border: 1px solid var(--border);
-            transition: all 0.25s; position: relative; overflow: hidden;
+            padding: 24px; border-radius: 8px;
+            background: #111; border: 1px solid #1a1a1a;
         }
-        .model-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--orange), var(--purple));
-            opacity: 0; transition: opacity 0.25s;
-        }
-        .model-card:hover { border-color: rgba(255,107,0,0.20); transform: translateY(-3px); }
-        .model-card:hover::before { opacity: 1; }
+        .model-card:hover { border-color: #2a2a2a; }
         .model-card .tag {
-            display: inline-block; padding: 3px 10px; border-radius: 6px;
-            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.03em;
-            margin-bottom: 14px;
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 0.7rem; font-weight: 600; margin-bottom: 12px;
+            background: #1a1a1a; color: var(--orange);
         }
-        .model-card .tag.orange { background: var(--orange-dim); color: var(--orange); }
-        .model-card .tag.purple { background: var(--purple-dim); color: var(--purple); }
-        .model-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
-        .model-card p { font-size: 0.875rem; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
+        .model-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+        .model-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
         .model-card .specs { display: flex; flex-wrap: wrap; gap: 6px; }
         .model-card .spec {
-            padding: 4px 10px; border-radius: 6px;
-            background: rgba(255,255,255,0.04); color: var(--text3);
-            font-size: 0.7rem; font-weight: 500;
+            padding: 3px 8px; border-radius: 4px;
+            background: #0a0a0a; color: var(--text3);
+            font-size: 0.7rem;
         }
 
-        /* Features */
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .feat-card {
-            padding: 28px; border-radius: var(--radius-lg);
-            background: var(--surface); border: 1px solid var(--border);
-            transition: all 0.2s;
-        }
-        .feat-card:hover { border-color: rgba(255,107,0,0.15); }
-        .feat-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; margin-bottom: 16px;
-        }
-        .feat-card h3 { font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px; }
-        .feat-card p { font-size: 0.8125rem; color: var(--text2); line-height: 1.6; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+        .feat-card { padding: 24px; border-radius: 8px; background: #111; border: 1px solid #1a1a1a; }
+        .feat-card .icon { font-size: 1.2rem; margin-bottom: 12px; }
+        .feat-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+        .feat-card p { font-size: 0.8rem; color: var(--text2); }
 
-        /* Stats */
-        .stats {
-            background: var(--bg2);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 32px; text-align: center; padding: 60px 0; }
-        .stat-num { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--orange), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-label { color: var(--text2); font-size: 0.875rem; margin-top: 6px; }
+        .stats { border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 24px; text-align: center; padding: 48px 0; }
+        .stat-num { font-size: 2rem; font-weight: 700; }
+        .stat-label { color: var(--text2); font-size: 0.8rem; margin-top: 4px; }
 
-        /* Arch */
-        .arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+        .arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
         .arch-item {
-            padding: 18px 20px; border-radius: var(--radius);
-            background: var(--surface); border: 1px solid var(--border);
-            font-size: 0.875rem; display: flex; align-items: center; gap: 10px;
+            padding: 14px 18px; border-radius: 6px;
+            background: #111; border: 1px solid #1a1a1a;
+            font-size: 0.85rem;
         }
-        .arch-item .arr { color: var(--orange); font-weight: 600; }
+        .arch-item .arr { color: var(--orange); }
 
-        /* CTA */
-        .cta {
-            text-align: center;
-            background: linear-gradient(135deg, rgba(255,107,0,0.06), rgba(196,123,255,0.04));
-            border-radius: var(--radius-lg);
-            padding: 64px 40px;
-            border: 1px solid rgba(255,107,0,0.10);
-        }
-        .cta h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: 12px; }
-        .cta p { color: var(--text2); font-size: 1rem; margin-bottom: 28px; }
+        .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+        .demo-card { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+        .demo-hdr { padding: 12px 16px; border-bottom: 1px solid #1a1a1a; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .demo-hdr .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .demo-body { padding: 16px; }
+        .msg { padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; line-height: 1.5; margin-bottom: 8px; }
+        .msg.user { background: rgba(255,107,0,0.06); border: 1px solid rgba(255,107,0,0.08); }
+        .msg.ai { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); }
+        .msg .label { font-size: 0.65rem; color: var(--text3); margin-bottom: 4px; }
+        .msg code { display: block; background: #0a0a0a; border-radius: 6px; padding: 8px; font-size: 0.75rem; overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+        .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+        .tags span { padding: 3px 8px; border-radius: 4px; background: #0a0a0a; font-size: 0.7rem; color: var(--text3); }
+        .sys-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .sys-row span { padding: 4px 10px; background: #0a0a0a; border-radius: 4px; font-size: 0.7rem; }
 
-        /* Footer */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 40px 0; color: var(--text3); font-size: 0.8125rem;
-        }
-        footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .cta-box { text-align: center; padding: 56px 32px; background: #111; border: 1px solid #1a1a1a; border-radius: 8px; }
+        .cta-box h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+        .cta-box p { color: var(--text2); font-size: 0.9rem; margin-bottom: 24px; }
+        .cta-box .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+        footer { border-top: 1px solid #1a1a1a; padding: 32px 0; font-size: 0.8rem; color: var(--text3); }
+        footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         footer a { color: var(--text2); text-decoration: none; }
-        footer a:hover { color: var(--orange); }
-        .footer-links { display: flex; gap: 20px; }
-
-        /* Mobile */
-        /* Demo Cards */
-        .demo-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; }
-        .demo-card:hover { border-color: rgba(255,107,0,0.15); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
-        .demo-hdr { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; font-size: 0.8125rem; font-weight: 600; }
-        .demo-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .demo-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { padding: 10px 14px; border-radius: 12px; font-size: 0.8125rem; line-height: 1.5; }
-        .bubble.user { align-self: flex-end; background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.10); max-width: 85%; }
-        .bubble.ai { align-self: flex-start; background: rgba(196,123,255,0.04); border: 1px solid rgba(196,123,255,0.06); max-width: 100%; }
-        .bubble-label { color: #c47bff; font-size: 0.65rem; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
-        .bubble-logo { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
-        .code-block { background: #0d0d14; border-radius: 8px; padding: 10px; font-size: 0.75rem; overflow-x: auto; margin: 0; font-family: 'JetBrains Mono', monospace; }
-        .tag-group { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-        .tag-sm { padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.04); font-size: 0.7rem; }
-        .memory-card { margin-top: 6px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #ff6b00; }
-        .memory-title { font-size: 0.7rem; color: #ff6b00; font-weight: 600; }
-        .memory-items { font-size: 0.75rem; margin-top: 4px; line-height: 1.6; }
-        .sys-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
-        .sys-item { padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.7rem; }
-        .plugin-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-        .plugin-row { padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; }
-        .status.on { color: #34d399; }
-        .status.off { color: #6a6a7a; }
-        .step-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-        .step { font-size: 0.75rem; padding: 4px 0; }
-        .step.done { color: #34d399; }
-        .step.doing { color: #8a8a9a; }
+        footer a:hover { color: var(--text); }
 
         @media (max-width: 768px) {
-            .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: rgba(7,7,13,0.98); flex-direction: column; padding: 20px 24px; border-bottom: 1px solid var(--border); }
-            .nav-links.show { display: flex; }
+            .nav-links { display: none; }
             .mobile-menu-btn { display: block; }
-            .models-grid, .features-grid { grid-template-columns: 1fr; }
+            .models-grid, .features-grid, .demo-grid { grid-template-columns: 1fr; }
             .arch-grid { grid-template-columns: 1fr 1fr; }
-            .hero h1 { font-size: 2.2rem; }
-            .cta { padding: 40px 24px; }
-            footer .container { flex-direction: column; text-align: center; }
+            .hero h1 { font-size: 1.8rem; }
+            section { padding: 48px 0; }
         }
     </style>
 </head>
 <body>
 
-<!-- Nav -->
 <nav>
     <div class="container">
-        <a href="#" class="nav-logo">
-            <img src="glassescat-logo.png" alt="">
-            GlassesCat
-        </a>
+        <a href="#" class="nav-logo">GlassesCat</a>
         <div class="nav-links" id="navLinks">
             <a href="#models">Modeller</a>
             <a href="#features">Özellikler</a>
             <a href="#architecture">Mimari</a>
-            <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="nav-gh">
-                <i class="fa-brands fa-github"></i> GitHub
-            </a>
+            <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="nav-gh">GitHub</a>
         </div>
-        <button class="mobile-menu-btn" onclick="document.getElementById('navLinks').classList.toggle('show')">
-            <i class="fa-solid fa-bars"></i>
-        </button>
+        <button class="mobile-menu-btn" onclick="document.getElementById('navLinks').classList.toggle('show')">☰</button>
     </div>
 </nav>
 
-<!-- Hero -->
 <section class="hero">
-    <div class="hero-grid"></div>
     <div class="container hero-content">
-        <div class="hero-badge"><i class="fa-solid fa-cat"></i> v3.0.0 — 37 Araç, Sınırsız Hafıza</div>
+        <div class="hero-badge">v3.0.0 — 37 Araç, Sınırsız Hafıza</div>
         <h1>Otonom AI <span>Ajan Sistemi</span></h1>
-        <p>GlassesCat; ReAct döngüsü, Obsidian tabanlı sınırsız bellek, 24+ araç ve çoklu model yönlendirici ile çalışan hibrit bir yapay zeka asistanıdır.</p>
+        <p>GlassesCat; ReAct döngüsü, Obsidian tabanlı sınırsız bellek, 24+ araç ve çoklu model yönlendirici. Berkay tarafından geliştiriliyor.</p>
         <div class="hero-btns">
-            <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn-primary">
-                <i class="fa-brands fa-github"></i> GitHub'da Gör
-            </a>
-            <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn-secondary">
-                <i class="fa-solid fa-brain"></i> Ollama Modeller
-            </a>
+            <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn primary">GitHub'da Gör</a>
+            <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn secondary">Ollama Modeller</a>
         </div>
     </div>
 </section>
 
-<!-- Stats -->
 <section class="stats">
     <div class="container stats-grid">
         <div><div class="stat-num">37</div><div class="stat-label">Entegre Araç</div></div>
@@ -301,17 +184,14 @@
     </div>
 </section>
 
-<!-- Models -->
 <section id="models">
     <div class="container">
-        <div class="section-label"><i class="fa-solid fa-brain"></i> Modeller</div>
-        <h2 class="section-title">GlassesCat Model Ailesi</h2>
-        <p class="section-desc">Ollama üzerinde barındırılan, her biri farklı güçlere sahip özel modeller.</p>
+        <h2 class="section-title">Modeller</h2>
         <div class="models-grid">
             <div class="model-card">
-                <span class="tag orange">V7</span>
+                <span class="tag">V7</span>
                 <h3>V7_HYBRID_TITAN</h3>
-                <p>En güncel model. Hibrit karar motoru, UltraAgent, MCP bridge, 37 araç, plugin/skill sistemi, AES-256 güvenlik.</p>
+                <p>En güncel. Hibrit karar motoru, UltraAgent, MCP bridge, 37 araç, plugin/skill sistemi, AES-256.</p>
                 <div class="specs">
                     <span class="spec">ReAct Loop</span>
                     <span class="spec">WebSocket</span>
@@ -320,9 +200,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag purple">V6</span>
+                <span class="tag">V6</span>
                 <h3>V6_OMNI_OVERLORD</h3>
-                <p>128K context penceresi, Multi-State Autonomous Swarm Node, düşük sıcaklık (0.2) ile yüksek deterministik çıktı.</p>
+                <p>128K context, Multi-State Autonomous Swarm Node, düşük sıcaklık (0.2) ile yüksek deterministik çıktı.</p>
                 <div class="specs">
                     <span class="spec">128K Context</span>
                     <span class="spec">Swarm Node</span>
@@ -330,9 +210,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag orange">V5</span>
+                <span class="tag">V5</span>
                 <h3>V5_NEXUS_CORE</h3>
-                <p>Doğal Türkçe konuşma, JSON/parantez içermeyen akıcı çıktı, hızlı task'lar için optimize edilmiş model.</p>
+                <p>Doğal Türkçe konuşma, JSON/parantez içermeyen akıcı çıktı, hızlı task'lar için optimize.</p>
                 <div class="specs">
                     <span class="spec">Doğal Dil</span>
                     <span class="spec">Türkçe</span>
@@ -340,9 +220,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag purple">X</span>
+                <span class="tag">X</span>
                 <h3>X_FABLE_CODER_V1</h3>
-                <p>361-entry dataset ile fine-tune edilmiş kodlama modeli. Berkay'ın kişisel modeli, birincil model router.</p>
+                <p>361-entry dataset ile fine-tune kodlama modeli. Berkay'ın kişisel modeli, birincil model router.</p>
                 <div class="specs">
                     <span class="spec">361 Dataset</span>
                     <span class="spec">Coder</span>
@@ -350,9 +230,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag orange">X</span>
+                <span class="tag">X</span>
                 <h3>X_GLITCH_OPUS_V2</h3>
-                <p>500-entry dataset, Colab notebook + QLoRA pipeline ile fine-tune. Kimlik mühürleme ve özel karakter eğitimi.</p>
+                <p>500-entry dataset, Colab + QLoRA pipeline ile fine-tune. Kimlik mühürleme.</p>
                 <div class="specs">
                     <span class="spec">500 Entry</span>
                     <span class="spec">QLoRA</span>
@@ -360,7 +240,7 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag purple">X</span>
+                <span class="tag">X</span>
                 <h3>X_OPUS Router</h3>
                 <p>Çift beyinli hibrit yönlendirici. Qwen 3.5 9B + Qwen 2.5 Coder 14B arasında akıllı routing.</p>
                 <div class="specs">
@@ -370,9 +250,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag orange">S</span>
+                <span class="tag">S</span>
                 <h3>ShadowCat R:1 Singularity</h3>
-                <p>1.5B parametreli hızlı router/classifier. Wake word tespiti, 12 intent sınıflandırma ve Matrix/Pulse'a akıllı routing yapar. DeepSeek-R1-Distill-Qwen-1.5B tabanlı.</p>
+                <p>1.5B router/classifier. Wake word tespiti, 12 intent, Matrix/Pulse'a routing. DeepSeek-R1-Distill-Qwen-1.5B.</p>
                 <div class="specs">
                     <span class="spec">1.5B Param</span>
                     <span class="spec">Router</span>
@@ -381,9 +261,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag purple">MAT</span>
+                <span class="tag">MAT</span>
                 <h3>ShadowCat R:1 Matrix</h3>
-                <p>7B parametreli thinking engine. Derinlemesine konu anlatımı, BFCL tool calling, Türkçe/İngilizce çeviri ve proje planlama. DeepSeek-R1-Distill-Qwen-7B tabanlı.</p>
+                <p>7B thinking engine. Konu anlatımı, BFCL tool calling, Türkçe/İngilizce çeviri. DeepSeek-R1-Distill-Qwen-7B.</p>
                 <div class="specs">
                     <span class="spec">7B Param</span>
                     <span class="spec">Thinking Engine</span>
@@ -392,9 +272,9 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag orange">R1</span>
+                <span class="tag">R1</span>
                 <h3>ShadowCat R:1 Pulse</h3>
-                <p>14B parametreli kod üretim modeli. Production-ready kod yazma, güvenlik denetimi, code review, UE5 Blueprint geliştirme. DeepSeek-R1-Distill-Qwen-14B tabanlı.</p>
+                <p>14B kod üretim. Production-ready kod, güvenlik denetimi, code review, UE5 Blueprint. DeepSeek-R1-Distill-Qwen-14B.</p>
                 <div class="specs">
                     <span class="spec">14B Param</span>
                     <span class="spec">Code Powerhouse</span>
@@ -406,50 +286,47 @@
     </div>
 </section>
 
-<!-- Features -->
-<section id="features" style="background: var(--bg2);">
+<section id="features">
     <div class="container">
-        <div class="section-label"><i class="fa-solid fa-star"></i> Özellikler</div>
-        <h2 class="section-title">Neler Yapabilir?</h2>
-        <p class="section-desc">24 araç, 8 kategoride toplanmış fonksiyon çağırma yetenekleri.</p>
+        <h2 class="section-title">Özellikler</h2>
         <div class="features-grid">
             <div class="feat-card">
-                <div class="feat-icon" style="background: var(--orange-dim); color: var(--orange);"><i class="fa-solid fa-rotate"></i></div>
+                <div class="icon">🔄</div>
                 <h3>ReAct Agent Loop</h3>
-                <p>Düşün → Karar ver → Uygula döngüsü. Çok adımlı görevleri otonom olarak çözer.</p>
+                <p>Düşün → Karar ver → Uygula. Çok adımlı görevleri otonom çözer.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: rgba(52,211,153,0.10); color: #34d399;"><i class="fa-solid fa-book"></i></div>
+                <div class="icon">📖</div>
                 <h3>Obsidian Hafıza</h3>
                 <p>Her konuşmayı hatırlar. Markdown formatında sınırsız kalıcı bellek.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: rgba(96,165,250,0.10); color: #60a5fa;"><i class="fa-solid fa-puzzle-piece"></i></div>
+                <div class="icon">🧩</div>
                 <h3>Plugin & Skill Sistemi</h3>
-                <p>Python, JS, Lua, Ruby, Bash, Go dillerinde plugin desteği. Hot-reload ile anında etkinleştirme.</p>
+                <p>Python, JS, Lua, Ruby, Bash, Go dillerinde plugin. Hot-reload.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: var(--purple-dim); color: var(--purple);"><i class="fa-solid fa-route"></i></div>
+                <div class="icon">🔀</div>
                 <h3>Akıllı Model Router</h3>
-                <p>Göreve göre doğru modeli seçer: kod için X_FABLE_CODER, reasoning için V7, hızlı task'lar için V5.</p>
+                <p>Göreve göre doğru model: kod için X_FABLE_CODER, reasoning için V7.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: rgba(251,191,36,0.10); color: #fbbf24;"><i class="fa-solid fa-globe"></i></div>
+                <div class="icon">🌐</div>
                 <h3>Otonom Web Agent</h3>
-                <p>Playwright + DDGS ile web'de gezinme, veri çekme, API çağrıları. Web scraping ve otomasyon.</p>
+                <p>Playwright + DDGS ile web'de gezinme, veri çekme, API çağrıları.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: rgba(244,114,182,0.10); color: #f472b6;"><i class="fa-solid fa-shield"></i></div>
-                <h3>AES-256 Model Güvenlik</h3>
-                <p>Şifreli model sağlayıcı, 2 şifreli model. Enterprise seviye güvenlik.</p>
+                <div class="icon">🔒</div>
+                <h3>AES-256 Güvenlik</h3>
+                <p>Şifreli model sağlayıcı. Enterprise seviye güvenlik.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: rgba(168,85,247,0.10); color: #a855f7;"><i class="fa-solid fa-heart"></i></div>
+                <div class="icon">❤️</div>
                 <h3>Kendini İyileştirme</h3>
-                <p>Feedback Loop ve ErrorFixEngine ile hataları otomatik tespit eder ve düzeltir.</p>
+                <p>Feedback Loop ile hataları otomatik tespit eder ve düzeltir.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon" style="background: rgba(34,211,238,0.10); color: #22d3ee;"><i class="fa-solid fa-clock"></i></div>
+                <div class="icon">⏰</div>
                 <h3>Görev Zamanlayıcı</h3>
                 <p>16 zamanlanmış görev, periyodik işlemler, cron benzeri programlama.</p>
             </div>
@@ -457,102 +334,92 @@
     </div>
 </section>
 
-<!-- Demo Chat -->
-<section id="demo" style="background: var(--bg2);">
+<section id="demo">
     <div class="container">
-        <div class="section-label"><i class="fa-solid fa-comment-dots"></i> Canlı Demo</div>
-        <h2 class="section-title">GlassesCat ile Neler Yapabilirsin?</h2>
-        <p class="section-desc">Gerçek kullanım senaryolarından örnekler. Her biri farklı bir yeteneği gösterir.</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 24px;">
-            <!-- Code / GlassesCat V7 -->
+        <h2 class="section-title">Demo</h2>
+        <div class="demo-grid">
             <div class="demo-card">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Kod Yazma · V7_HYBRID_TITAN</div>
+                <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Kod Yazma · V7</div>
                 <div class="demo-body">
-                    <div class="bubble user">Python ile bir dosya okuyucu yaz</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> GlassesCat V7</div>
-                        <pre class="code-block">def read_file(path):
+                    <div class="msg user">Python ile bir dosya okuyucu yaz</div>
+                    <div class="msg ai">
+                        <div class="label">GlassesCat V7</div>
+                        <code>def read_file(path):
     with open(path, 'r', encoding='utf-8') as f:
         return f.read()
 
-print(read_file('ornek.txt'))</pre>
+print(read_file('ornek.txt'))</code>
                     </div>
                 </div>
             </div>
-            <!-- Web / GlassesCat V6 -->
             <div class="demo-card">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#60a5fa"></span>Web Araması · V6_OMNI_OVERLORD</div>
+                <div class="demo-hdr"><span class="dot" style="background:#60a5fa"></span>Web Araması · V6</div>
                 <div class="demo-body">
-                    <div class="bubble user">Bugünkü teknoloji haberlerini ara</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> GlassesCat V6</div>
-                        <div style="margin-bottom:6px;">🔍 Web'de arıyorum...</div>
-                        <div class="tag-group">
-                            <span class="tag-sm">Yapay zeka</span>
-                            <span class="tag-sm">Teknoloji</span>
-                            <span class="tag-sm">2026</span>
+                    <div class="msg user">Bugünkü teknoloji haberlerini ara</div>
+                    <div class="msg ai">
+                        <div class="label">GlassesCat V6</div>
+                        <div>🔍 Web'de arıyorum...</div>
+                        <div class="tags">
+                            <span>Yapay zeka</span>
+                            <span>Teknoloji</span>
+                            <span>2026</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Memory / GlassesCat V5 -->
             <div class="demo-card">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#34d399"></span>Hafıza · V5_NEXUS_CORE</div>
+                <div class="demo-hdr"><span class="dot" style="background:#34d399"></span>Hafıza · V5</div>
                 <div class="demo-body">
-                    <div class="bubble user">Geçen haftaki proje notlarımı hatırla</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> GlassesCat V5</div>
+                    <div class="msg user">Geçen haftaki proje notlarımı hatırla</div>
+                    <div class="msg ai">
+                        <div class="label">GlassesCat V5</div>
                         <div>📂 Obsidian hafızamda buldum</div>
-                        <div class="memory-card">
-                            <div class="memory-title">proje_notlari.md</div>
-                            <div class="memory-items">• V7_HYBRID_TITAN testleri tamamlandı<br>• MCP bridge entegrasyonu yapıldı<br>• Yeni plugin sistemi eklendi</div>
+                        <div style="margin-top:6px;padding:8px 12px;background:#0a0a0a;border-radius:6px;border-left:3px solid var(--orange);font-size:0.75rem;">
+                            <div style="font-weight:600;font-size:0.7rem;color:var(--orange);">proje_notlari.md</div>
+                            <div style="margin-top:4px;">• V7_HYBRID_TITAN testleri tamamlandı<br>• MCP bridge entegrasyonu yapıldı<br>• Yeni plugin sistemi eklendi</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- ShadowCat R:1 Singularity -->
-            <div class="demo-card" style="border-color:rgba(255,107,0,0.15)">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Intent Routing · ShadowCat R:1 Singularity</div>
+            <div class="demo-card">
+                <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Intent Routing · Singularity</div>
                 <div class="demo-body">
-                    <div class="bubble user">hey shadow, bana bir API yaz</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> Singularity · 1.5B</div>
-                        <div style="margin-bottom:6px;">🔍 Wake word detected → classifying intent...</div>
-                        <div class="step-list">
-                            <span class="step done">✓ Intent: CODE_TASK</span>
-                            <span class="step done">✓ Routing: ShadowCat R:1 Pulse</span>
-                            <span class="step doing">⏳ Yönlendiriliyor...</span>
+                    <div class="msg user">hey shadow, bana bir API yaz</div>
+                    <div class="msg ai">
+                        <div class="label">Singularity · 1.5B</div>
+                        <div>🔍 Wake word detected → classifying intent...</div>
+                        <div style="margin-top:4px;font-size:0.75rem;">
+                            <div style="color:#34d399;">✓ Intent: CODE_TASK</div>
+                            <div style="color:#34d399;">✓ Routing: ShadowCat R:1 Pulse</div>
+                            <div style="color:var(--text3);">⏳ Yönlendiriliyor...</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- ShadowCat R:1 Matrix -->
-            <div class="demo-card" style="border-color:rgba(196,123,255,0.15)">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#c47bff"></span>Reasoning · ShadowCat R:1 Matrix</div>
+            <div class="demo-card">
+                <div class="demo-hdr"><span class="dot" style="background:#c47bff"></span>Reasoning · Matrix</div>
                 <div class="demo-body">
-                    <div class="bubble user">2x+5=13 denklemini çöz</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> Matrix · 7B</div>
-                        <div style="margin-bottom:6px;">🧠 Adım adım:</div>
-                        <div class="step-list">
-                            <span class="step done">1. 2x + 5 = 13</span>
-                            <span class="step done">2. 2x = 13 - 5 = 8</span>
-                            <span class="step done">3. x = 8 / 2 = 4</span>
+                    <div class="msg user">2x+5=13 denklemini çöz</div>
+                    <div class="msg ai">
+                        <div class="label">Matrix · 7B</div>
+                        <div>🧠 Adım adım:</div>
+                        <div style="margin-top:4px;font-size:0.75rem;color:var(--text2);">
+                            <div>1. 2x + 5 = 13</div>
+                            <div>2. 2x = 13 - 5 = 8</div>
+                            <div>3. x = 8 / 2 = 4</div>
                         </div>
                         <div style="margin-top:6px;font-weight:500;">✓ x = 4</div>
                     </div>
                 </div>
             </div>
-            <!-- ShadowCat R:1 Pulse -->
-            <div class="demo-card" style="border-color:rgba(255,107,0,0.20)">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Code Generation · ShadowCat R:1 Pulse</div>
+            <div class="demo-card">
+                <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Code Generation · Pulse</div>
                 <div class="demo-body">
-                    <div class="bubble user">FastAPI ile bir REST API yaz</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> Pulse · 14B</div>
+                    <div class="msg user">FastAPI ile bir REST API yaz</div>
+                    <div class="msg ai">
+                        <div class="label">Pulse · 14B</div>
                         <div style="margin-bottom:6px;">⚡ Production-ready kod üretiliyor...</div>
-                        <pre class="code-block">from fastapi import FastAPI
+                        <code>from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -567,54 +434,50 @@ async def list_items():
 
 @app.post("/items")
 async def create_item(item: Item):
-    return {"ok": True, "item": item}</pre>
+    return {"ok": True, "item": item}</code>
                     </div>
                 </div>
             </div>
-            <!-- System / GlassesCat -->
             <div class="demo-card">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#f472b6"></span>Sistem · GlassesCat Core</div>
+                <div class="demo-hdr"><span class="dot" style="background:#f472b6"></span>Sistem · Core</div>
                 <div class="demo-body">
-                    <div class="bubble user">Sistem durumunu göster</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> GlassesCat</div>
-                        <div class="sys-grid">
-                            <span class="sys-item">CPU: %23</span>
-                            <span class="sys-item">RAM: %45</span>
-                            <span class="sys-item">37 araç</span>
-                            <span class="sys-item">31 hafıza</span>
+                    <div class="msg user">Sistem durumunu göster</div>
+                    <div class="msg ai">
+                        <div class="label">GlassesCat</div>
+                        <div class="sys-row">
+                            <span>CPU: %23</span>
+                            <span>RAM: %45</span>
+                            <span>37 araç</span>
+                            <span>31 hafıza</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Plugin -->
             <div class="demo-card">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#a855f7"></span>Pluginler · X_FABLE_CODER</div>
+                <div class="demo-hdr"><span class="dot" style="background:#a855f7"></span>Pluginler · X_FABLE_CODER</div>
                 <div class="demo-body">
-                    <div class="bubble user">Pluginleri listele</div>
-                    <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> X_FABLE_CODER</div>
-                        <div class="plugin-list">
-                            <span class="plugin-row"><span>Qwen Assistant</span><span class="status on">● aktif</span></span>
-                            <span class="plugin-row"><span>Web Scraper</span><span class="status on">● aktif</span></span>
-                            <span class="plugin-row"><span>Security Analyst</span><span class="status off">○ pasif</span></span>
+                    <div class="msg user">Pluginleri listele</div>
+                    <div class="msg ai">
+                        <div class="label">X_FABLE_CODER</div>
+                        <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;font-size:0.75rem;">
+                            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#0a0a0a;border-radius:4px;">Qwen Assistant <span style="color:#34d399;">● aktif</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#0a0a0a;border-radius:4px;">Web Scraper <span style="color:#34d399;">● aktif</span></div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#0a0a0a;border-radius:4px;">Security Analyst <span style="color:var(--text3);">○ pasif</span></div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Chat - Coming Soon -->
-            <div class="demo-card" style="border-color:rgba(34,211,238,0.15)">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#22d3ee"></span>Canlı Sohbet · GlassesCat AI</div>
+            <div class="demo-card">
+                <div class="demo-hdr"><span class="dot" style="background:#22d3ee"></span>Canlı Sohbet</div>
                 <div class="demo-body" style="text-align:center;padding:32px 20px;">
-                    <div style="font-size:2.5rem;margin-bottom:12px;">💬</div>
-                    <div style="font-weight:600;margin-bottom:6px;">GlassesCat Sohbet Arayüzü</div>
-                    <div style="font-size:0.8125rem;color:#8a8a9a;margin-bottom:16px;">Sidebar, mesaj geçmişi, plugin/tool/memory paneli</div>
-                    <button onclick="showComingSoon()" class="btn-primary" style="display:inline-flex;border:none;cursor:pointer;">Sohbete Başla</button>
-                    <div id="comingSoonMsg" style="display:none;margin-top:16px;padding:16px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:12px;text-align:left;font-size:0.8125rem;">
-                        <div style="font-weight:600;margin-bottom:8px;">🚧 Henüz Kullanıma Açık Değil</div>
-                        <p style="color:#8a8a9a;margin-bottom:8px;">Gerçek zamanlı sohbet, sunucu tarafında çalışan bir AI modeli gerektiriyor. Şu an home server altyapımız kurulum aşamasında olduğu için bu özellik şimdilik pasif.</p>
-                        <p style="color:#8a8a9a;">🖥️ Home server kurulumu tamamlandığında GlassesCat ve ShadowCat modelleri canlı olarak kullanılabilecek. Developer'lara özel erken erişim için GitHub üzerinden duyuruları takip edebilirsin.</p>
+                    <div style="font-size:2rem;margin-bottom:8px;">💬</div>
+                    <div style="font-weight:600;margin-bottom:4px;">GlassesCat Sohbet</div>
+                    <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px;">Sidebar, mesaj geçmişi, plugin/tool paneli</div>
+                    <button onclick="showComingSoon()" class="btn primary">Sohbete Başla</button>
+                    <div id="comingSoonMsg" style="display:none;margin-top:16px;padding:16px;background:#1a1a1a;border-radius:8px;text-align:left;font-size:0.8rem;">
+                        <div style="font-weight:600;margin-bottom:8px;color:#fbbf24;">🚧 Henüz Kullanıma Açık Değil</div>
+                        <p style="color:var(--text2);margin-bottom:8px;">Gerçek zamanlı sohbet için sunucu tarafında çalışan bir AI modeli gerekir. Home server altyapımız kurulum aşamasında.</p>
+                        <p style="color:var(--text2);">Home server hazır olduğunda GlassesCat ve ShadowCat modelleri canlı kullanılabilecek.</p>
                     </div>
                 </div>
             </div>
@@ -629,12 +492,9 @@ function showComingSoon() {
 }
 </script>
 
-<!-- Architecture -->
 <section id="architecture">
     <div class="container">
-        <div class="section-label"><i class="fa-solid fa-diagram-project"></i> Mimari</div>
-        <h2 class="section-title">Sistem Mimarisi</h2>
-        <p class="section-desc">GlassesCat Core etrafında şekillenen modüler yapı.</p>
+        <h2 class="section-title">Mimari</h2>
         <div class="arch-grid">
             <div class="arch-item"><span class="arr">└─</span>Glassescat Core</div>
             <div class="arch-item"><span class="arr">├─</span>AgentLoop (ReAct)</div>
@@ -652,39 +512,29 @@ function showComingSoon() {
     </div>
 </section>
 
-<!-- CTA -->
 <section>
     <div class="container">
-        <div class="cta">
+        <div class="cta-box">
             <h2>Hemen Başla</h2>
-            <p>GlassesCat'i yerel ortamında çalıştır, modelleri Ollama'dan çek, kendi AI asistanını kur.</p>
-            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="showComingSoon()" class="btn-primary" style="border:none;cursor:pointer;">
-                    <i class="fa-solid fa-comment"></i> Canlı Sohbet
-                </button>
-                <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn-secondary">
-                    <i class="fa-brands fa-github"></i> GitHub
-                </a>
-                <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn-secondary">
-                    <i class="fa-solid fa-brain"></i> Ollama
-                </a>
+            <p>GlassesCat'i yerel ortamında çalıştır, modelleri Ollama'dan çek.</p>
+            <div class="btns">
+                <button onclick="showComingSoon()" class="btn primary">Canlı Sohbet</button>
+                <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn secondary">GitHub</a>
+                <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn secondary">Ollama</a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
 <footer>
     <div class="container">
         <span>&copy; 2026 Berkay Gülmez — GlassesCat AI</span>
-        <div class="footer-links">
-            <a href="https://github.com/glassesglitchstudio-lab" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
-            <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank"><i class="fa-solid fa-brain"></i> Ollama</a>
-            <a href="#">Yukarı <i class="fa-solid fa-arrow-up"></i></a>
+        <div>
+            <a href="https://github.com/glassesglitchstudio-lab" target="_blank" style="margin-right:16px;">GitHub</a>
+            <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank">Ollama</a>
         </div>
     </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
 </body>
 </html>
