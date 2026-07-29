@@ -370,37 +370,36 @@
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag orange">R1</span>
-                <h3>ShadowCat R:1 Pulse</h3>
-                <p>761K entry dataset ile hazırlanan reasoning modeli. Derin mantıksal akıl yürütme, çok adımlı analiz ve karmaşık problem çözme.</p>
+                <span class="tag orange">S</span>
+                <h3>ShadowCat R:1 Singularity</h3>
+                <p>1.5B parametreli hızlı router/classifier. Wake word tespiti, 12 intent sınıflandırma ve Matrix/Pulse'a akıllı routing yapar. DeepSeek-R1-Distill-Qwen-1.5B tabanlı.</p>
                 <div class="specs">
-                    <span class="spec">761K Dataset</span>
-                    <span class="spec">Reasoning</span>
-                    <span class="spec">Pulse Core</span>
-                    <span class="spec">Derin Analiz</span>
+                    <span class="spec">1.5B Param</span>
+                    <span class="spec">Router</span>
+                    <span class="spec">500 Entry</span>
+                    <span class="spec">~30dk Train</span>
                 </div>
             </div>
-
             <div class="model-card">
                 <span class="tag purple">MAT</span>
                 <h3>ShadowCat R:1 Matrix</h3>
-                <p>Çok boyutlu matris hesaplama ve gerçek zamanlı sinyal işleme motoru. Frekans analizi, anomali tespiti ve örüntü tanıma.</p>
+                <p>7B parametreli thinking engine. Derinlemesine konu anlatımı, BFCL tool calling, Türkçe/İngilizce çeviri ve proje planlama. DeepSeek-R1-Distill-Qwen-7B tabanlı.</p>
                 <div class="specs">
-                    <span class="spec">Matris Hesaplama</span>
-                    <span class="spec">Sinyal İşleme</span>
-                    <span class="spec">Anomali Tespiti</span>
-                    <span class="spec">Örüntü Tanıma</span>
+                    <span class="spec">7B Param</span>
+                    <span class="spec">Thinking Engine</span>
+                    <span class="spec">558K Dataset</span>
+                    <span class="spec">~6-8sa Train</span>
                 </div>
             </div>
             <div class="model-card">
-                <span class="tag orange">S</span>
-                <h3>ShadowCat R:1 Singularity</h3>
-                <p>Tekillik analizi ve tahminsel modelleme motoru. Karmaşık sistemlerde davranış tahmini, optimizasyon ve karar desteği.</p>
+                <span class="tag orange">R1</span>
+                <h3>ShadowCat R:1 Pulse</h3>
+                <p>14B parametreli kod üretim modeli. Production-ready kod yazma, güvenlik denetimi, code review, UE5 Blueprint geliştirme. DeepSeek-R1-Distill-Qwen-14B tabanlı.</p>
                 <div class="specs">
-                    <span class="spec">Tekillik Analizi</span>
-                    <span class="spec">Tahmin</span>
-                    <span class="spec">Optimizasyon</span>
-                    <span class="spec">Karar Desteği</span>
+                    <span class="spec">14B Param</span>
+                    <span class="spec">Code Powerhouse</span>
+                    <span class="spec">212K Dataset</span>
+                    <span class="spec">~6-8sa Train</span>
                 </div>
             </div>
         </div>
@@ -512,13 +511,29 @@ print(read_file('ornek.txt'))</pre>
                     </div>
                 </div>
             </div>
-            <!-- ShadowCat R:1 -->
+            <!-- ShadowCat R:1 Singularity -->
             <div class="demo-card" style="border-color:rgba(255,107,0,0.15)">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Reasoning · ShadowCat R:1</div>
+                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Intent Routing · ShadowCat R:1 Singularity</div>
+                <div class="demo-body">
+                    <div class="bubble user">hey shadow, bana bir API yaz</div>
+                    <div class="bubble ai">
+                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> Singularity · 1.5B</div>
+                        <div style="margin-bottom:6px;">🔍 Wake word detected → classifying intent...</div>
+                        <div class="step-list">
+                            <span class="step done">✓ Intent: CODE_TASK</span>
+                            <span class="step done">✓ Routing: ShadowCat R:1 Pulse</span>
+                            <span class="step doing">⏳ Yönlendiriliyor...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ShadowCat R:1 Matrix -->
+            <div class="demo-card" style="border-color:rgba(196,123,255,0.15)">
+                <div class="demo-hdr"><span class="demo-dot" style="background:#c47bff"></span>Reasoning · ShadowCat R:1 Matrix</div>
                 <div class="demo-body">
                     <div class="bubble user">2x+5=13 denklemini çöz</div>
                     <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> ShadowCat R:1</div>
+                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> Matrix · 7B</div>
                         <div style="margin-bottom:6px;">🧠 Adım adım:</div>
                         <div class="step-list">
                             <span class="step done">1. 2x + 5 = 13</span>
@@ -529,21 +544,30 @@ print(read_file('ornek.txt'))</pre>
                     </div>
                 </div>
             </div>
-
-            <!-- ShadowCat R:1 Singularity -->
+            <!-- ShadowCat R:1 Pulse -->
             <div class="demo-card" style="border-color:rgba(255,107,0,0.20)">
-                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Sinyal Analizi · ShadowCat R:1 Singularity</div>
+                <div class="demo-hdr"><span class="demo-dot" style="background:#ff6b00"></span>Code Generation · ShadowCat R:1 Pulse</div>
                 <div class="demo-body">
-                    <div class="bubble user">Bu sinyaldeki anomaliyi bul</div>
+                    <div class="bubble user">FastAPI ile bir REST API yaz</div>
                     <div class="bubble ai">
-                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> ShadowCat R:1 Singularity</div>
-                        <div style="margin-bottom:6px;">⚡ Matris taraması yapılıyor...</div>
-                        <div class="sys-grid">
-                            <span class="sys-item">Frekans: 2.4 GHz</span>
-                            <span class="sys-item">Genlik: 0.87</span>
-                            <span class="sys-item" style="color:#ff6b00;">⚠ Anomali: +3.2σ</span>
-                            <span class="sys-item">Güven: %94</span>
-                        </div>
+                        <div class="bubble-label"><img src="glassescat-logo.png" class="bubble-logo"> Pulse · 14B</div>
+                        <div style="margin-bottom:6px;">⚡ Production-ready kod üretiliyor...</div>
+                        <pre class="code-block">from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+@app.get("/items")
+async def list_items():
+    return [{"name": "Laptop", "price": 1500}]
+
+@app.post("/items")
+async def create_item(item: Item):
+    return {"ok": True, "item": item}</pre>
                     </div>
                 </div>
             </div>
