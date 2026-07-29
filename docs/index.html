@@ -602,19 +602,32 @@ async def create_item(item: Item):
                     </div>
                 </div>
             </div>
-            <!-- Chat -->
+
+            <!-- Chat - Coming Soon -->
             <div class="demo-card" style="border-color:rgba(34,211,238,0.15)">
                 <div class="demo-hdr"><span class="demo-dot" style="background:#22d3ee"></span>Canlı Sohbet · GlassesCat AI</div>
                 <div class="demo-body" style="text-align:center;padding:32px 20px;">
                     <div style="font-size:2.5rem;margin-bottom:12px;">💬</div>
                     <div style="font-weight:600;margin-bottom:6px;">GlassesCat Sohbet Arayüzü</div>
                     <div style="font-size:0.8125rem;color:#8a8a9a;margin-bottom:16px;">Sidebar, mesaj geçmişi, plugin/tool/memory paneli</div>
-                    <a href="chat.html" target="_blank" class="btn-primary" style="display:inline-flex;">Sohbete Başla</a>
+                    <button onclick="showComingSoon()" class="btn-primary" style="display:inline-flex;border:none;cursor:pointer;">Sohbete Başla</button>
+                    <div id="comingSoonMsg" style="display:none;margin-top:16px;padding:16px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:12px;text-align:left;font-size:0.8125rem;">
+                        <div style="font-weight:600;margin-bottom:8px;">🚧 Henüz Kullanıma Açık Değil</div>
+                        <p style="color:#8a8a9a;margin-bottom:8px;">Gerçek zamanlı sohbet, sunucu tarafında çalışan bir AI modeli gerektiriyor. Şu an home server altyapımız kurulum aşamasında olduğu için bu özellik şimdilik pasif.</p>
+                        <p style="color:#8a8a9a;">🖥️ Home server kurulumu tamamlandığında GlassesCat ve ShadowCat modelleri canlı olarak kullanılabilecek. Developer'lara özel erken erişim için GitHub üzerinden duyuruları takip edebilirsin.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+function showComingSoon() {
+    var msg = document.getElementById('comingSoonMsg');
+    msg.style.display = msg.style.display === 'none' ? 'block' : 'none';
+}
+</script>
 
 <!-- Architecture -->
 <section id="architecture">
@@ -646,9 +659,9 @@ async def create_item(item: Item):
             <h2>Hemen Başla</h2>
             <p>GlassesCat'i yerel ortamında çalıştır, modelleri Ollama'dan çek, kendi AI asistanını kur.</p>
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <a href="chat.html" target="_blank" class="btn-primary">
+                <button onclick="showComingSoon()" class="btn-primary" style="border:none;cursor:pointer;">
                     <i class="fa-solid fa-comment"></i> Canlı Sohbet
-                </a>
+                </button>
                 <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn-secondary">
                     <i class="fa-brands fa-github"></i> GitHub
                 </a>
