@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat AI — Otonom Ajan Sistemi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ::selection { background: rgba(255,107,0,0.35); color: #fff; }
+        html { scroll-behavior: smooth; }
+
+        :root {
+            --bg: #07070d;
+            --bg2: #0a0a12;
+            --surface: rgba(255,255,255,0.03);
+            --surface2: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.06);
+            --border2: rgba(255,255,255,0.12);
+            --orange: #ff6b00;
+            --orange-dim: rgba(255,107,0,0.15);
+            --orange-glow: rgba(255,107,0,0.25);
+            --purple: #c47bff;
+            --purple-dim: rgba(196,123,255,0.12);
+            --text: #f0f0f5;
+            --text2: #8a8a9a;
+            --text3: #5a5a6a;
+            --radius: 12px;
+            --radius-lg: 20px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* Nav */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: rgba(7,7,13,0.75);
+            border-bottom: 1px solid var(--border);
+        }
+        nav .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; text-decoration: none; color: var(--text); }
+        .nav-logo img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .nav-links { display: flex; align-items: center; gap: 24px; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.15s; }
+        .nav-links a:hover { color: var(--text); }
+        .nav-gh {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 8px;
+            background: var(--orange-dim); color: var(--orange);
+            text-decoration: none; font-size: 0.8125rem; font-weight: 600;
+            transition: all 0.15s;
+        }
+        .nav-gh:hover { background: rgba(255,107,0,0.25); transform: translateY(-1px); }
+        .mobile-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.2rem; cursor: pointer; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex; align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 64px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse at 30% 40%, rgba(255,107,0,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(196,123,255,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+        .hero-content { position: relative; z-index: 2; padding: 80px 0; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px;
+            background: var(--orange-dim); color: var(--orange);
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em;
+            margin-bottom: 24px; border: 1px solid rgba(255,107,0,0.15);
+        }
+        .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.08; margin-bottom: 20px; letter-spacing: -0.02em; }
+        .hero h1 span { background: linear-gradient(135deg, var(--orange), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.125rem; color: var(--text2); line-height: 1.7; max-width: 600px; margin-bottom: 32px; }
+        .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 14px 28px; border-radius: var(--radius);
+            background: var(--orange); color: #fff;
+            font-weight: 600; font-size: 0.9375rem; text-decoration: none;
+            transition: all 0.15s; border: none; cursor: pointer;
+        }
+        .btn-primary:hover { background: #ff7a1a; transform: translateY(-2px); box-shadow: 0 8px 30px var(--orange-glow); }
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 14px 28px; border-radius: var(--radius);
+            border: 1px solid var(--border2); color: var(--text);
+            font-weight: 500; font-size: 0.9375rem; text-decoration: none;
+            transition: all 0.15s;
+        }
+        .btn-secondary:hover { border-color: var(--orange); background: var(--orange-dim); }
+
+        /* Sections */
+        section { padding: 100px 0; }
+        .section-label {
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--orange); margin-bottom: 12px;
+        }
+        .section-title { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; margin-bottom: 16px; letter-spacing: -0.01em; }
+        .section-desc { color: var(--text2); font-size: 1.0625rem; line-height: 1.7; max-width: 600px; margin-bottom: 48px; }
+
+        /* Models */
+        .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .model-card {
+            padding: 28px; border-radius: var(--radius-lg);
+            background: var(--surface); border: 1px solid var(--border);
+            transition: all 0.25s; position: relative; overflow: hidden;
+        }
+        .model-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--orange), var(--purple));
+            opacity: 0; transition: opacity 0.25s;
+        }
+        .model-card:hover { border-color: rgba(255,107,0,0.20); transform: translateY(-3px); }
+        .model-card:hover::before { opacity: 1; }
+        .model-card .tag {
+            display: inline-block; padding: 3px 10px; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.03em;
+            margin-bottom: 14px;
+        }
+        .model-card .tag.orange { background: var(--orange-dim); color: var(--orange); }
+        .model-card .tag.purple { background: var(--purple-dim); color: var(--purple); }
+        .model-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+        .model-card p { font-size: 0.875rem; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
+        .model-card .specs { display: flex; flex-wrap: wrap; gap: 6px; }
+        .model-card .spec {
+            padding: 4px 10px; border-radius: 6px;
+            background: rgba(255,255,255,0.04); color: var(--text3);
+            font-size: 0.7rem; font-weight: 500;
+        }
+
+        /* Features */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .feat-card {
+            padding: 28px; border-radius: var(--radius-lg);
+            background: var(--surface); border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .feat-card:hover { border-color: rgba(255,107,0,0.15); }
+        .feat-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; margin-bottom: 16px;
+        }
+        .feat-card h3 { font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px; }
+        .feat-card p { font-size: 0.8125rem; color: var(--text2); line-height: 1.6; }
+
+        /* Stats */
+        .stats {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 32px; text-align: center; padding: 60px 0; }
+        .stat-num { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--orange), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { color: var(--text2); font-size: 0.875rem; margin-top: 6px; }
+
+        /* Arch */
+        .arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+        .arch-item {
+            padding: 18px 20px; border-radius: var(--radius);
+            background: var(--surface); border: 1px solid var(--border);
+            font-size: 0.875rem; display: flex; align-items: center; gap: 10px;
+        }
+        .arch-item .arr { color: var(--orange); font-weight: 600; }
+
+        /* CTA */
+        .cta {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255,107,0,0.06), rgba(196,123,255,0.04));
+            border-radius: var(--radius-lg);
+            padding: 64px 40px;
+            border: 1px solid rgba(255,107,0,0.10);
+        }
+        .cta h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: 12px; }
+        .cta p { color: var(--text2); font-size: 1rem; margin-bottom: 28px; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0; color: var(--text3); font-size: 0.8125rem;
+        }
+        footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        footer a { color: var(--text2); text-decoration: none; }
+        footer a:hover { color: var(--orange); }
+        .footer-links { display: flex; gap: 20px; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: rgba(7,7,13,0.98); flex-direction: column; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+            .nav-links.show { display: flex; }
+            .mobile-menu-btn { display: block; }
+            .models-grid, .features-grid { grid-template-columns: 1fr; }
+            .arch-grid { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 2.2rem; }
+            .cta { padding: 40px 24px; }
+            footer .container { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+    <div class="container">
+        <a href="#" class="nav-logo">
+            <img src="glassescat-logo.png" alt="">
+            GlassesCat
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="#models">Modeller</a>
+            <a href="#features">Özellikler</a>
+            <a href="#architecture">Mimari</a>
+            <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="nav-gh">
+                <i class="fa-brands fa-github"></i> GitHub
+            </a>
+        </div>
+        <button class="mobile-menu-btn" onclick="document.getElementById('navLinks').classList.toggle('show')">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-grid"></div>
+    <div class="container hero-content">
+        <div class="hero-badge"><i class="fa-solid fa-cat"></i> v3.0.0 — 37 Araç, Sınırsız Hafıza</div>
+        <h1>Otonom AI <span>Ajan Sistemi</span></h1>
+        <p>GlassesCat; ReAct döngüsü, Obsidian tabanlı sınırsız bellek, 24+ araç ve çoklu model yönlendirici ile çalışan hibrit bir yapay zeka asistanıdır.</p>
+        <div class="hero-btns">
+            <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn-primary">
+                <i class="fa-brands fa-github"></i> GitHub'da Gör
+            </a>
+            <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn-secondary">
+                <i class="fa-solid fa-brain"></i> Ollama Modeller
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+    <div class="container stats-grid">
+        <div><div class="stat-num">37</div><div class="stat-label">Entegre Araç</div></div>
+        <div><div class="stat-num">30+</div><div class="stat-label">Hafıza Dosyası</div></div>
+        <div><div class="stat-num">16</div><div class="stat-label">Zamanlanmış Görev</div></div>
+        <div><div class="stat-num">9</div><div class="stat-label">UltraAgent Protokolü</div></div>
+    </div>
+</section>
+
+<!-- Models -->
+<section id="models">
+    <div class="container">
+        <div class="section-label"><i class="fa-solid fa-brain"></i> Modeller</div>
+        <h2 class="section-title">GlassesCat Model Ailesi</h2>
+        <p class="section-desc">Ollama üzerinde barındırılan, her biri farklı güçlere sahip özel modeller.</p>
+        <div class="models-grid">
+            <div class="model-card">
+                <span class="tag orange">V7</span>
+                <h3>V7_HYBRID_TITAN</h3>
+                <p>En güncel model. Hibrit karar motoru, UltraAgent, MCP bridge, 37 araç, plugin/skill sistemi, AES-256 güvenlik.</p>
+                <div class="specs">
+                    <span class="spec">ReAct Loop</span>
+                    <span class="spec">WebSocket</span>
+                    <span class="spec">RAG</span>
+                    <span class="spec">Swarm</span>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="tag purple">V6</span>
+                <h3>V6_OMNI_OVERLORD</h3>
+                <p>128K context penceresi, Multi-State Autonomous Swarm Node, düşük sıcaklık (0.2) ile yüksek deterministik çıktı.</p>
+                <div class="specs">
+                    <span class="spec">128K Context</span>
+                    <span class="spec">Swarm Node</span>
+                    <span class="spec">Temp 0.2</span>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="tag orange">V5</span>
+                <h3>V5_NEXUS_CORE</h3>
+                <p>Doğal Türkçe konuşma, JSON/parantez içermeyen akıcı çıktı, hızlı task'lar için optimize edilmiş model.</p>
+                <div class="specs">
+                    <span class="spec">Doğal Dil</span>
+                    <span class="spec">Türkçe</span>
+                    <span class="spec">Hızlı Task</span>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="tag purple">X</span>
+                <h3>X_FABLE_CODER_V1</h3>
+                <p>361-entry dataset ile fine-tune edilmiş kodlama modeli. Berkay'ın kişisel modeli, birincil model router.</p>
+                <div class="specs">
+                    <span class="spec">361 Dataset</span>
+                    <span class="spec">Coder</span>
+                    <span class="spec">Model Router</span>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="tag orange">X</span>
+                <h3>X_GLITCH_OPUS_V2</h3>
+                <p>500-entry dataset, Colab notebook + QLoRA pipeline ile fine-tune. Kimlik mühürleme ve özel karakter eğitimi.</p>
+                <div class="specs">
+                    <span class="spec">500 Entry</span>
+                    <span class="spec">QLoRA</span>
+                    <span class="spec">Colab</span>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="tag purple">X</span>
+                <h3>X_OPUS Router</h3>
+                <p>Çift beyinli hibrit yönlendirici. Qwen 3.5 9B + Qwen 2.5 Coder 14B arasında akıllı routing.</p>
+                <div class="specs">
+                    <span class="spec">Çift Beyin</span>
+                    <span class="spec">Hibrit</span>
+                    <span class="spec">Akıllı Routing</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section id="features" style="background: var(--bg2);">
+    <div class="container">
+        <div class="section-label"><i class="fa-solid fa-star"></i> Özellikler</div>
+        <h2 class="section-title">Neler Yapabilir?</h2>
+        <p class="section-desc">24 araç, 8 kategoride toplanmış fonksiyon çağırma yetenekleri.</p>
+        <div class="features-grid">
+            <div class="feat-card">
+                <div class="feat-icon" style="background: var(--orange-dim); color: var(--orange);"><i class="fa-solid fa-rotate"></i></div>
+                <h3>ReAct Agent Loop</h3>
+                <p>Düşün → Karar ver → Uygula döngüsü. Çok adımlı görevleri otonom olarak çözer.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: rgba(52,211,153,0.10); color: #34d399;"><i class="fa-solid fa-book"></i></div>
+                <h3>Sınırsız Obsidian Hafıza</h3>
+                <p>30+ .md dosyası, her konuşmayı hatırlar. Markdown formatında kalıcı bellek.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: rgba(96,165,250,0.10); color: #60a5fa;"><i class="fa-solid fa-puzzle-piece"></i></div>
+                <h3>Plugin & Skill Sistemi</h3>
+                <p>Python, JS, Lua, Ruby, Bash, Go dillerinde plugin desteği. Hot-reload ile anında etkinleştirme.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: var(--purple-dim); color: var(--purple);"><i class="fa-solid fa-route"></i></div>
+                <h3>Akıllı Model Router</h3>
+                <p>Göreve göre doğru modeli seçer: kod için X_FABLE_CODER, reasoning için V7, hızlı task'lar için V5.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: rgba(251,191,36,0.10); color: #fbbf24;"><i class="fa-solid fa-globe"></i></div>
+                <h3>Otonom Web Agent</h3>
+                <p>Playwright + DDGS ile web'de gezinme, veri çekme, API çağrıları. Web scraping ve otomasyon.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: rgba(244,114,182,0.10); color: #f472b6;"><i class="fa-solid fa-shield"></i></div>
+                <h3>AES-256 Model Güvenlik</h3>
+                <p>Şifreli model sağlayıcı, 2 şifreli model. Enterprise seviye güvenlik.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: rgba(168,85,247,0.10); color: #a855f7;"><i class="fa-solid fa-heart"></i></div>
+                <h3>Kendini İyileştirme</h3>
+                <p>Feedback Loop ve ErrorFixEngine ile hataları otomatik tespit eder ve düzeltir.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon" style="background: rgba(34,211,238,0.10); color: #22d3ee;"><i class="fa-solid fa-clock"></i></div>
+                <h3>Görev Zamanlayıcı</h3>
+                <p>16 zamanlanmış görev, periyodik işlemler, cron benzeri programlama.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+    <div class="container">
+        <div class="section-label"><i class="fa-solid fa-diagram-project"></i> Mimari</div>
+        <h2 class="section-title">Sistem Mimarisi</h2>
+        <p class="section-desc">GlassesCat Core etrafında şekillenen modüler yapı.</p>
+        <div class="arch-grid">
+            <div class="arch-item"><span class="arr">└─</span>Glassescat Core</div>
+            <div class="arch-item"><span class="arr">├─</span>AgentLoop (ReAct)</div>
+            <div class="arch-item"><span class="arr">├─</span>TaskPlanner</div>
+            <div class="arch-item"><span class="arr">├─</span>StateManager</div>
+            <div class="arch-item"><span class="arr">├─</span>WebAgent</div>
+            <div class="arch-item"><span class="arr">├─</span>FeedbackLoop</div>
+            <div class="arch-item"><span class="arr">├─</span>Toolformer (24 araç)</div>
+            <div class="arch-item"><span class="arr">├─</span>ObsidianMemory</div>
+            <div class="arch-item"><span class="arr">├─</span>ModelRouter</div>
+            <div class="arch-item"><span class="arr">├─</span>UltraAgent (9 protokol)</div>
+            <div class="arch-item"><span class="arr">├─</span>MCP Bridge (37 tool)</div>
+            <div class="arch-item"><span class="arr">├─</span>Plugin/Skill Manager</div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section>
+    <div class="container">
+        <div class="cta">
+            <h2>Hemen Başla</h2>
+            <p>GlassesCat'i yerel ortamında çalıştır, modelleri Ollama'dan çek, kendi AI asistanını kur.</p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://github.com/glassesglitchstudio-lab/glasses-cat-ai" target="_blank" class="btn-primary">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </a>
+                <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank" class="btn-secondary">
+                    <i class="fa-solid fa-brain"></i> Ollama
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <span>&copy; 2026 Berkay Gülmez — GlassesCat AI</span>
+        <div class="footer-links">
+            <a href="https://github.com/glassesglitchstudio-lab" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
+            <a href="https://ollama.com/glassesglitchstudio/gulmzcetiner" target="_blank"><i class="fa-solid fa-brain"></i> Ollama</a>
+            <a href="#">Yukarı <i class="fa-solid fa-arrow-up"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+</body>
+</html>
