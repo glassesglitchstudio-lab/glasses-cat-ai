@@ -194,6 +194,23 @@
         .arch-item:hover { border-color: #333; transform: translateX(4px) rotate(var(--r, 0deg)); }
         .arch-item .arr { color: var(--orange); }
 
+        /* ===== PRICING ===== */
+        .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 1000px; margin: 0 auto; }
+        .pricing-card { background: #111; border: 1px solid #1a1a1a; border-radius: 16px; padding: 32px 24px; display: flex; flex-direction: column; gap: 16px; position:relative; transition: border-color 0.3s, transform 0.3s cubic-bezier(.22,1,.36,1); }
+        .pricing-card:hover { border-color: #333; transform: translateY(-3px); }
+        .pricing-card.highlight { border-color: var(--orange); background: linear-gradient(135deg,rgba(255,107,0,0.04) 0%,rgba(196,123,255,0.04) 100%); }
+        .pricing-card.highlight:hover { border-color: #ff7a1a; }
+        .pricing-badge { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); }
+        .pricing-badge.popular { color: var(--orange); }
+        .pricing-card h3 { font-size: 1.2rem; font-weight: 700; }
+        .pricing-price { margin: 4px 0; }
+        .pricing-price .amount { font-size: 2.2rem; font-weight: 800; color: var(--text); }
+        .pricing-price .period { font-size: 0.9rem; color: var(--text2); margin-left: 4px; }
+        .pricing-feats { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text2); flex:1; }
+        .pricing-feats li { display: flex; align-items: center; gap: 8px; }
+        @media (max-width:768px){ .pricing-grid { grid-template-columns: 1fr; } }
+        @media (max-width:1024px) and (min-width:769px){ .pricing-grid { grid-template-columns: repeat(2,1fr); } }
+
         /* ===== DEMO ===== */
         .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
         .demo-card { background: #111; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; transition: border-color 0.3s, transform 0.3s cubic-bezier(.22,1,.36,1); }
@@ -268,6 +285,7 @@
             <span class="nav-logo-text" style="font-size:0.85rem;">GlassesCat<span class="nav-logo-dot"></span></span>
         </a>
         <div class="nav-links" id="navLinks">
+            <a href="#pricing">Fiyat</a>
             <a href="#models">Modeller</a>
             <a href="#features">Özellikler</a>
             <a href="#architecture">Mimari</a>
@@ -599,6 +617,57 @@ async def list_items():
                         <p style="color:var(--text2);">Home server hazır olduğunda GlassesCat ve ShadowCat modelleri <strong>Elythra-AI</strong> altyapısıyla canlı kullanılabilecek.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="pricing">
+    <div class="container">
+        <h2 class="section-title reveal">Fiyatlandırma</h2>
+        <p class="section-desc reveal">Tüm planlar <strong style="color:#fbbf24;">1 ay ücretsiz</strong>, sonra dilediğin gibi devam et.</p>
+        <div class="pricing-grid">
+            <div class="pricing-card reveal">
+                <div class="pricing-badge">Başlangıç</div>
+                <h3>Free</h3>
+                <div class="pricing-price"><span class="amount">₺0</span><span class="period">/ay</span></div>
+                <ul class="pricing-feats">
+                    <li>✅ 1 model (V5)</li>
+                    <li>✅ 10 sohbet / gün</li>
+                    <li>✅ Obsidian hafıza</li>
+                    <li>✅ 5 araç</li>
+                    <li>❌ Özel model seçimi</li>
+                    <li>❌ ShadowCat modeller</li>
+                </ul>
+                <button class="btn primary" style="width:100%;justify-content:center;">1 Ay Ücretsiz</button>
+            </div>
+            <div class="pricing-card highlight reveal">
+                <div class="pricing-badge popular">Popüler</div>
+                <h3>Pro</h3>
+                <div class="pricing-price"><span class="amount">₺99</span><span class="period">/ay</span></div>
+                <ul class="pricing-feats">
+                    <li>✅ Tüm modeller</li>
+                    <li>✅ Sınırsız sohbet</li>
+                    <li>✅ Obsidian + RAG</li>
+                    <li>✅ 37 araç + plugin</li>
+                    <li>✅ Özel model seçimi</li>
+                    <li>✅ ShadowCat R:1 ailesi</li>
+                </ul>
+                <button class="btn primary" style="width:100%;justify-content:center;">1 Ay Ücretsiz</button>
+            </div>
+            <div class="pricing-card reveal">
+                <div class="pricing-badge">Kurumsal</div>
+                <h3>Enterprise</h3>
+                <div class="pricing-price"><span class="amount">₺499</span><span class="period">/ay</span></div>
+                <ul class="pricing-feats">
+                    <li>✅ Pro'daki her şey</li>
+                    <li>✅ Özel sunucu</li>
+                    <li>✅ Özel model fine-tune</li>
+                    <li>✅ Öncelikli destek</li>
+                    <li>✅ SLA garantisi</li>
+                    <li>✅ Özel entegrasyon</li>
+                </ul>
+                <button class="btn primary" style="width:100%;justify-content:center;">1 Ay Ücretsiz</button>
             </div>
         </div>
     </div>
