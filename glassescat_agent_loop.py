@@ -293,11 +293,11 @@ class AgentLoop:
                 "success": True
             }
         
-        # --- PLUGIN: after_chat (max iter) ---
-        self._run_plugin_hook(HookPoint.AFTER_CHAT, response=final_response, tool_calls=tool_calls, max_iterations_reached=True)
-        
         # Maksimum iterasyon aşıldıysa
         final_response = "Bu görevi tamamlamak için daha fazla adıma ihtiyacım var. Kaldığım yerden devam edebilirim."
+        
+        # --- PLUGIN: after_chat (max iter) ---
+        self._run_plugin_hook(HookPoint.AFTER_CHAT, response=final_response, tool_calls=tool_calls, max_iterations_reached=True)
         
         if tool_calls:
             son_islem = tool_calls[-1]

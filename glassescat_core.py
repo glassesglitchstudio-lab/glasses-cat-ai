@@ -730,19 +730,44 @@ class GlassescatCore:
     
     def _process_with_toolformer(self, user_input: str) -> Dict:
         """Toolformer ile direkt işleme (agent loop yoksa yedek)"""
+        tool_calls = []
+        thoughts = [{"type": "system", "content": "Toolformer modunda çalışıyor"}]
+
         if not self.toolformer:
             return {
                 "response": "Henüz tam olarak hazır değilim. Lütfen bekleyin.",
-                "tool_calls": [],
-                "thoughts": []
+                "tool_calls": tool_calls,
+                "thoughts": thoughts
             }
-        
-        # LLM çağrısı simülasyonu
-        return {
-            "response": "Toolformer ile işleniyor...",
-            "tool_calls": [],
-            "thoughts": [{"type": "system", "content": "Toolformer modunda çalışıyor"}]
-        }
+
+        try:
+            if hasattr(self, 'model_router') and self.model_router:
+                ai_response = self.model_router.chat(user_input)
+            else:
+                ai_response = f"Kullanıcı mesajı: {user_input}"
+
+            result = self.toolformer.process_response(ai_response)
+
+            response_text = result.get("natural_response", ai_response)
+            if result.get("has_tool_calls"):
+                tool_calls = result.get("tool_calls", [])
+                results = result.get("results", [])
+                summary = result.get("execution_summary", "")
+                if summary:
+                    response_text += f"\n\n{summary}"
+
+            return {
+                "response": response_text,
+                "tool_calls": tool_calls,
+                "thoughts": thoughts
+            }
+        except Exception as e:
+            logger.error(f"Toolformer işleme hatası: {e}")
+            return {
+                "response": f"Bir hata oluştu: {str(e)}",
+                "tool_calls": [],
+                "thoughts": thoughts
+            }
     
     def _save_conversation_to_memory(self, session_id: str, user_input: str, response: str):
         """Konuşmayı Obsidian'a kaydet"""
