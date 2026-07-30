@@ -4,179 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlassesCat AI — Elythra-AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        ::selection { background: rgba(184,134,11,0.3); color: #dfd6cd; }
+        ::selection { background: rgba(184,134,11,0.25); color: #dfd6cd; }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            background: #0f0d0b;
+            background: #0c0a08;
             color: #dfd6cd;
             height: 100vh;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-        body::after {
-            content: ''; position: fixed; inset: 0; z-index: 9999;
-            pointer-events: none; opacity: 0.025;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-repeat: repeat; background-size: 200px 200px;
+            display: flex;
+            flex-direction: column;
         }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.04); border-radius: 2px; }
 
-        .sidebar {
-            width: 260px; min-width: 260px;
-            background: #14110e;
-            border-right: 1px solid #2a231f;
-            display: flex; flex-direction: column; height: 100vh;
-            transition: transform 0.25s;
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px 0;
+            position: relative;
         }
-        @media (max-width:768px){ .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%)} .sidebar.open{transform:translateX(0)} }
+        .top-inner {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .brand-mark {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: rgba(184,134,11,0.08);
+            border: 1px solid rgba(184,134,11,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #dfd6cd;
+            letter-spacing: -0.01em;
+        }
+        .brand-sub {
+            font-size: 0.55rem;
+            color: #5a524b;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .top-btn {
+            width: 30px; height: 30px;
+            border-radius: 5px;
+            border: none;
+            background: transparent;
+            color: #5a524b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: color 0.15s;
+        }
+        .top-btn:hover { color: #938880; }
 
-        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; }
-        .topbar {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 16px;
-            border-bottom: 1px solid #2a231f;
-            min-height: 52px;
-            background: rgba(15,13,11,0.6);
-        }
-        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .msgs-inner {
-            width: 100%; max-width: 720px;
-            margin: 0 auto; padding: 24px 24px 16px;
-            flex: 1; display: flex; flex-direction: column; gap: 4px;
-        }
-
-        .msg { padding: 14px 18px; animation: fadeIn 0.2s ease-out; position: relative; }
-        .msg.user {
-            background: rgba(184,134,11,0.035);
-            border: 1px solid rgba(184,134,11,0.08);
-            border-left: 2px solid #b8860b;
-        }
-        .msg.ai { padding: 14px 0; }
-        .msg .label {
-            font-size: 0.65rem; font-weight: 500;
-            margin-bottom: 6px; display: flex;
-            align-items: center; gap: 6px;
-            letter-spacing: 0.03em;
-            color: #635952;
-        }
-        .msg.user .label { color: #b8860b; }
-        .msg.ai .label { color: #938880; }
-        .msg .content {
-            font-size: 0.88rem; line-height: 1.7;
-            color: #d5ccc3; white-space: pre-wrap;
-        }
-        .msg .content pre {
-            background: #14110e !important;
-            border: 1px solid #2a231f;
-            border-radius: 6px; padding: 12px; margin: 8px 0; overflow-x: auto;
-        }
-        .msg .content pre code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
-        .msg .content :not(pre) > code {
-            background: rgba(184,134,11,0.06);
-            color: #c9951a; padding: 1px 6px; border-radius: 3px;
-            font-size: 0.85em;
-        }
-        .msg-actions {
-            position: absolute; top: 10px; right: 10px;
-            display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s;
-        }
-        .msg:hover .msg-actions { opacity: 1; }
-        .msg-actions button {
-            width: 24px; height: 24px; border-radius: 4px; border: none;
-            background: rgba(255,255,255,0.03); color: #635952;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;
-        }
-        .msg-actions button:hover { background: rgba(255,255,255,0.06); color: #938880; }
-
-        .input-area {
-            border-top: 1px solid #2a231f;
-            padding: 12px 24px 20px;
-            display: flex; justify-content: center;
-            background: rgba(15,13,11,0.6);
-        }
-        .input-outer { width: 100%; max-width: 720px; position: relative; display: flex; align-items: flex-end; gap: 8px; }
-        .input-box {
+        .msgs-wrap {
             flex: 1;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid #2a231f;
-            border-radius: 8px; padding: 11px 14px;
-            color: #dfd6cd; font-family: inherit;
-            font-size: 0.88rem; line-height: 1.5;
-            resize: none; outline: none; max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 24px 0;
         }
-        .input-box:focus { border-color: #b8860b; box-shadow: 0 0 0 1px rgba(184,134,11,0.15); }
-        .send-btn {
-            width: 38px; height: 38px; border-radius: 6px; border: none;
-            background: #b8860b; color: #fff;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.3; flex-shrink: 0;
-            font-size: 0.8rem;
+        .msgs-inner {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
-        .send-btn.active { opacity: 1; }
-        .send-btn:hover { background: #c9951a; }
 
         .welcome {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            flex: 1; text-align: center; padding: 60px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            padding-bottom: 10vh;
         }
-        .welcome-logo {
-            width: 60px; height: 60px; border-radius: 50%;
-            background: rgba(184,134,11,0.05);
-            border: 1px solid rgba(184,134,11,0.12);
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 20px; overflow: hidden;
-        }
-        .welcome-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
         .welcome h1 {
-            font-size: 1.25rem; font-weight: 600;
-            margin-bottom: 4px; letter-spacing: -0.01em;
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
         .welcome .byline {
             font-family: 'Caveat', cursive;
-            font-size: 1rem; color: #938880;
-            margin-top: 2px;
+            font-size: 1rem;
+            color: #938880;
         }
         .welcome .byline strong { color: #b8860b; font-weight: 600; }
-        .welcome p { color: #938880; font-size: 0.85rem; margin-top: 8px; }
-        .suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; justify-content: center; }
-        .suggestions button {
-            padding: 6px 14px; border-radius: 5px;
-            border: 1px solid #2a231f;
-            background: rgba(255,255,255,0.015);
-            color: #938880; font-size: 0.78rem; cursor: pointer;
-            transition: border-color 0.15s, color 0.15s;
+        .welcome p {
+            color: #635952;
+            font-size: 0.82rem;
+            margin-top: 12px;
         }
-        .suggestions button:hover { border-color: #b8860b; color: #dfd6cd; }
 
-        .chat-item {
-            padding: 8px 12px; border-radius: 5px; cursor: pointer;
-            font-size: 0.78rem; color: #938880;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            transition: background 0.15s;
+        .msg { padding: 12px 0; animation: fadeIn 0.2s ease-out; }
+        .msg .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #5a524b;
+            margin-bottom: 4px;
+            letter-spacing: 0.03em;
         }
-        .chat-item:hover { background: rgba(255,255,255,0.02); color: #dfd6cd; }
-        .chat-item.active {
-            background: rgba(184,134,11,0.05);
-            color: #b8860b;
-            border: 1px solid rgba(184,134,11,0.08);
+        .msg.user .label { color: #b8860b; }
+        .msg.ai .label { color: #5a524b; }
+        .msg .content {
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: #d5ccc3;
+        }
+        .msg .content pre {
+            background: #14110e !important;
+            border: 1px solid #1e1a17;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            overflow-x: auto;
+        }
+        .msg .content :not(pre) > code {
+            background: rgba(184,134,11,0.06);
+            color: #c9951a;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.85em;
         }
 
         .think {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 24px; color: #635952; font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            max-width: 680px;
+            margin: 0 auto;
+            width: 100%;
+            color: #5a524b;
+            font-size: 0.8rem;
         }
         .think-dots span {
-            display: inline-block; width: 4px; height: 4px; border-radius: 50%;
-            background: #635952; margin: 0 2px;
+            display: inline-block;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: #5a524b;
+            margin: 0 2px;
             animation: dot 1.4s infinite ease-in-out both;
         }
         .think-dots span:nth-child(1) { animation-delay: -0.32s; }
@@ -184,346 +183,346 @@
         @keyframes dot { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
-        .info-panel {
-            position: fixed; right: -420px; top: 0; width: 420px; height: 100vh;
-            background: #14110e; border-left: 1px solid #2a231f;
-            z-index: 60; transition: right 0.3s;
-            overflow-y: auto; padding: 28px;
+        .input-area {
+            padding: 12px 24px 24px;
+            display: flex;
+            justify-content: center;
         }
-        .info-panel.open { right: 0; }
-        .info-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-            z-index: 55; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        .input-outer {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
         }
-        .info-overlay.show { opacity: 1; pointer-events: auto; }
-        .info-section { margin-bottom: 28px; }
-        .info-section h3 {
-            font-size: 0.55rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.08em; color: #5a524b;
-            margin-bottom: 10px; padding-bottom: 6px;
-            border-bottom: 1px solid #2a231f;
-        }
-        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 0.78rem; }
-        .info-row .lbl { color: #938880; }
-        .info-row .val { color: #dfd6cd; font-weight: 500; }
-        .info-badge {
-            font-size: 0.58rem; padding: 2px 8px; border-radius: 4px;
-            background: rgba(184,134,11,0.06); color: #b8860b; font-weight: 500;
-            border: 1px solid rgba(184,134,11,0.08);
-        }
-        .copy-toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: rgba(184,134,11,0.85); color: #fff;
-            padding: 8px 20px; border-radius: 6px; font-size: 0.78rem;
-            z-index: 100; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .copy-toast.show { opacity: 1; }
-
-        .model-btn {
-            display:flex; align-items:center; gap:6px;
-            padding:5px 12px; border-radius:5px;
-            border:1px solid #2a231f; background:rgba(255,255,255,0.015);
-            cursor:pointer; font-size:0.78rem; color:#938880;
-            transition:all 0.15s;
-        }
-        .model-btn:hover { border-color:rgba(184,134,11,0.2); background:rgba(184,134,11,0.03); }
-        .model-btn .chev { font-size:0.5rem; margin-left:2px; transition:transform 0.2s; }
-        .model-btn.active .chev { transform:rotate(180deg); }
-
-        .model-dropdown {
-            position:absolute; top:calc(100% + 6px); left:0;
-            min-width:280px;
-            background:#14110e; border:1px solid #2a231f;
-            border-radius:8px; padding:6px;
-            z-index:70; display:none;
-            box-shadow:0 20px 60px rgba(0,0,0,0.6);
-        }
-        .model-dropdown.show { display:block; }
-        .model-dropdown .search {
-            width:100%; padding:7px 10px; border-radius:5px;
-            border:1px solid #2a231f; background:rgba(255,255,255,0.015);
-            color:#dfd6cd; font-size:0.78rem; outline:none; margin-bottom:4px;
+        .input-box {
+            flex: 1;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #1e1a17;
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: #dfd6cd;
             font-family: inherit;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            max-height: 160px;
         }
-        .model-dropdown .search:focus { border-color:#b8860b; }
-        .model-opt {
-            display:flex; align-items:center; gap:8px;
-            padding:8px 10px; border-radius:5px;
-            cursor:pointer; transition:background 0.1s;
+        .input-box:focus { border-color: #b8860b; }
+        .send-btn {
+            width: 38px; height: 38px;
+            border-radius: 6px;
+            border: none;
+            background: #b8860b;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+            flex-shrink: 0;
+            transition: opacity 0.15s;
         }
-        .model-opt:hover { background:rgba(255,255,255,0.02); }
-        .model-opt.active { background:rgba(184,134,11,0.05); border:1px solid rgba(184,134,11,0.08); }
-        .model-opt.disabled { opacity:0.35; cursor:not-allowed; }
-        .model-opt.disabled:hover { background:transparent; }
-        .model-opt .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-        .model-opt .info { flex:1; }
-        .model-opt .name { font-size:0.78rem; font-weight:500; color:#dfd6cd; }
-        .model-opt .desc { font-size:0.65rem; color:#635952; margin-top:1px; }
-        .model-opt .badge.soon { font-size:0.58rem; padding:1px 7px; border-radius:4px; background:rgba(251,191,36,0.06); color:#fbbf24; border:1px solid rgba(251,191,36,0.1); }
-
-        .think-selector { margin-top:6px; padding:10px; border-top:1px solid #2a231f; }
-        .think-selector label { font-size:0.65rem; color:#635952; display:block; margin-bottom:4px; }
-        .think-options { display:flex; gap:3px; }
-        .think-opt {
-            flex:1; padding:5px 0; text-align:center;
-            border-radius:4px; font-size:0.7rem; color:#938880;
-            cursor:pointer; transition:all 0.1s;
-            border:1px solid transparent;
-        }
-        .think-opt:hover { background:rgba(255,255,255,0.015); }
-        .think-opt.active { background:rgba(184,134,11,0.05); border-color:rgba(184,134,11,0.1); color:#b8860b; font-weight:500; }
-        .think-opt .sub { display:block; font-size:0.58rem; color:#5a524b; margin-top:1px; }
+        .send-btn.active { opacity: 1; }
+        .send-btn:hover { background: #c9951a; }
 
         .demo-badge {
-            position:fixed; bottom:60px; left:50%; transform:translateX(-50%);
-            background:rgba(184,134,11,0.08); border:1px solid rgba(184,134,11,0.12);
-            color:#b8860b; padding:5px 14px; border-radius:5px;
-            font-size:0.7rem; z-index:80; display:none;
-            backdrop-filter:blur(4px);
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(184,134,11,0.06);
+            border: 1px solid rgba(184,134,11,0.1);
+            color: #b8860b;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            z-index: 80;
+            display: none;
         }
-        .demo-badge.show { display:flex; align-items:center; gap:5px; }
+        .demo-badge.show { display: flex; align-items: center; gap: 4px; }
 
-        .workshop-label {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 2px 8px; border-radius: 3px;
-            background: rgba(184,134,11,0.04); border: 1px solid rgba(184,134,11,0.08);
-            font-size: 0.55rem; letter-spacing: 0.05em; text-transform: uppercase;
-            color: #b8860b; font-weight: 500;
+        .model-menu {
+            position: relative;
+        }
+        .model-trigger {
+            padding: 3px 10px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #5a524b;
+            font-size: 0.75rem;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+        .model-trigger:hover {
+            border-color: #1e1a17;
+            color: #938880;
+        }
+        .model-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            min-width: 240px;
+            background: #14110e;
+            border: 1px solid #1e1a17;
+            border-radius: 8px;
+            padding: 6px;
+            z-index: 70;
+            display: none;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+        }
+        .model-dropdown.show { display: block; }
+        .model-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .model-opt:hover { background: rgba(255,255,255,0.02); }
+        .model-opt.active { background: rgba(184,134,11,0.05); }
+        .model-opt.disabled { opacity: 0.35; cursor: not-allowed; }
+        .model-opt .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .model-opt .info { flex: 1; }
+        .model-opt .name { font-size: 0.78rem; font-weight: 500; color: #dfd6cd; }
+        .model-opt .desc { font-size: 0.62rem; color: #5a524b; margin-top: 1px; }
+        .model-opt .badge.soon {
+            font-size: 0.55rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(251,191,36,0.06);
+            color: #fbbf24;
+            border: 1px solid rgba(251,191,36,0.1);
+        }
+        .model-divider {
+            height: 1px;
+            background: #1e1a17;
+            margin: 6px;
         }
 
-        @media (max-width:768px){ .info-panel{width:100%;right:-100%} }
+        .toast {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(184,134,11,0.85);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.25s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
-    <div class="flex h-screen">
-        <aside id="sidebar" class="sidebar">
-            <div class="p-3 border-b border-[#2a231f]">
-                <div class="flex items-center gap-3 px-2 mb-3">
-                    <div style="width:26px;height:26px;border-radius:50%;background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                        <img src="/static/glassescat-logo.png" alt="" style="width:100%;height:100%;object-fit:contain;">
-                    </div>
-                    <div>
-                        <span class="font-semibold text-sm" style="letter-spacing:-0.01em">GlassesCat</span>
-                        <div style="font-size:0.55rem;color:#635952;margin-top:0px;">workshop v3.0</div>
-                    </div>
-                </div>
-                <button onclick="newChat()" class="w-full flex items-center gap-2 px-3 py-2 rounded text-sm text-[#938880] hover:bg-[rgba(255,255,255,0.02)] hover:text-[#dfd6cd] transition-all border border-transparent hover:border-[#2a231f]">
-                    <i class="fa-solid fa-plus text-xs"></i> Yeni Sohbet
+
+<div class="top">
+    <div class="top-inner">
+        <a href="#" class="brand">
+            <span class="brand-mark"><img src="/static/glassescat-logo.png" alt=""></span>
+            <div>
+                <div class="brand-name">GlassesCat</div>
+                <div class="brand-sub">workshop v3.0</div>
+            </div>
+        </a>
+        <div class="top-actions">
+            <div class="model-menu">
+                <button class="model-trigger" onclick="toggleModel()">
+                    <span id="modelName" style="color:#dfd6cd;font-weight:500">X_OPUS</span>
+                    <span style="font-size:0.55rem">&#9660;</span>
                 </button>
-            </div>
-            <div id="chatList" class="flex-1 overflow-y-auto p-2 space-y-0.5"></div>
-            <div class="p-3 border-t border-[#2a231f]">
-                <button onclick="toggleInfo()" class="w-full flex items-center gap-2 px-3 py-2 rounded text-xs text-[#635952] hover:bg-[rgba(255,255,255,0.02)]">
-                    <i class="fa-solid fa-circle-info"></i> Sistem Durumu
-                </button>
-            </div>
-        </aside>
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="toggleSidebar()"></div>
-
-        <div class="main">
-            <div class="topbar">
-                <div class="flex items-center gap-2">
-                    <button onclick="toggleSidebar()" class="md:hidden w-8 h-8 flex items-center justify-center rounded text-[#635952] hover:bg-[rgba(255,255,255,0.02)]"><i class="fa-solid fa-bars"></i></button>
-                    <div style="position:relative">
-                        <div id="modelBtn" class="model-btn" onclick="toggleModelDropdown()">
-                            <span style="display:inline-block;font-size:0.6rem;color:#b8860b">&#9679;</span>
-                            <span id="modelName">X_OPUS</span>
-                            <span class="chev">&#9660;</span>
-                        </div>
-                        <div id="modelDropdown" class="model-dropdown">
-                            <input class="search" id="modelSearch" placeholder="model ara..." oninput="filterModels()">
-                            <div id="modelList"></div>
-                            <div class="think-selector">
-                                <label>d&uuml;&shy;n&uuml;nce s&uuml;resi</label>
-                                <div class="think-options">
-                                    <div class="think-opt" data-val="quick" onclick="setThink(this)">Hızlı<span class="sub">anlık</span></div>
-                                    <div class="think-opt active" data-val="normal" onclick="setThink(this)">Normal<span class="sub">standart</span></div>
-                                    <div class="think-opt" data-val="deep" onclick="setThink(this)">Derin<span class="sub">5-10sn</span></div>
-                                    <div class="think-opt" data-val="extreme" onclick="setThink(this)">Max<span class="sub">30sn+</span></div>
-                                </div>
-                            </div>
-                        </div>
+                <div id="modelDropdown" class="model-dropdown">
+                    <div class="model-opt active" onclick="selectModel('X_OPUS')">
+                        <span class="dot" style="background:#b8860b"></span>
+                        <div class="info"><div class="name">X_OPUS</div><div class="desc">hibrit &ccedil;ift beyin routing</div></div>
+                    </div>
+                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">
+                        <span class="dot" style="background:#938880"></span>
+                        <div class="info"><div class="name">X_GLITCH_OPUS</div><div class="desc">glitch optimizasyon</div></div>
+                    </div>
+                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">
+                        <span class="dot" style="background:#5a524b"></span>
+                        <div class="info"><div class="name">X_FABLE_CODER</div><div class="desc">kod &uuml;retim &amp; debug</div></div>
+                    </div>
+                    <div class="model-divider"></div>
+                    <div class="model-opt disabled">
+                        <span class="dot" style="background:#b8860b"></span>
+                        <div class="info"><div class="name">ShadowCat R:1 Pulse <span class="badge soon">yak&#305;nda</span></div><div class="desc">14B kod &uuml;retim</div></div>
+                    </div>
+                    <div class="model-opt disabled">
+                        <span class="dot" style="background:#938880"></span>
+                        <div class="info"><div class="name">ShadowCat R:1 Matrix <span class="badge soon">yak&#305;nda</span></div><div class="desc">7B thinking engine</div></div>
+                    </div>
+                    <div class="model-opt disabled">
+                        <span class="dot" style="background:#635952"></span>
+                        <div class="info"><div class="name">ShadowCat R:1 Singularity <span class="badge soon">yak&#305;nda</span></div><div class="desc">1.5B router</div></div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span id="thinkLabel" style="font-size:0.65rem;color:#5a524b;display:none">Normal</span>
-                    <button id="demoToggle" onclick="toggleDemo()" class="w-8 h-8 flex items-center justify-center rounded text-[#635952] hover:bg-[rgba(255,255,255,0.02)]" title="Demo modu"><i class="fa-solid fa-flask"></i></button>
-                    <button onclick="toggleInfo()" class="w-8 h-8 flex items-center justify-center rounded text-[#635952] hover:bg-[rgba(255,255,255,0.02)]"><i class="fa-solid fa-sliders"></i></button>
-                </div>
             </div>
-
-            <div class="msgs-wrap" id="msgsWrap">
-                <div id="welcome" class="welcome">
-                    <div class="welcome-logo"><img src="/static/glassescat-logo.png" alt="GlassesCat"></div>
-                    <h1>GlassesCat</h1>
-                    <div class="byline">by <strong>Elythra-AI</strong></div>
-                    <p>Merhaba, nasıl yardımcı olabilirim?</p>
-                    <div class="suggestions">
-                        <button onclick="sendSug('Python ile dosya okuyucu yaz')"><i class="fa-solid fa-code mr-1.5"></i>Kod</button>
-                        <button onclick="sendSug('Pluginleri listele')"><i class="fa-solid fa-puzzle-piece mr-1.5"></i>Pluginler</button>
-                        <button onclick="sendSug('Sistem durumu nedir?')"><i class="fa-solid fa-gauge mr-1.5"></i>Sistem</button>
-                    </div>
-                </div>
-                <div id="msgsInner" class="msgs-inner" style="display:none"></div>
-            </div>
-
-            <div id="think" class="think" style="display:none">
-                <div class="think-dots"><span></span><span></span><span></span></div>
-                <span id="thinkText">&ccedil;alışıyorum...</span>
-            </div>
-
-            <div class="input-area">
-                <div class="input-outer">
-                    <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesajınızı yazın..." oninput="resize(this);updateBtn()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-                    <button id="sendBtn" class="send-btn" onclick="send()" disabled><i class="fa-solid fa-arrow-up" style="font-size:0.8rem"></i></button>
-                </div>
-            </div>
+            <button class="top-btn" onclick="toggleDemo()" title="Demo modu">&#9878;</button>
+            <button class="top-btn" onclick="newChat()" title="Yeni sohbet">+</button>
         </div>
     </div>
+</div>
 
-    <div id="demoBadge" class="demo-badge"><i class="fa-solid fa-flask"></i> demo mod &mdash; yanıtlar sim&uuml;le ediliyor</div>
-
-    <div id="infoOverlay" class="info-overlay" onclick="toggleInfo()"></div>
-    <div id="infoPanel" class="info-panel">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-sm font-semibold">Sistem Durumu</h2>
-            <button onclick="toggleInfo()" class="w-7 h-7 flex items-center justify-center rounded text-[#635952] hover:bg-[rgba(255,255,255,0.02)]"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="info-section"><h3>Genel</h3><div id="infoGeneral"><div class="text-xs text-[#635952]">y&uuml;kleniyor...</div></div></div>
-        <div class="info-section"><h3>Pluginler</h3><div id="infoPlugins"><div class="text-xs text-[#635952]">y&uuml;kleniyor...</div></div></div>
-        <div class="info-section"><h3>Ara&ccedil;lar &amp; Hafıza</h3><div id="infoTools"><div class="text-xs text-[#635952]">y&uuml;kleniyor...</div></div></div>
+<div class="msgs-wrap" id="msgsWrap">
+    <div id="welcome" class="welcome">
+        <h1>GlassesCat</h1>
+        <div class="byline">by <strong>Elythra-AI</strong></div>
+        <p>Nas&#305;l yard&#305;mc&#305; olabilirim?</p>
     </div>
-    <div id="toast" class="copy-toast">kopyalandı</div>
+    <div id="msgsInner" class="msgs-inner" style="display:none"></div>
+</div>
 
-    <script>
-        let chatId=null, chats={}, busy=false, demoMode=true;
+<div id="think" class="think" style="display:none">
+    <div class="think-dots"><span></span><span></span><span></span></div>
+    <span id="thinkText">&ccedil;al&#305;&#351;&#305;yorum...</span>
+</div>
 
-        const DEMO_RESPONSES={
-            'kod': 'İşte Python ile basit bir dosya okuyucu:\n\n```python\ndef read_file(path):\n    with open(path, \'r\', encoding=\'utf-8\') as f:\n        return f.read()\n\nprint(read_file(\'ornek.txt\'))\n```\n\nBu fonksiyon dosyayı a&ccedil;ar, UTF-8 ile okur ve i&ccedil;eriğini d&ouml;nd&uuml;r&uuml;r.',
-            'plugin': 'Aktif pluginler:\n\n- **Qwen Assistant** &mdash; aktif\n- **Web Scraper** &mdash; aktif\n- **Security Analyst** &mdash; pasif\n- **Code Formatter** &mdash; aktif\n\n`/plugins` ile y&ouml;netebilirsin.',
-            'sistem': '**Sistem Durumu**\n\n- CPU: %23\n- RAM: %45 (8.2 GB / 18 GB)\n- 37 ara&ccedil; aktif\n- 31 hafıza dosyası\n- uptime: 2s 14dk\n- Model: ' + (()=>{const m={X_OPUS:'X_OPUS (hibrit routing)',X_GLITCH_OPUS:'X_GLITCH_OPUS',X_FABLE_CODER:'X_FABLE_CODER'};return m[selectedModel]||selectedModel})(),
-            'python': '```python\ndef fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\nfor i, f in enumerate(fibonacci(10)):\n    print(f"F({i}) = {f}")\n```\n\nBu &uuml;rete&ccedil; Fibonacci sayılarını bellekte tutmadan hesaplar.',
-            'merhaba': 'Merhaba! Sana nasıl yardımcı olabilirim? Kod yazma, dosya işlemleri, sistem y&ouml;netimi veya web araması i&ccedil;in buradayım.',
-            'ne': 'GlassesCat AI &mdash; **Elythra-AI** tarafından geliştirilen otonom ajan sistemi.\n\nYapabileceklerim:\n- Kod yazma ve debug\n- Dosya işlemleri\n- Web araması\n- Obsidian hafıza\n- Sistem y&ouml;netimi\n- Plugin y&ouml;netimi'
-        };
+<div class="input-area">
+    <div class="input-outer">
+        <textarea id="inputBox" class="input-box" rows="1" placeholder="Bir &#351;ey yaz..." oninput="resize(this);updateBtn()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+        <button id="sendBtn" class="send-btn" onclick="send()" disabled>&#8593;</button>
+    </div>
+</div>
 
-        function getDemoReply(msg){
-            const lower=msg.toLowerCase();
-            for(const [key,val] of Object.entries(DEMO_RESPONSES)){
-                if(lower.includes(key)) return val;
-            }
-            return 'Anladım. "**'+msg+'**" &uuml;zerine &ccedil;alışıyorum.\n\nBu bir demo yanıtıdır. Ger&ccedil;ek AI yanıtı i&ccedil;in backend bağlantısı gereklidir.\n\nSe&ccedil;ili model: **'+document.getElementById('modelName').textContent+'**\nD&uuml;&shy;n&uuml;nce s&uuml;resi: **'+thinkLevel+'**';
+<div id="demoBadge" class="demo-badge show"><span>&#9878;</span> demo mod</div>
+<div id="toast" class="toast">kopyaland&#305;</div>
+
+<script>
+    let chats = {};
+    let chatId = null;
+    let selectedModel = 'X_OPUS';
+    let busy = false;
+    let demoMode = true;
+
+    const DEMO = {
+        'kod': '&#304;&#351;te Python dosya okuyucu:\n\n```python\ndef read_file(path):\n    with open(path, \'r\') as f:\n        return f.read()\n```',
+        'plugin': 'Aktif pluginler: **Qwen Assistant**, **Web Scraper**, **Code Formatter**',
+        'sistem': 'CPU: %23 &middot; RAM: 8.2/18 GB &middot; 37 ara&ccedil; &middot; 31 haf&#305;za dosyas&#305;',
+        'python': '```python\ndef fib(n):\n    a,b=0,1\n    for _ in range(n):\n        yield a\n        a,b=b,a+b\n```',
+        'merhaba': 'Merhaba! Kod, dosya, web aramas&#305; veya sistem y&ouml;netimi i&ccedil;in buraday&#305;m.',
+        'ne': 'Otonom ajan sistemi. Kod &middot; Dosya &middot; Web &middot; Haf&#305;za &middot; Plugin'
+    };
+
+    function reply(msg) {
+        const l = msg.toLowerCase();
+        for (const [k, v] of Object.entries(DEMO)) if (l.includes(k)) return v;
+        return '**' + msg + '** &uuml;zerine &ccedil;al&#305;&#351;&#305;yorum.\n\nModel: **' + selectedModel + '**';
+    }
+
+    function toggleDemo() {
+        demoMode = !demoMode;
+        document.getElementById('demoBadge').classList.toggle('show', demoMode);
+        toast(demoMode ? 'demo mod' : 'canl&#305; mod');
+    }
+
+    function toggleModel() {
+        document.getElementById('modelDropdown').classList.toggle('show');
+    }
+
+    function selectModel(id) {
+        selectedModel = id;
+        document.getElementById('modelName').textContent = id === 'X_OPUS' ? 'X_OPUS' : id;
+        document.getElementById('modelDropdown').classList.remove('show');
+        toast('model: ' + id);
+    }
+
+    function toast(t) {
+        const e = document.getElementById('toast');
+        e.innerHTML = t;
+        e.classList.add('show');
+        setTimeout(() => e.classList.remove('show'), 1500);
+    }
+
+    function newChat() {
+        chatId = 'c' + Date.now();
+        chats[chatId] = { msgs: [], title: 'Yeni Sohbet' };
+        showWelcome();
+    }
+
+    function showWelcome() {
+        document.getElementById('welcome').style.display = 'flex';
+        document.getElementById('msgsInner').style.display = 'none';
+        document.getElementById('msgsInner').innerHTML = '';
+    }
+
+    function addMsg(role, text) {
+        const inner = document.getElementById('msgsInner');
+        document.getElementById('welcome').style.display = 'none';
+        inner.style.display = 'flex';
+        const el = document.createElement('div');
+        el.className = 'msg ' + role;
+        const lbl = document.createElement('div');
+        lbl.className = 'label';
+        lbl.innerHTML = role === 'user' ? 'sen' : 'glassescat';
+        el.appendChild(lbl);
+        const ct = document.createElement('div');
+        ct.className = 'content';
+        if (role === 'ai') {
+            ct.innerHTML = format(text);
+            ct.querySelectorAll('pre code').forEach(b => hljs && hljs.highlightElement(b));
+        } else ct.textContent = text;
+        el.appendChild(ct);
+        inner.appendChild(el);
+        scrollBottom();
+    }
+
+    function format(t) {
+        return t.replace(/```(\w+)?\n([\s\S]*?)```/g, (m, l, c) => '<pre><code class="language-' + (l || '') + '">' + esc(c.trim()) + '</code></pre>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
+    }
+
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function scrollBottom() { setTimeout(() => document.getElementById('msgsWrap').scrollTop = document.getElementById('msgsWrap').scrollHeight, 20); }
+    function resize(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; }
+    function updateBtn() { const v = document.getElementById('inputBox').value.trim(); const b = document.getElementById('sendBtn'); b.disabled = !v || busy; b.classList.toggle('active', v.length > 0); }
+
+    async function send() {
+        const i = document.getElementById('inputBox'), t = i.value.trim();
+        if (!t || busy) return;
+        if (!chatId) {
+            chatId = 'c' + Date.now();
+            chats[chatId] = { msgs: [], title: t.slice(0, 30) };
         }
+        chats[chatId].msgs.push({ role: 'user', text: t });
+        addMsg('user', t);
+        i.value = '';
+        resize(i);
+        updateBtn();
+        busy = true;
+        document.getElementById('think').style.display = 'flex';
+        await new Promise(r => setTimeout(r, demoMode ? 600 : 1200));
+        const replyText = reply(t);
+        chats[chatId].msgs.push({ role: 'ai', text: replyText });
+        addMsg('ai', replyText);
+        busy = false;
+        document.getElementById('think').style.display = 'none';
+        updateBtn();
+        i.focus();
+    }
 
-        function toggleDemo(){
-            demoMode=!demoMode;
-            document.getElementById('demoBadge').classList.toggle('show',demoMode);
-            document.getElementById('demoToggle').style.color=demoMode?'#b8860b':'#635952';
-            toast(demoMode?'demo mod: yanıtlar sim&uuml;le ediliyor':'canlı mod: backend API kullanılıyor');
+    document.addEventListener('click', function(e) {
+        const dd = document.getElementById('modelDropdown');
+        if (dd.classList.contains('show') && !e.target.closest('.model-menu')) {
+            dd.classList.remove('show');
         }
+    });
 
-        function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('hidden')}
-        function toggleInfo(){document.getElementById('infoPanel').classList.toggle('open');document.getElementById('infoOverlay').classList.toggle('show');if(document.getElementById('infoPanel').classList.contains('open'))loadInfo()}
-        function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
-        function newChat(){chatId='c'+Date.now();chats[chatId]={msgs:[],title:'Yeni Sohbet'};renderList();showWelcome();if(window.innerWidth<768)toggleSidebar()}
-        function renderList(){const e=document.getElementById('chatList');e.innerHTML='';Object.entries(chats).forEach(([id,c])=>{const d=document.createElement('div');d.className='chat-item'+(id===chatId?' active':'');d.textContent=c.title;d.onclick=()=>switchChat(id);e.appendChild(d)})}
-        function switchChat(id){chatId=id;renderList();const c=chats[id];document.getElementById('welcome').style.display='none';const i=document.getElementById('msgsInner');i.style.display='flex';i.innerHTML='';c.msgs.forEach(m=>addMsg(m.role,m.text,false));scrollBottom()}
-        function showWelcome(){document.getElementById('welcome').style.display='flex';document.getElementById('msgsInner').style.display='none';document.getElementById('msgsInner').innerHTML=''}
-        function addMsg(role,text,anim){const inner=document.getElementById('msgsInner');document.getElementById('welcome').style.display='none';inner.style.display='flex';const el=document.createElement('div');el.className='msg '+role;const lbl=document.createElement('div');lbl.className='label';lbl.innerHTML=role==='user'?'<i class="fa-solid fa-user"></i> sen':'<i class="fa-solid fa-cat"></i> glassescat';el.appendChild(lbl);const ct=document.createElement('div');ct.className='content';if(role==='ai'){ct.innerHTML=formatAI(text);ct.querySelectorAll('pre code').forEach(b=>hljs.highlightElement(b))}else ct.textContent=text;el.appendChild(ct);inner.appendChild(el);scrollBottom()}
-        function formatAI(t){return t.replace(/```(\w+)?\n([\s\S]*?)```/g,(m,l,c)=>{const a=l||'plaintext';return'<pre><code class="language-'+a+'">'+escHtml(c.trim())+'</code></pre>'}).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')}
-        function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-        function scrollBottom(){const w=document.getElementById('msgsWrap');setTimeout(()=>{w.scrollTop=w.scrollHeight},20)}
-        function resize(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,200)+'px'}
-        function updateBtn(){const v=document.getElementById('inputBox').value.trim(),btn=document.getElementById('sendBtn');btn.disabled=!v||busy;btn.classList.toggle('active',v.length>0)}
-        function sendSug(t){document.getElementById('inputBox').value=t;updateBtn();send()}
-        async function send(){
-            const i=document.getElementById('inputBox'),t=i.value.trim();
-            if(!t||busy)return;
-            if(!chatId){chatId='c'+Date.now();chats[chatId]={msgs:[],title:t.slice(0,40)+(t.length>40?'...':'')}}else{const c=chats[chatId];if(c.msgs.length===0)c.title=t.slice(0,40)+(t.length>40?'...':'')}
-            chats[chatId].msgs.push({role:'user',text:t});addMsg('user',t);
-            i.value='';resize(i);updateBtn();
-            busy=true;document.getElementById('think').style.display='flex';updateBtn();
-
-            const thinkDelay={quick:300,normal:1200,deep:3500,extreme:6000};
-            const delay=thinkDelay[thinkLevel]||1200;
-
-            if(demoMode){
-                await new Promise(r=>setTimeout(r,delay));
-                const reply=getDemoReply(t);
-                chats[chatId].msgs.push({role:'ai',text:reply});
-                addMsg('ai',reply);renderList();
-            }else{
-                try{
-                    const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,model:selectedModel,think:thinkLevel})});
-                    const d=await r.json(),reply=d.response||'&Uuml;zg&uuml;n&uuml;m, yanıt &uuml;retemedim.';
-                    chats[chatId].msgs.push({role:'ai',text:reply});addMsg('ai',reply);renderList();
-                }catch{addMsg('ai','&#9888; bağlantı hatası. backend &ccedil;alışmıyor olabilir.')}
-            }
-            busy=false;document.getElementById('think').style.display='none';updateBtn();document.getElementById('inputBox').focus()
-        }
-        async function loadInfo(){const g=document.getElementById('infoGeneral'),p=document.getElementById('infoPlugins'),t=document.getElementById('infoTools');try{const[core,plugins,tools,mem]=await Promise.all([fetch('/api/core/status').then(r=>r.json()).catch(()=>({})),fetch('/api/plugins').then(r=>r.json()).catch(()=>({})),fetch('/api/tools').then(r=>r.json()).catch(()=>({})),fetch('/api/memory/stats').then(r=>r.json()).catch(()=>({}))]);const s=core.stats||{},mod=core.modules||{};g.innerHTML='<div class="info-row"><span class="lbl">s&uuml;r&uuml;m</span><span class="val">'+(core.version||'?')+'</span></div><div class="info-row"><span class="lbl">uptime</span><span class="val">'+(core.uptime||'?')+'</span></div><div class="info-row"><span class="lbl">mod</span><span class="val"><span class="info-badge">'+((core.state&&core.state.mode)||'normal')+'</span></span></div><div class="info-row"><span class="lbl">komutlar</span><span class="val">'+(s.commands_executed||0)+'</span></div><div class="info-row"><span class="lbl">ara&ccedil;</span><span class="val">'+(s.tools_available||0)+'</span></div><div class="info-row"><span class="lbl">hafıza</span><span class="val">'+(mod.memory?'&#10004;':'&#10008;')+'</span></div>';const pl=Array.isArray(plugins)?plugins:(plugins.plugins||[]);p.innerHTML=pl.length?pl.map(pl=>'<div class="plugin-item" style="padding:5px 0;font-size:0.78rem;display:flex;justify-content:space-between"><span>'+(pl.name||'?')+'</span></div>').join(''):'<div class="text-xs text-[#635952]">y&uuml;kl&uuml; plugin yok</div>';t.innerHTML='<div class="info-row"><span class="lbl">ara&ccedil; sayısı</span><span class="val">'+(s.tools_available||0)+'</span></div><div class="info-row"><span class="lbl">hafıza</span><span class="val">'+(mem.total_files||0)+' dosya</span></div><div class="info-row"><span class="lbl">sohbetler</span><span class="val">'+(s.conversation_count||0)+'</span></div>'}catch{g.innerHTML='<div class="text-xs text-[#8b3a1a]">y&uuml;klenemedi</div>';p.innerHTML='';t.innerHTML=''}}
-
-        let selectedModel='X_OPUS', thinkLevel='normal';
-
-        const MODELS=[
-            {id:'X_OPUS',name:'X_OPUS',desc:'hibrit y&ouml;nlendirici — &ccedil;ift beyin routing',color:'#b8860b',soon:false},
-            {id:'X_GLITCH_OPUS',name:'X_GLITCH_OPUS',desc:'glitch optimizasyonlu opus',color:'#938880',soon:false},
-            {id:'X_FABLE_CODER',name:'X_FABLE_CODER',desc:'kod &uuml;retim ve debug',color:'#5a524b',soon:false},
-            {id:'SHADOW_PULSE',name:'ShadowCat R:1 Pulse',desc:'14B kod &uuml;retim',color:'#b8860b',soon:true},
-            {id:'SHADOW_MATRIX',name:'ShadowCat R:1 Matrix',desc:'7B thinking engine',color:'#938880',soon:true},
-            {id:'SHADOW_SINGULARITY',name:'ShadowCat R:1 Singularity',desc:'1.5B router/classifier',color:'#635952',soon:true},
-        ];
-
-        function renderModels(filter){
-            const list=document.getElementById('modelList');
-            const q=(filter||'').toLowerCase();
-            list.innerHTML=MODELS.filter(m=>!q||m.name.toLowerCase().includes(q)||m.desc.toLowerCase().includes(q))
-                .map(m=>'<div class="model-opt'+(m.id===selectedModel?' active':'')+(m.soon?' disabled':'')+'" onclick="'+(m.soon?'':'selectModel(\''+m.id+'\')')+'">'+
-                    '<span class="dot" style="background:'+m.color+'"></span>'+
-                    '<div class="info"><div class="name">'+m.name+(m.soon?' <span class="badge soon">yakında</span>':'')+'</div>'+
-                    '<div class="desc">'+m.desc+'</div></div></div>').join('');
-        }
-
-        function toggleModelDropdown(){
-            const dd=document.getElementById('modelDropdown');
-            dd.classList.toggle('show');
-            document.getElementById('modelBtn').classList.toggle('active');
-            if(dd.classList.contains('show')){renderModels();setTimeout(()=>document.getElementById('modelSearch').focus(),50)}
-        }
-
-        function selectModel(id){
-            selectedModel=id;
-            const m=MODELS.find(x=>x.id===id);
-            document.getElementById('modelName').textContent=m.name;
-            document.getElementById('modelBtn').querySelector('span:first-child').style.color=m.color;
-            document.getElementById('modelDropdown').classList.remove('show');
-            document.getElementById('modelBtn').classList.remove('active');
-            renderModels();
-            toast('model: '+m.name+(m.soon?' (yakında)':''));
-        }
-
-        function filterModels(){renderModels(document.getElementById('modelSearch').value)}
-
-        function setThink(el){
-            document.querySelectorAll('.think-opt').forEach(x=>x.classList.remove('active'));
-            el.classList.add('active');
-            thinkLevel=el.dataset.val;
-            const label={quick:'hızlı',normal:'normal',deep:'derin',extreme:'max'}[thinkLevel];
-            document.getElementById('thinkLabel').textContent=label;
-            document.getElementById('thinkLabel').style.display='inline';
-        }
-
-        document.addEventListener('click',function(e){
-            const dd=document.getElementById('modelDropdown');
-            if(dd.classList.contains('show')&&!document.getElementById('modelBtn').contains(e.target)&&!dd.contains(e.target)){
-                dd.classList.remove('show');document.getElementById('modelBtn').classList.remove('active');
-            }
-        });
-
-        document.getElementById('demoBadge').classList.add('show');
-        document.getElementById('demoToggle').style.color='#b8860b';
-        newChat();
-    </script>
+    newChat();
+</script>
 </body>
 </html>
