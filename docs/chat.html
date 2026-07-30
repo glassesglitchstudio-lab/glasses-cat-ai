@@ -160,6 +160,7 @@
 
         .toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(26,26,26,0.85);color:#fff;padding:5px 14px;border-radius:8px;font-size:.75rem;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
         .toast.show{opacity:1}
+        .hidden{display:none!important}
 
         @media(max-width:900px){.artifacts{position:fixed;right:0;top:0;z-index:60;height:100vh;box-shadow:-4px 0 24px rgba(0,0,0,0.06)}.artifacts.open{width:90vw!important}}
         @media(max-width:768px){.welcome .chips{flex-direction:column;align-items:stretch}.msg .ct{margin-left:0}.think{margin-left:0}.topbar{padding:8px 12px}.tb-group{gap:2px}.tb-btn{font-size:.68rem;padding:4px 8px}}
@@ -238,7 +239,7 @@
                     <button class="chip" onclick="sendSug('Merhaba')">Merhaba de</button>
                 </div>
             </div>
-            <div id="msgsInner" class="msgs-inner" style="display:none"></div>
+            <div id="msgsInner" class="msgs-inner hidden"></div>
         </div>
 
         <div id="artifactsPanel" class="artifacts">
@@ -519,24 +520,24 @@
         chatId = id;
         renderList();
         const c = chats[id];
-        document.getElementById('welcome').style.display = 'none';
+        document.getElementById('welcome').classList.add('hidden');
         const i = document.getElementById('msgsInner');
-        i.style.display = 'flex';
+        i.classList.remove('hidden');
         i.innerHTML = '';
         c.msgs.forEach(m => addMsg(m.role, m.text, false));
         scrollBottom();
     }
 
     function showWelcome() {
-        document.getElementById('welcome').style.display = 'flex';
-        document.getElementById('msgsInner').style.display = 'none';
+        document.getElementById('welcome').classList.remove('hidden');
+        document.getElementById('msgsInner').classList.add('hidden');
         document.getElementById('msgsInner').innerHTML = '';
     }
 
     function addMsg(role, text, save = true) {
         const inner = document.getElementById('msgsInner');
-        document.getElementById('welcome').style.display = 'none';
-        inner.style.display = 'flex';
+        document.getElementById('welcome').classList.add('hidden');
+        inner.classList.remove('hidden');
         const el = document.createElement('div');
         el.className = 'msg ' + role;
         const hdr = document.createElement('div');
