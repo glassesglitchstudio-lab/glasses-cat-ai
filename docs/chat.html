@@ -520,10 +520,14 @@
         chatId = id;
         renderList();
         const c = chats[id];
-        document.getElementById('welcome').classList.add('hidden');
         const i = document.getElementById('msgsInner');
-        i.classList.remove('hidden');
         i.innerHTML = '';
+        if (c.msgs.length === 0) {
+            showWelcome();
+            return;
+        }
+        document.getElementById('welcome').classList.add('hidden');
+        i.classList.remove('hidden');
         c.msgs.forEach(m => addMsg(m.role, m.text, false));
         scrollBottom();
     }
@@ -680,8 +684,10 @@
         if (!t || busy) return;
         if (!chatId) { chatId = 'c' + Date.now(); chats[chatId] = { msgs: [], title: t.slice(0,30) }; renderList(); }
         const isSlash = t.startsWith('/');
-        chats[chatId].msgs.push({role:'user',text:t});
-        addMsg('user', t);
+        if (chatId && chats[chatId] && chats[chatId].msgs.length === 0) {
+            chats[chatId].title = t.slice(0, 40);
+        }
+        addMsg('user', t, true);
         i.value = ''; resize(i); updateBtn(); busy = true;
         const thinkEl = document.getElementById('think');
         const thinkText = document.getElementById('thinkText');
@@ -689,8 +695,7 @@
         thinkEl.style.display = 'flex';
         await new Promise(r => setTimeout(r, isSlash ? 200 : 600));
         const r = isSlash ? handleSlash(t) : reply(t);
-        chats[chatId].msgs.push({role:'ai',text:r});
-        addMsg('ai', r);
+        addMsg('ai', r, true);
         renderList();
         busy = false; thinkEl.style.display = 'none'; updateBtn(); i.focus();
     }
