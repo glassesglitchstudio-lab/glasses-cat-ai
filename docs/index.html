@@ -204,7 +204,7 @@
         .pricing-badge.popular { color: var(--orange); }
         .pricing-card h3 { font-size: 1.2rem; font-weight: 700; }
         .pricing-price { margin: 4px 0; }
-        .pricing-price .amount { font-size: 2.2rem; font-weight: 800; color: var(--text); }
+        .pricing-price .amount { font-size: 1.8rem; font-weight: 800; color: var(--text); }
         .pricing-price .period { font-size: 0.9rem; color: var(--text2); margin-left: 4px; }
         .pricing-feats { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text2); flex:1; }
         .pricing-feats li { display: flex; align-items: center; gap: 8px; }
@@ -625,49 +625,43 @@ async def list_items():
 <section id="pricing">
     <div class="container">
         <h2 class="section-title reveal">Fiyatlandırma</h2>
-        <p class="section-desc reveal">Tüm planlar <strong style="color:#fbbf24;">1 ay ücretsiz</strong>, sonra dilediğin gibi devam et.</p>
+        <p class="section-desc reveal">Şu an <strong style="color:#34d399;">tümüyle ücretsiz</strong> — hiçbir şey ödemeden kullanmaya başla.</p>
         <div class="pricing-grid">
             <div class="pricing-card reveal">
-                <div class="pricing-badge">Başlangıç</div>
-                <h3>Free</h3>
-                <div class="pricing-price"><span class="amount">₺0</span><span class="period">/ay</span></div>
+                <div class="pricing-badge">Temel</div>
+                <h3>Bireysel</h3>
+                <div class="pricing-price"><span class="amount">Ücretsiz</span></div>
                 <ul class="pricing-feats">
-                    <li>✅ 1 model (V5)</li>
-                    <li>✅ 10 sohbet / gün</li>
-                    <li>✅ Obsidian hafıza</li>
-                    <li>✅ 5 araç</li>
-                    <li>❌ Özel model seçimi</li>
-                    <li>❌ ShadowCat modeller</li>
+                    <li>✅ X_OPUS Router</li>
+                    <li>✅ X_GLITCH_OPUS</li>
+                    <li>✅ X_FABLE_CODER</li>
+                    <li>✅ Sınırsız sohbet</li>
                 </ul>
-                <button class="btn primary" style="width:100%;justify-content:center;">1 Ay Ücretsiz</button>
+                <button class="btn primary" style="width:100%;justify-content:center;">Başla</button>
             </div>
             <div class="pricing-card highlight reveal">
                 <div class="pricing-badge popular">Popüler</div>
                 <h3>Pro</h3>
-                <div class="pricing-price"><span class="amount">₺99</span><span class="period">/ay</span></div>
+                <div class="pricing-price"><span class="amount">Ücretsiz</span></div>
                 <ul class="pricing-feats">
                     <li>✅ Tüm modeller</li>
                     <li>✅ Sınırsız sohbet</li>
-                    <li>✅ Obsidian + RAG</li>
-                    <li>✅ 37 araç + plugin</li>
                     <li>✅ Özel model seçimi</li>
-                    <li>✅ ShadowCat R:1 ailesi</li>
+                    <li>✅ ShadowCat R:1 (Yakında)</li>
                 </ul>
-                <button class="btn primary" style="width:100%;justify-content:center;">1 Ay Ücretsiz</button>
+                <button class="btn primary" style="width:100%;justify-content:center;">Başla</button>
             </div>
             <div class="pricing-card reveal">
                 <div class="pricing-badge">Kurumsal</div>
                 <h3>Enterprise</h3>
-                <div class="pricing-price"><span class="amount">₺499</span><span class="period">/ay</span></div>
+                <div class="pricing-price"><span class="amount">Ücretsiz</span></div>
                 <ul class="pricing-feats">
                     <li>✅ Pro'daki her şey</li>
                     <li>✅ Özel sunucu</li>
-                    <li>✅ Özel model fine-tune</li>
                     <li>✅ Öncelikli destek</li>
-                    <li>✅ SLA garantisi</li>
                     <li>✅ Özel entegrasyon</li>
                 </ul>
-                <button class="btn primary" style="width:100%;justify-content:center;">1 Ay Ücretsiz</button>
+                <button class="btn primary" style="width:100%;justify-content:center;">Başla</button>
             </div>
         </div>
     </div>
