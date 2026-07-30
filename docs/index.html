@@ -424,6 +424,67 @@
     <div class="container">
         <h2 class="section-title reveal">Demo</h2>
         <div class="demo-grid">
+            <!-- X_OPUS -->
+            <div class="demo-card reveal">
+                <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Hibrit Routing · X_OPUS</div>
+                <div class="demo-body">
+                    <div class="msg user">Karmaşık bir SQL sorgusu yaz</div>
+                    <div class="msg ai">
+                        <div class="label">X_OPUS Router</div>
+                        <div style="margin-bottom:6px;font-size:0.75rem;">🔀 Çift beyin değerlendiriyor...</div>
+                        <div style="display:flex;gap:12px;font-size:0.7rem;margin-bottom:6px;">
+                            <span style="color:#8a8a9a;">Qwen 3.5 9B:</span><span style="color:#34d399;">✅ reasoning</span>
+                            <span style="color:#8a8a9a;">Qwen 2.5 Coder 14B:</span><span style="color:#34d399;">✅ code</span>
+                        </div>
+                        <div style="font-size:0.7rem;color:#fbbf24;margin-bottom:4px;">→ Coder beyin seçildi</div>
+                        <pre class="code-block">SELECT u.name, COUNT(o.id) as total
+FROM users u
+JOIN orders o ON u.id = o.user_id
+GROUP BY u.name
+HAVING COUNT(o.id) > 5
+ORDER BY total DESC;</pre>
+                    </div>
+                </div>
+            </div>
+            <!-- X_GLITCH_OPUS -->
+            <div class="demo-card reveal">
+                <div class="demo-hdr"><span class="dot" style="background:#c47bff"></span>Optimizasyon · X_GLITCH_OPUS</div>
+                <div class="demo-body">
+                    <div class="msg user">Bu kodu optimize et</div>
+                    <div class="msg ai">
+                        <div class="label">X_GLITCH_OPUS</div>
+                        <div style="font-size:0.75rem;color:#8a8a9a;margin-bottom:6px;">⚡ 3 optimizasyon bulundu</div>
+                        <pre class="code-block"># Öncesi: O(n²)
+for i in range(len(arr)):
+    for j in range(len(arr)):
+        ...
+
+# Sonrası: O(n log n)
+arr.sort()
+for i in range(len(arr)):
+    ...</pre>
+                    </div>
+                </div>
+            </div>
+            <!-- X_FABLE_CODER -->
+            <div class="demo-card reveal">
+                <div class="demo-hdr"><span class="dot" style="background:#34d399"></span>Kod Üretim · X_FABLE_CODER</div>
+                <div class="demo-body">
+                    <div class="msg user">Python ile API istemcisi yaz</div>
+                    <div class="msg ai">
+                        <div class="label">X_FABLE_CODER</div>
+                        <pre class="code-block">import requests
+
+class APIClient:
+    def __init__(self, base_url):
+        self.base_url = base_url
+    def get(self, endpoint):
+        r = requests.get(f"{self.base_url}{endpoint}")
+        r.raise_for_status()
+        return r.json()</pre>
+                    </div>
+                </div>
+            </div>
             <div class="demo-card reveal">
                 <div class="demo-hdr"><span class="dot" style="background:#ff6b00"></span>Kod Yazma · V7</div>
                 <div class="demo-body">
