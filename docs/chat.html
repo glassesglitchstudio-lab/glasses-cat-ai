@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassesCat AI — Elythra-AI Workshop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ::selection { background: rgba(184,134,11,0.3); color: #dfd6cd; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0f0d0b;
+            color: #dfd6cd;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        body::after {
+            content: ''; position: fixed; inset: 0; z-index: 9999;
+            pointer-events: none; opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat; background-size: 200px 200px;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 2px; }
+
+        .sidebar {
+            width: 260px; min-width: 260px;
+            background: #14110e;
+            border-right: 1px solid #2a231f;
+            display: flex; flex-direction: column; height: 100vh;
+            transition: transform 0.25s;
+        }
+        @media (max-width:768px){ .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%)} .sidebar.open{transform:translateX(0)} }
+
+        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; }
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 16px;
+            border-bottom: 1px solid #2a231f;
+            min-height: 52px;
+            background: rgba(15,13,11,0.6);
+        }
+        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .msgs-inner {
+            width: 100%; max-width: 720px;
+            margin: 0 auto; padding: 24px 24px 16px;
+            flex: 1; display: flex; flex-direction: column; gap: 4px;
+        }
+
+        .msg { padding: 14px 18px; animation: fadeIn 0.2s ease-out; position: relative; }
+        .msg.user {
+            background: rgba(184,134,11,0.035);
+            border: 1px solid rgba(184,134,11,0.08);
+            border-left: 2px solid #b8860b;
+        }
+        .msg.ai { padding: 14px 0; }
+        .msg .label {
+            font-size: 0.65rem; font-weight: 500;
+            margin-bottom: 6px; display: flex;
+            align-items: center; gap: 6px;
+            letter-spacing: 0.03em;
+            color: #635952;
+        }
+        .msg.user .label { color: #b8860b; }
+        .msg.ai .label { color: #938880; }
+        .msg .content {
+            font-size: 0.88rem; line-height: 1.7;
+            color: #d5ccc3; white-space: pre-wrap;
+        }
+        .msg .content pre {
+            background: #14110e !important;
+            border: 1px solid #2a231f;
+            border-radius: 6px; padding: 12px; margin: 8px 0; overflow-x: auto;
+        }
+        .msg .content pre code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+        .msg .content :not(pre) > code {
+            background: rgba(184,134,11,0.06);
+            color: #c9951a; padding: 1px 6px; border-radius: 3px;
+            font-size: 0.85em;
+        }
+        .msg-actions {
+            position: absolute; top: 10px; right: 10px;
+            display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s;
+        }
+        .msg:hover .msg-actions { opacity: 1; }
+        .msg-actions button {
+            width: 24px; height: 24px; border-radius: 4px; border: none;
+            background: rgba(255,255,255,0.03); color: #635952;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;
+        }
+        .msg-actions button:hover { background: rgba(255,255,255,0.06); color: #938880; }
+
+        .input-area {
+            border-top: 1px solid #2a231f;
+            padding: 12px 24px 20px;
+            display: flex; justify-content: center;
+            background: rgba(15,13,11,0.6);
+        }
+        .input-outer { width: 100%; max-width: 720px; position: relative; display: flex; align-items: flex-end; gap: 8px; }
+        .input-box {
+            flex: 1;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #2a231f;
+            border-radius: 8px; padding: 11px 14px;
+            color: #dfd6cd; font-family: inherit;
+            font-size: 0.88rem; line-height: 1.5;
+            resize: none; outline: none; max-height: 200px;
+        }
+        .input-box:focus { border-color: #b8860b; box-shadow: 0 0 0 1px rgba(184,134,11,0.15); }
+        .send-btn {
+            width: 38px; height: 38px; border-radius: 6px; border: none;
+            background: #b8860b; color: #fff;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.3; flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+        .send-btn.active { opacity: 1; }
+        .send-btn:hover { background: #c9951a; }
+
+        .welcome {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            flex: 1; text-align: center; padding: 60px 24px;
+        }
+        .welcome-logo {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(184,134,11,0.05);
+            border: 1px solid rgba(184,134,11,0.12);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; overflow: hidden;
+        }
+        .welcome-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+        .welcome h1 {
+            font-size: 1.25rem; font-weight: 600;
+            margin-bottom: 4px; letter-spacing: -0.01em;
+        }
+        .welcome .byline {
+            font-family: 'Caveat', cursive;
+            font-size: 1rem; color: #938880;
+            margin-top: 2px;
+        }
+        .welcome .byline strong { color: #b8860b; font-weight: 600; }
+        .welcome p { color: #938880; font-size: 0.85rem; margin-top: 8px; }
+        .suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; justify-content: center; }
+        .suggestions button {
+            padding: 6px 14px; border-radius: 5px;
+            border: 1px solid #2a231f;
+            background: rgba(255,255,255,0.015);
+            color: #938880; font-size: 0.78rem; cursor: pointer;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .suggestions button:hover { border-color: #b8860b; color: #dfd6cd; }
+
+        .chat-item {
+            padding: 8px 12px; border-radius: 5px; cursor: pointer;
+            font-size: 0.78rem; color: #938880;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            transition: background 0.15s;
+        }
+        .chat-item:hover { background: rgba(255,255,255,0.02); color: #dfd6cd; }
+        .chat-item.active {
+            background: rgba(184,134,11,0.05);
+            color: #b8860b;
+            border: 1px solid rgba(184,134,11,0.08);
+        }
+
+        .think {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 24px; color: #635952; font-size: 0.8rem;
+        }
+        .think-dots span {
+            display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+            background: #635952; margin: 0 2px;
+            animation: dot 1.4s infinite ease-in-out both;
+        }
+        .think-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .think-dots span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes dot { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+        .model-btn {
+            display:flex; align-items:center; gap:6px;
+            padding:5px 12px; border-radius:5px;
+            border:1px solid #2a231f; background:rgba(255,255,255,0.015);
+            cursor:pointer; font-size:0.78rem; color:#938880;
+            transition:all 0.15s;
+        }
+        .model-btn:hover { border-color:rgba(184,134,11,0.2); background:rgba(184,134,11,0.03); }
+        .model-btn .chev { font-size:0.5rem; margin-left:2px; transition:transform 0.2s; }
+        .model-btn.active .chev { transform:rotate(180deg); }
+
+        .model-dropdown {
+            position:absolute; top:calc(100% + 6px); left:0;
+            min-width:280px;
+            background:#14110e; border:1px solid #2a231f;
+            border-radius:8px; padding:6px;
+            z-index:70; display:none;
+            box-shadow:0 20px 60px rgba(0,0,0,0.6);
+        }
+        .model-dropdown.show { display:block; }
+        .model-dropdown .search {
+            width:100%; padding:7px 10px; border-radius:5px;
+            border:1px solid #2a231f; background:rgba(255,255,255,0.015);
+            color:#dfd6cd; font-size:0.78rem; outline:none; margin-bottom:4px;
+            font-family: inherit;
+        }
+        .model-dropdown .search:focus { border-color:#b8860b; }
+        .model-opt {
+            display:flex; align-items:center; gap:8px;
+            padding:8px 10px; border-radius:5px;
+            cursor:pointer; transition:background 0.1s;
+        }
+        .model-opt:hover { background:rgba(255,255,255,0.02); }
+        .model-opt.active { background:rgba(184,134,11,0.05); border:1px solid rgba(184,134,11,0.08); }
+        .model-opt.disabled { opacity:0.35; cursor:not-allowed; }
+        .model-opt.disabled:hover { background:transparent; }
+        .model-opt .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .model-opt .info { flex:1; }
+        .model-opt .name { font-size:0.78rem; font-weight:500; color:#dfd6cd; }
+        .model-opt .desc { font-size:0.65rem; color:#635952; margin-top:1px; }
+        .model-opt .badge.soon { font-size:0.58rem; padding:1px 7px; border-radius:4px; background:rgba(251,191,36,0.06); color:#fbbf24; border:1px solid rgba(251,191,36,0.1); }
+
+        .think-selector { margin-top:6px; padding:10px; border-top:1px solid #2a231f; }
+        .think-selector label { font-size:0.65rem; color:#635952; display:block; margin-bottom:4px; }
+        .think-options { display:flex; gap:3px; }
+        .think-opt {
+            flex:1; padding:5px 0; text-align:center;
+            border-radius:4px; font-size:0.7rem; color:#938880;
+            cursor:pointer; transition:all 0.1s;
+            border:1px solid transparent;
+        }
+        .think-opt:hover { background:rgba(255,255,255,0.015); }
+        .think-opt.active { background:rgba(184,134,11,0.05); border-color:rgba(184,134,11,0.1); color:#b8860b; font-weight:500; }
+        .think-opt .sub { display:block; font-size:0.58rem; color:#5a524b; margin-top:1px; }
+
+        .demo-badge {
+            position:fixed; bottom:60px; left:50%; transform:translateX(-50%);
+            background:rgba(184,134,11,0.08); border:1px solid rgba(184,134,11,0.12);
+            color:#b8860b; padding:5px 14px; border-radius:5px;
+            font-size:0.7rem; z-index:80; display:none;
+            backdrop-filter:blur(4px);
+        }
+        .demo-badge.show { display:flex; align-items:center; gap:5px; }
+
+        .copy-toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(184,134,11,0.85); color: #fff;
+            padding: 8px 20px; border-radius: 6px; font-size: 0.78rem;
+            z-index: 100; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .copy-toast.show { opacity: 1; }
+
+        @media (max-width:768px){ .sidebar{width:100%;min-width:100%} }
+    </style>
+</head>
+<body>
+    <div class="flex" style="display:flex;height:100vh">
+        <aside id="sidebar" class="sidebar">
+            <div style="padding:12px;border-bottom:1px solid #2a231f">
+                <div style="display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:12px">
+                    <div style="width:26px;height:26px;border-radius:50%;background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                        <img src="glassescat-logo.png" alt="" style="width:100%;height:100%;object-fit:contain">
+                    </div>
+                    <div>
+                        <div style="font-weight:600;font-size:0.88rem;letter-spacing:-0.01em">GlassesCat</div>
+                        <div style="font-size:0.55rem;color:#635952">workshop v3.0</div>
+                    </div>
+                </div>
+                <button onclick="newChat()" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:5px;border:1px solid transparent;background:none;color:#938880;font-size:0.82rem;font-family:inherit;cursor:pointer;transition:all 0.15s" onmouseenter="this.style.borderColor='#2a231f'" onmouseleave="this.style.borderColor='transparent'">
+                    <span style="font-size:0.75rem">+</span> Yeni Sohbet
+                </button>
+            </div>
+            <div id="chatList" style="flex:1;overflow-y:auto;padding:8px"></div>
+            <div style="padding:12px;border-top:1px solid #2a231f">
+                <div style="font-size:0.65rem;color:#5a524b;font-family:'JetBrains Mono',monospace">demo mode &middot; static</div>
+            </div>
+        </aside>
+        <div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:40" onclick="toggleSidebar()"></div>
+
+        <div class="main" style="flex:1;display:flex;flex-direction:column;height:100vh;min-width:0">
+            <div class="topbar">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button onclick="toggleSidebar()" style="display:none;width:32px;height:32px;align-items:center;justify-content:center;border-radius:5px;border:none;background:none;color:#635952;cursor:pointer;font-size:1rem" class="mob-menu">&#9776;</button>
+                    <div style="position:relative">
+                        <div id="modelBtn" class="model-btn" onclick="toggleModelDropdown()">
+                            <span style="display:inline-block;font-size:0.6rem;color:#b8860b">&#9679;</span>
+                            <span id="modelName">X_OPUS</span>
+                            <span class="chev">&#9660;</span>
+                        </div>
+                        <div id="modelDropdown" class="model-dropdown">
+                            <input class="search" id="modelSearch" placeholder="model ara..." oninput="filterModels()">
+                            <div id="modelList"></div>
+                            <div class="think-selector">
+                                <label>d&uuml;&shy;n&uuml;nce s&uuml;resi</label>
+                                <div class="think-options">
+                                    <div class="think-opt" data-val="quick" onclick="setThink(this)">H&#305;zl&#305;<span class="sub">anl&#305;k</span></div>
+                                    <div class="think-opt active" data-val="normal" onclick="setThink(this)">Normal<span class="sub">standart</span></div>
+                                    <div class="think-opt" data-val="deep" onclick="setThink(this)">Derin<span class="sub">5-10sn</span></div>
+                                    <div class="think-opt" data-val="extreme" onclick="setThink(this)">Max<span class="sub">30sn+</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span id="thinkLabel" style="font-size:0.65rem;color:#5a524b;display:none">normal</span>
+                </div>
+            </div>
+
+            <div class="msgs-wrap" id="msgsWrap">
+                <div id="welcome" class="welcome">
+                    <div class="welcome-logo"><img src="glassescat-logo.png" alt="GlassesCat"></div>
+                    <h1>GlassesCat</h1>
+                    <div class="byline">by <strong>Elythra-AI</strong></div>
+                    <p>Merhaba, nas&#305;l yard&#305;mc&#305; olabilirim?</p>
+                    <div class="suggestions">
+                        <button onclick="sendSug('Python ile dosya okuyucu yaz')">Kod</button>
+                        <button onclick="sendSug('Pluginleri listele')">Pluginler</button>
+                        <button onclick="sendSug('Sistem durumu nedir?')">Sistem</button>
+                    </div>
+                </div>
+                <div id="msgsInner" class="msgs-inner" style="display:none"></div>
+            </div>
+
+            <div id="think" class="think" style="display:none">
+                <div class="think-dots"><span></span><span></span><span></span></div>
+                <span id="thinkText">&ccedil;al&#305;&#351;&#305;yorum...</span>
+            </div>
+
+            <div class="input-area">
+                <div class="input-outer">
+                    <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj&#305;n&#305;z&#305; yaz&#305;n..." oninput="resize(this);updateBtn()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+                    <button id="sendBtn" class="send-btn" onclick="send()" disabled>&#8593;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="demoBadge" class="demo-badge show"><span>&#9878;</span> demo mod &mdash; yan&#305;tlar sim&uuml;le ediliyor</div>
+    <div id="toast" class="copy-toast">kopyaland&#305;</div>
+
+    <style>
+        @media (max-width:768px){ .mob-menu{display:flex !important} }
+    </style>
+
+    <script>
+        let chatId=null, chats={}, busy=false, demoMode=true;
+
+        const DEMO_RESPONSES={
+            'kod': '&#304;&#351;te Python ile basit bir dosya okuyucu:\n\n```python\ndef read_file(path):\n    with open(path, \'r\', encoding=\'utf-8\') as f:\n        return f.read()\n\nprint(read_file(\'ornek.txt\'))\n```\n\nBu fonksiyon dosyay&#305; a&ccedil;ar, UTF-8 ile okur ve i&ccedil;eri&#287;ini d&ouml;nd&uuml;r&uuml;r.',
+            'plugin': 'Aktif pluginler:\n\n- **Qwen Assistant** &mdash; aktif\n- **Web Scraper** &mdash; aktif\n- **Security Analyst** &mdash; pasif\n- **Code Formatter** &mdash; aktif\n\n`/plugins` ile y&ouml;netebilirsin.',
+            'sistem': '**Sistem Durumu**\n\n- CPU: %23\n- RAM: %45 (8.2 GB / 18 GB)\n- 37 ara&ccedil; aktif\n- 31 haf&#305;za dosyas&#305;\n- uptime: 2s 14dk\n- Model: ' + (()=>{const m={X_OPUS:'X_OPUS (hibrit routing)',X_GLITCH_OPUS:'X_GLITCH_OPUS',X_FABLE_CODER:'X_FABLE_CODER'};return m[selectedModel]||selectedModel})(),
+            'python': '```python\ndef fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\nfor i, f in enumerate(fibonacci(10)):\n    print(f"F({i}) = {f}")\n```\n\nBu &uuml;rete&ccedil; Fibonacci say&#305;lar&#305;n&#305; bellekte tutmadan hesaplar.',
+            'merhaba': 'Merhaba! Sana nas&#305;l yard&#305;mc&#305; olabilirim? Kod yazma, dosya i&#351;lemleri, sistem y&ouml;netimi veya web aramas&#305; i&ccedil;in buraday&#305;m.',
+            'ne': 'GlassesCat AI &mdash; **Elythra-AI** taraf&#305;ndan geli&#351;tirilen otonom ajan sistemi.\n\nYapabileceklerim:\n- Kod yazma ve debug\n- Dosya i&#351;lemleri\n- Web aramas&#305;\n- Obsidian haf&#305;za\n- Sistem y&ouml;netimi\n- Plugin y&ouml;netimi'
+        };
+
+        function getDemoReply(msg){
+            const lower=msg.toLowerCase();
+            for(const [key,val] of Object.entries(DEMO_RESPONSES)){
+                if(lower.includes(key)) return val;
+            }
+            return 'Anlad&#305;m. "**'+msg+'**" &uuml;zerine &ccedil;al&#305;&#351;&#305;yorum.\n\nBu bir demo yan&#305;t&#305;d&#305;r.\n\nSe&ccedil;ili model: **'+document.getElementById('modelName').textContent+'**\nD&uuml;&shy;n&uuml;nce s&uuml;resi: **'+thinkLevel+'**';
+        }
+
+        function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').style.display=document.getElementById('sidebar').classList.contains('open')?'block':'none'}
+        function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+        function newChat(){chatId='c'+Date.now();chats[chatId]={msgs:[],title:'Yeni Sohbet'};renderList();showWelcome();if(window.innerWidth<768)toggleSidebar()}
+        function renderList(){const e=document.getElementById('chatList');e.innerHTML='';Object.entries(chats).forEach(([id,c])=>{const d=document.createElement('div');d.className='chat-item'+(id===chatId?' active':'');d.textContent=c.title;d.onclick=()=>switchChat(id);e.appendChild(d)})}
+        function switchChat(id){chatId=id;renderList();const c=chats[id];document.getElementById('welcome').style.display='none';const i=document.getElementById('msgsInner');i.style.display='flex';i.innerHTML='';c.msgs.forEach(m=>addMsg(m.role,m.text,false));scrollBottom()}
+        function showWelcome(){document.getElementById('welcome').style.display='flex';document.getElementById('msgsInner').style.display='none';document.getElementById('msgsInner').innerHTML=''}
+        function addMsg(role,text,anim){const inner=document.getElementById('msgsInner');document.getElementById('welcome').style.display='none';inner.style.display='flex';const el=document.createElement('div');el.className='msg '+role;const lbl=document.createElement('div');lbl.className='label';lbl.innerHTML=role==='user'?'&#9787; sen':'&#128049; glassescat';el.appendChild(lbl);const ct=document.createElement('div');ct.className='content';if(role==='ai'){ct.innerHTML=formatAI(text)}else ct.textContent=text;el.appendChild(ct);inner.appendChild(el);scrollBottom()}
+        function formatAI(t){return t.replace(/```(\w+)?\n([\s\S]*?)```/g,(m,l,c)=>{const a=l||'';return'<pre><code>'+escHtml(c.trim())+'</code></pre>'}).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')}
+        function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+        function scrollBottom(){const w=document.getElementById('msgsWrap');setTimeout(()=>{w.scrollTop=w.scrollHeight},20)}
+        function resize(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,200)+'px'}
+        function updateBtn(){const v=document.getElementById('inputBox').value.trim(),btn=document.getElementById('sendBtn');btn.disabled=!v||busy;btn.classList.toggle('active',v.length>0)}
+        function sendSug(t){document.getElementById('inputBox').value=t;updateBtn();send()}
+        async function send(){
+            const i=document.getElementById('inputBox'),t=i.value.trim();
+            if(!t||busy)return;
+            if(!chatId){chatId='c'+Date.now();chats[chatId]={msgs:[],title:t.slice(0,40)+(t.length>40?'...':'')}}else{const c=chats[chatId];if(c.msgs.length===0)c.title=t.slice(0,40)+(t.length>40?'...':'')}
+            chats[chatId].msgs.push({role:'user',text:t});addMsg('user',t);
+            i.value='';resize(i);updateBtn();
+            busy=true;document.getElementById('think').style.display='flex';updateBtn();
+            const thinkDelay={quick:300,normal:1200,deep:3500,extreme:6000};
+            const delay=thinkDelay[thinkLevel]||1200;
+            await new Promise(r=>setTimeout(r,delay));
+            const reply=getDemoReply(t);
+            chats[chatId].msgs.push({role:'ai',text:reply});
+            addMsg('ai',reply);renderList();
+            busy=false;document.getElementById('think').style.display='none';updateBtn();document.getElementById('inputBox').focus()
+        }
+
+        let selectedModel='X_OPUS', thinkLevel='normal';
+
+        const MODELS=[
+            {id:'X_OPUS',name:'X_OPUS',desc:'hibrit y&ouml;nlendirici &mdash; &ccedil;ift beyin routing',color:'#b8860b',soon:false},
+            {id:'X_GLITCH_OPUS',name:'X_GLITCH_OPUS',desc:'glitch optimizasyonlu opus',color:'#938880',soon:false},
+            {id:'X_FABLE_CODER',name:'X_FABLE_CODER',desc:'kod &uuml;retim ve debug',color:'#5a524b',soon:false},
+            {id:'SHADOW_PULSE',name:'ShadowCat R:1 Pulse',desc:'14B kod &uuml;retim',color:'#b8860b',soon:true},
+            {id:'SHADOW_MATRIX',name:'ShadowCat R:1 Matrix',desc:'7B thinking engine',color:'#938880',soon:true},
+            {id:'SHADOW_SINGULARITY',name:'ShadowCat R:1 Singularity',desc:'1.5B router/classifier',color:'#635952',soon:true},
+        ];
+
+        function renderModels(filter){
+            const list=document.getElementById('modelList');
+            const q=(filter||'').toLowerCase();
+            list.innerHTML=MODELS.filter(m=>!q||m.name.toLowerCase().includes(q)||m.desc.toLowerCase().includes(q))
+                .map(m=>'<div class="model-opt'+(m.id===selectedModel?' active':'')+(m.soon?' disabled':'')+'" onclick="'+(m.soon?'':'selectModel(\''+m.id+'\')')+'">'+
+                    '<span class="dot" style="background:'+m.color+'"></span>'+
+                    '<div class="info"><div class="name">'+m.name+(m.soon?' <span class="badge soon">yak&#305;nda</span>':'')+'</div>'+
+                    '<div class="desc">'+m.desc+'</div></div></div>').join('');
+        }
+
+        function toggleModelDropdown(){
+            const dd=document.getElementById('modelDropdown');
+            dd.classList.toggle('show');
+            document.getElementById('modelBtn').classList.toggle('active');
+            if(dd.classList.contains('show')){renderModels();setTimeout(()=>document.getElementById('modelSearch').focus(),50)}
+        }
+
+        function selectModel(id){
+            selectedModel=id;
+            const m=MODELS.find(x=>x.id===id);
+            document.getElementById('modelName').textContent=m.name;
+            document.getElementById('modelBtn').querySelector('span:first-child').style.color=m.color;
+            document.getElementById('modelDropdown').classList.remove('show');
+            document.getElementById('modelBtn').classList.remove('active');
+            renderModels();
+            toast('model: '+m.name+(m.soon?' (yak&#305;nda)':''));
+        }
+
+        function filterModels(){renderModels(document.getElementById('modelSearch').value)}
+
+        function setThink(el){
+            document.querySelectorAll('.think-opt').forEach(x=>x.classList.remove('active'));
+            el.classList.add('active');
+            thinkLevel=el.dataset.val;
+            const label={quick:'h&#305;zl&#305;',normal:'normal',deep:'derin',extreme:'max'}[thinkLevel];
+            document.getElementById('thinkLabel').textContent=label;
+            document.getElementById('thinkLabel').style.display='inline';
+        }
+
+        document.addEventListener('click',function(e){
+            const dd=document.getElementById('modelDropdown');
+            if(dd.classList.contains('show')&&!document.getElementById('modelBtn').contains(e.target)&&!dd.contains(e.target)){
+                dd.classList.remove('show');document.getElementById('modelBtn').classList.remove('active');
+            }
+        });
+
+        newChat();
+    </script>
+</body>
+</html>
