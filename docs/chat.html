@@ -4,133 +4,129 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlassesCat AI — Elythra-AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        ::selection { background: rgba(124,58,237,0.3); color: #fff; }
+        ::selection { background: rgba(255,107,0,0.2); }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            background: #050508;
-            color: #e8e6f0;
+            background: #f8f7f4;
+            color: #1f1f1f;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.15); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.06); border-radius: 2px; }
 
-        .top {
-            display: flex; align-items: center; justify-content: center;
-            padding: 12px 20px 0; position: relative;
-        }
-        .top::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 60%; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(124,58,237,0.2), rgba(6,182,212,0.2), transparent);
-        }
-        .top-inner { width: 100%; max-width: 720px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; }
+        .top { display: flex; align-items: center; justify-content: center; padding: 8px 20px 0; }
+        .top-inner { width: 100%; max-width: 768px; display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
         .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .brand-icon {
-            width: 32px; height: 32px; border-radius: 10px;
-            background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1));
-            border: 1px solid rgba(124,58,237,0.15);
-            display: flex; align-items: center; justify-content: center; font-size: 1rem;
-        }
-        .brand-text { font-weight: 700; font-size: 0.95rem; background: linear-gradient(135deg, #a78bfa, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .brand-sub { font-size: 0.55rem; color: #555; letter-spacing: 0.06em; text-transform: uppercase; margin-top: -1px; }
-
-        .top-actions { display: flex; align-items: center; gap: 6px; }
+        .brand img { width: 32px; height: 32px; border-radius: 50%; object-fit: contain; }
+        .brand-text { font-weight: 700; font-size: 1rem; color: #1f1f1f; letter-spacing: -0.01em; }
+        .brand-sub { font-size: 0.65rem; color: #888; margin-top: -1px; }
+        .top-right { display: flex; align-items: center; gap: 8px; }
         .top-btn {
-            padding: 5px 12px; border-radius: 6px;
-            border: 1px solid rgba(124,58,237,0.08);
-            background: rgba(124,58,237,0.04);
-            color: #888; cursor: pointer; font-size: 0.72rem; font-family: inherit;
-            transition: all 0.15s; display: flex; align-items: center; gap: 4px;
+            height: 36px; padding: 0 14px; border-radius: 100px;
+            border: 1px solid #e0dcd4; background: #fff;
+            color: #444; cursor: pointer; font-size: 0.8rem;
+            font-family: inherit; font-weight: 500;
+            display: flex; align-items: center; gap: 6px;
+            transition: all 0.15s;
         }
-        .top-btn:hover { border-color: rgba(124,58,237,0.2); color: #e8e6f0; background: rgba(124,58,237,0.08); }
-        .top-btn .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #7c3aed; }
-        .model-dd { position: relative; }
-        .model-menu {
-            position: absolute; top: calc(100% + 4px); right: 0; min-width: 220px;
-            background: #0c0c14; border: 1px solid rgba(124,58,237,0.12);
-            border-radius: 10px; padding: 6px; z-index: 70; display: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        .top-btn:hover { background: #f0ede8; border-color: #ccc; }
+        .top-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: #ff6b00; display: inline-block; }
+        .model-dropdown {
+            position: absolute; top: calc(100% + 4px); right: 0;
+            min-width: 220px; background: #fff; border: 1px solid #e0dcd4;
+            border-radius: 12px; padding: 6px;
+            z-index: 70; display: none;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
         }
-        .model-menu.show { display: block; }
+        .model-dropdown.show { display: block; }
         .model-opt {
             display: flex; align-items: center; gap: 8px;
-            padding: 8px 10px; border-radius: 6px;
+            padding: 8px 12px; border-radius: 8px;
             cursor: pointer; transition: background 0.1s;
+            font-size: 0.82rem; color: #333;
         }
-        .model-opt:hover { background: rgba(124,58,237,0.04); }
+        .model-opt:hover { background: #f8f7f4; }
         .model-opt.disabled { opacity: 0.3; cursor: default; }
-        .model-opt .mname { font-size: 0.78rem; font-weight: 500; color: #e8e6f0; }
-        .model-opt .badge { font-size: 0.5rem; padding: 1px 6px; border-radius: 4px; background: rgba(6,182,212,0.08); color: #22d3ee; }
+        .model-opt .tag { font-size: 0.55rem; padding: 1px 6px; border-radius: 4px; background: #f0ede8; color: #888; }
 
-        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 20px 20px 0; }
-        .msgs-inner { width: 100%; max-width: 720px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; gap: 4px; padding-bottom: 8px; }
+        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 0 20px; }
+        .msgs-inner { width: 100%; max-width: 768px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 24px 0 8px; }
 
         .welcome {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; flex: 1; text-align: center; padding-bottom: 12vh;
         }
-        .welcome-icon {
-            width: 64px; height: 64px; border-radius: 18px;
-            background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05));
-            border: 1px solid rgba(124,58,237,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem; margin-bottom: 16px;
+        .welcome img { width: 48px; height: 48px; border-radius: 50%; margin-bottom: 20px; object-fit: contain; }
+        .welcome h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; color: #1f1f1f; }
+        .welcome .sub { color: #888; font-size: 0.85rem; margin-top: 4px; }
+        .welcome .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 28px; justify-content: center; }
+        .welcome .chip {
+            padding: 8px 18px; border-radius: 100px;
+            border: 1px solid #e0dcd4; background: #fff;
+            color: #555; font-size: 0.82rem; cursor: pointer;
+            transition: all 0.15s;
         }
-        .welcome h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; }
-        .welcome .tagline { font-size: 0.85rem; color: #666; margin-top: 4px; }
-        .welcome .tagline em { font-style: normal; background: linear-gradient(135deg, #a78bfa, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; }
+        .welcome .chip:hover { border-color: #ff6b00; color: #ff6b00; background: rgba(255,107,0,0.02); }
 
-        .msg { padding: 14px 16px; animation: fadeIn 0.2s ease-out; }
-        .msg.user { background: rgba(124,58,237,0.03); border-radius: 10px; border: 1px solid rgba(124,58,237,0.06); }
-        .msg.ai { padding: 14px 0; }
-        .msg .label { font-size: 0.6rem; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
-        .msg.user .label { color: #7c3aed; }
-        .msg.ai .label { color: #22d3ee; }
-        .msg .content { font-size: 0.9rem; line-height: 1.7; color: #d8d6e0; }
-        .msg .content pre { background: #0c0c14 !important; border: 1px solid rgba(124,58,237,0.06); border-radius: 8px; padding: 14px; margin: 8px 0; overflow-x: auto; font-family: 'Courier New', monospace; }
-        .msg .content :not(pre) > code { background: rgba(124,58,237,0.06); color: #a78bfa; padding: 1px 6px; border-radius: 4px; }
+        .msg { padding: 14px 0; animation: fadeIn 0.2s ease-out; }
+        .msg .label { font-size: 0.65rem; font-weight: 600; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .msg .content { font-size: 0.92rem; line-height: 1.7; color: #2a2a2a; }
+        .msg .content pre {
+            background: #f8f7f4 !important; border: 1px solid #e0dcd4;
+            border-radius: 10px; padding: 14px; margin: 8px 0; overflow-x: auto;
+            font-family: 'Courier New', monospace; font-size: 0.82rem;
+        }
+        .msg .content :not(pre) > code { background: rgba(255,107,0,0.06); color: #ff6b00; padding: 1px 6px; border-radius: 4px; }
 
-        .think { display: flex; align-items: center; gap: 8px; padding: 8px 0; max-width: 720px; margin: 0 auto; width: 100%; color: #666; font-size: 0.8rem; }
+        .think { display: flex; align-items: center; gap: 8px; padding: 8px 0; max-width: 768px; margin: 0 auto; width: 100%; color: #999; font-size: 0.82rem; }
         .think span { animation: pulse 1.4s ease-in-out infinite; }
         @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
 
-        .input-area { padding: 12px 20px 20px; display: flex; justify-content: center; }
-        .input-outer { width: 100%; max-width: 720px; display: flex; align-items: flex-end; gap: 8px; }
-        .input-box {
-            flex: 1; background: rgba(124,58,237,0.02);
-            border: 1px solid rgba(124,58,237,0.06); border-radius: 10px;
-            padding: 12px 16px; color: #e8e6f0; font-family: inherit;
-            font-size: 0.9rem; line-height: 1.5; resize: none; outline: none; max-height: 160px;
+        .input-area { padding: 8px 20px 20px; display: flex; justify-content: center; }
+        .input-outer {
+            width: 100%; max-width: 768px;
+            background: #fff; border: 1px solid #e0dcd4;
+            border-radius: 16px; padding: 12px 12px 12px 20px;
+            display: flex; align-items: flex-end; gap: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+            transition: border-color 0.15s;
         }
-        .input-box:focus { border-color: rgba(124,58,237,0.2); }
+        .input-outer:focus-within { border-color: #ff6b00; box-shadow: 0 2px 16px rgba(255,107,0,0.04); }
+        .input-box {
+            flex: 1; background: transparent; border: none;
+            color: #1f1f1f; font-family: inherit; font-size: 0.92rem;
+            line-height: 1.5; resize: none; outline: none; max-height: 160px;
+        }
         .send-btn {
-            width: 40px; height: 40px; border-radius: 10px; border: none;
-            background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff;
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: #ff6b00; color: #fff;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             opacity: 0.2; flex-shrink: 0; transition: opacity 0.15s;
         }
         .send-btn.active { opacity: 1; }
-        .send-btn:hover { transform: scale(1.02); }
+        .send-btn:hover { background: #e86000; }
 
         .demo-badge {
-            position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%);
-            background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.08);
-            color: #22d3ee; padding: 4px 12px; border-radius: 6px;
-            font-size: 0.65rem; z-index: 80; display: none;
+            position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,107,0,0.04); border: 1px solid rgba(255,107,0,0.08);
+            color: #ff6b00; padding: 4px 14px; border-radius: 100px;
+            font-size: 0.7rem; z-index: 80; display: none;
+            backdrop-filter: blur(8px);
         }
         .demo-badge.show { display: flex; align-items: center; gap: 4px; }
 
         .toast {
-            position: fixed; bottom: 116px; left: 50%; transform: translateX(-50%);
-            background: rgba(124,58,237,0.8); color: #fff;
-            padding: 6px 16px; border-radius: 8px; font-size: 0.75rem;
-            z-index: 100; opacity: 0; transition: opacity 0.25s; pointer-events: none;
+            position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
+            background: rgba(31,31,31,0.85); color: #fff;
+            padding: 6px 16px; border-radius: 10px;
+            font-size: 0.78rem; z-index: 100;
+            opacity: 0; transition: opacity 0.25s; pointer-events: none;
         }
         .toast.show { opacity: 1; }
     </style>
@@ -140,71 +136,77 @@
 <div class="top">
     <div class="top-inner">
         <a href="#" class="brand">
-            <div class="brand-icon">&#9670;</div>
+            <img src="glassescat-logo.png" alt="GlassesCat">
             <div>
                 <div class="brand-text">GlassesCat</div>
-                <div class="brand-sub">Elythra-AI &mdash; v3.0</div>
+                <div class="brand-sub">by Elythra-AI</div>
             </div>
         </a>
-        <div class="top-actions">
-            <div class="model-dd">
+        <div class="top-right">
+            <div style="position:relative">
                 <button class="top-btn" onclick="toggleModel()"><span class="dot"></span><span id="modelName">X_OPUS</span></button>
-                <div id="modelMenu" class="model-menu">
-                    <div class="model-opt" onclick="selectModel('X_OPUS')"><span class="mname">X_OPUS</span></div>
-                    <div class="model-opt" onclick="selectModel('X_GLITCH')"><span class="mname">X_GLITCH_OPUS</span></div>
-                    <div class="model-opt" onclick="selectModel('X_FABLE')"><span class="mname">X_FABLE_CODER</span></div>
-                    <div style="height:1px;background:rgba(124,58,237,0.06);margin:4px"></div>
-                    <div class="model-opt disabled"><span class="mname">ShadowCat R:1 <span class="badge">yak&#305;nda</span></span></div>
+                <div id="modelList" class="model-dropdown">
+                    <div class="model-opt" onclick="selectModel('X_OPUS')">X_OPUS</div>
+                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS</div>
+                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER</div>
+                    <div style="height:1px;background:#e0dcd4;margin:4px 8px"></div>
+                    <div class="model-opt disabled">ShadowCat R:1 <span class="tag">yak&#305;nda</span></div>
                 </div>
             </div>
-            <button class="top-btn" onclick="toggleDemo()">&#9878; Demo</button>
+            <button class="top-btn" onclick="toggleDemo()">&#9678; Demo</button>
         </div>
     </div>
 </div>
 
 <div class="msgs-wrap" id="msgsWrap">
     <div id="welcome" class="welcome">
-        <div class="welcome-icon">&#9670;</div>
-        <h1>GlassesCat</h1>
-        <div class="tagline">by <em>Elythra-AI</em> &mdash; nas&#305;l yard&#305;mc&#305; olabilirim?</div>
+        <img src="glassescat-logo.png" alt="">
+        <h1>Merhaba</h1>
+        <div class="sub">Size nas&#305;l yard&#305;mc&#305; olabilirim?</div>
+        <div class="chips">
+            <button class="chip" onclick="sendSug('Bana Python ile dosya okuyucu yaz')">&#9003; Kod yaz</button>
+            <button class="chip" onclick="sendSug('Pluginleri listele')">&#9678; Pluginler</button>
+            <button class="chip" onclick="sendSug('Sistem durumunu goster')">&#9881; Sistem</button>
+            <button class="chip" onclick="sendSug('Merhaba')">&#9998; Merhaba de</button>
+        </div>
     </div>
     <div id="msgsInner" class="msgs-inner" style="display:none"></div>
 </div>
 
 <div id="think" class="think" style="display:none">
-    <span>d&uuml;&shy;n&uuml;n&uuml;yor...</span>
+    <span>yan&#305;t haz&#305;rlan&#305;yor...</span>
 </div>
 
 <div class="input-area">
     <div class="input-outer">
-        <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yaz..." oninput="resize(this);updateBtn()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+        <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yaz&#305;n..." oninput="resize(this);updateBtn()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
         <button id="sendBtn" class="send-btn" onclick="send()" disabled>&#8593;</button>
     </div>
 </div>
 
-<div id="demoBadge" class="demo-badge show">&#9878; demo mod</div>
+<div id="demoBadge" class="demo-badge show">&#9678; Demo mod &mdash; yan&#305;tlar sim&uuml;le ediliyor</div>
 <div id="toast" class="toast">kopyaland&#305;</div>
 
 <script>
-    let chats = {}, chatId = null, busy = false, demoMode = true, model = 'X_OPUS';
+    let chats = {}, chatId = null, busy = false, demoMode = true;
 
     const DEMO = {
-        'kod':'```python\ndef read(path):\n    with open(path) as f:\n        return f.read()\n```',
-        'plugin':'Aktif: Qwen Assistant, Web Scraper, Code Formatter',
-        'sistem':'CPU %23 &middot; RAM 8.2/18GB &middot; 37 ara&ccedil; &middot; 31 haf&#305;za',
-        'python':'```python\ndef fib(n):\n    a,b=0,1\n    for _ in range(n):\n        yield a\n        a,b=b,a+b\n```',
-        'merhaba':'Merhaba! Kod, dosya, web aramas&#305; i&ccedil;in buraday&#305;m.'
+        'kod':'```python\ndef read_file(path):\n    with open(path, \'r\', encoding=\'utf-8\') as f:\n        return f.read()\n\nprint(read_file(\'ornek.txt\'))\n```\n\nBu kadar basit. Dosyay&#305; a&ccedil;, oku, d&ouml;nd&uuml;r.',
+        'plugin':'**Aktif Pluginler**\n\n- Qwen Assistant &mdash; aktif\n- Web Scraper &mdash; aktif\n- Code Formatter &mdash; aktif',
+        'sistem':'**Sistem Durumu**\n\n- CPU: %23\n- RAM: 8.2 GB / 18 GB\n- 37 ara&ccedil; aktif\n- 31 haf&#305;za dosyas&#305;',
+        'python':'```python\ndef fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\nprint(list(fib(10)))\n```',
+        'merhaba':'Merhaba! Size nas&#305;l yard&#305;mc&#305; olabilirim?\n\nKod yazma, dosya i&#351;lemleri, web aramas&#305; veya sistem y&ouml;netimi i&ccedil;in buraday&#305;m.'
     };
 
     function reply(m) {
         const l = m.toLowerCase();
         for (const [k, v] of Object.entries(DEMO)) if (l.includes(k)) return v;
-        return '"**'+m+'**" &uuml;zerine &ccedil;al&#305;&#351;&#305;yorum.';
+        return '"**' + m + '**" &uuml;zerine &ccedil;al&#305;&#351;&#305;yorum.\n\nBu bir demo yan&#305;t&#305;d&#305;r.';
     }
 
-    function toggleDemo() { demoMode = !demoMode; document.getElementById('demoBadge').classList.toggle('show', demoMode); toast(demoMode ? 'demo' : 'canl&#305;'); }
-    function toggleModel() { document.getElementById('modelMenu').classList.toggle('show'); }
-    function selectModel(id) { model = id; document.getElementById('modelName').textContent = id; document.getElementById('modelMenu').classList.remove('show'); toast(id); }
+    function toggleDemo() { demoMode = !demoMode; document.getElementById('demoBadge').classList.toggle('show', demoMode); toast(demoMode ? 'Demo mod a&ccedil;&#305;k' : 'Canl&#305; mod'); }
+    function toggleModel() { document.getElementById('modelList').classList.toggle('show'); }
+    function selectModel(id) { document.getElementById('modelName').textContent = id; document.getElementById('modelList').classList.remove('show'); toast(id); }
     function toast(t) { const e = document.getElementById('toast'); e.innerHTML = t; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 1500); }
     function newChat() { chatId = 'c'+Date.now(); chats[chatId] = {msgs:[]}; document.getElementById('welcome').style.display = 'flex'; document.getElementById('msgsInner').style.display = 'none'; document.getElementById('msgsInner').innerHTML = ''; }
     function addMsg(role, text) {
@@ -213,7 +215,7 @@
         inner.style.display = 'flex';
         const el = document.createElement('div'); el.className = 'msg ' + role;
         const lbl = document.createElement('div'); lbl.className = 'label';
-        lbl.textContent = role === 'user' ? 'sen' : 'glassescat';
+        lbl.textContent = role === 'user' ? 'Sen' : 'GlassesCat';
         el.appendChild(lbl);
         const ct = document.createElement('div'); ct.className = 'content';
         if (role === 'ai') ct.innerHTML = format(text);
@@ -221,10 +223,11 @@
         el.appendChild(ct); inner.appendChild(el);
         setTimeout(() => document.getElementById('msgsWrap').scrollTop = document.getElementById('msgsWrap').scrollHeight, 20);
     }
-    function format(t) { return t.replace(/```(\w+)?\n([\s\S]*?)```/g, (m,l,c) => '<pre><code>' + esc(c.trim()) + '</code></pre>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>'); }
+    function format(t) { return t.replace(/```(\w+)?\n([\s\S]*?)```/g, (m,l,c) => '<pre><code>'+esc(c.trim())+'</code></pre>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>'); }
     function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function resize(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; }
     function updateBtn() { const v = document.getElementById('inputBox').value.trim(); const b = document.getElementById('sendBtn'); b.disabled = !v || busy; b.classList.toggle('active', v.length > 0); }
+    function sendSug(t) { document.getElementById('inputBox').value = t; updateBtn(); send(); }
 
     async function send() {
         const i = document.getElementById('inputBox'), t = i.value.trim();
@@ -233,14 +236,14 @@
         chats[chatId].msgs.push({role:'user',text:t}); addMsg('user',t);
         i.value = ''; resize(i); updateBtn(); busy = true;
         document.getElementById('think').style.display = 'flex';
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 600));
         const r = reply(t); chats[chatId].msgs.push({role:'ai',text:r}); addMsg('ai',r);
         busy = false; document.getElementById('think').style.display = 'none'; updateBtn(); i.focus();
     }
 
     document.addEventListener('click', function(e) {
-        const m = document.getElementById('modelMenu');
-        if (m.classList.contains('show') && !e.target.closest('.model-dd')) m.classList.remove('show');
+        const m = document.getElementById('modelList');
+        if (m.classList.contains('show') && !e.target.closest('.top-btn') && !e.target.closest('.model-dropdown')) m.classList.remove('show');
     });
 
     newChat();
