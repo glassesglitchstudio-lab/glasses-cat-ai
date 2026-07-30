@@ -175,7 +175,8 @@ class AgentLoop:
                 logger.warning(f"Skill sistemi başlatılamadı: {e}")
     
     def run(self, user_input: str, conversation_history: List = None,
-            memory_context: str = "", session_id: str = None) -> Dict:
+            memory_context: str = "", session_id: str = None,
+            custom_prompt: str = "") -> Dict:
         """
         ReAct döngüsünü çalıştır.
 
@@ -184,6 +185,7 @@ class AgentLoop:
             conversation_history: Konuşma geçmişi
             memory_context: Hafızadan bulunan bağlam
             session_id: Oturum kimliği
+            custom_prompt: Stil/tercih/extended thinking prompt'u
         
         Returns:
             Dict: {
@@ -202,8 +204,8 @@ class AgentLoop:
         # --- PLUGIN: ON_USER_INPUT ---
         self._run_plugin_hook(HookPoint.ON_USER_INPUT, user_input=user_input, session_id=session_id)
         
-        # Sistem prompt'unu oluştur (skill'ler dahil)
-        system_prompt = self._build_system_prompt()
+        # Sistem prompt'unu oluştur (skill'ler + custom prompt dahil)
+        system_prompt = self._build_system_prompt(custom_prompt=custom_prompt)
         
         # Kullanıcı prompt'unu oluştur (hafıza bağlamıyla)
         user_prompt = self._build_user_prompt(user_input, memory_context, conversation_history)
@@ -312,22 +314,26 @@ class AgentLoop:
             "success": True
         }
     
-    def _build_system_prompt(self) -> str:
-        """Sistem prompt'unu oluştur (tool descriptions ile)"""
+    def _build_system_prompt(self, custom_prompt: str = "") -> str:
+        """Sistem prompt'unu oluştur (tool descriptions + custom prompt ile)"""
         tool_descriptions = ""
         if self.core and self.core.toolformer:
             tool_descriptions = self.core.toolformer.build_system_prompt()
-            # Sadece tool listesini al (tüm prompt'u değil)
             tool_list = []
             for tool in self.core.toolformer.registry.list_all():
                 params = ", ".join(f"{p.name}:{p.type}" for p in tool.parameters)
                 tool_list.append(f"  • {tool.name}({params}) - {tool.description[:60]}")
             tool_descriptions = "\n".join(tool_list)
         
-        return REACT_SYSTEM_PROMPT.format(
+        base = REACT_SYSTEM_PROMPT.format(
             tool_descriptions=tool_descriptions or "Henüz araç tanımlanmamış.",
             max_iterations=self.max_iterations
         )
+        
+        if custom_prompt:
+            base += f"\n\n## Kullanıcı Tercihleri\n{custom_prompt}"
+        
+        return base
     
     def _build_user_prompt(self, user_input: str, memory_context: str,
                           conversation_history: List = None) -> str:

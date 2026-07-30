@@ -16,7 +16,7 @@
 ╚═══════════════════════════════════════════════════════════╝
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -33,6 +33,9 @@ import re
 import hashlib
 import secrets
 from datetime import datetime
+import uuid
+import io
+import csv
 
 # Glassescat AI Core - Yeni mimari
 try:
@@ -480,6 +483,165 @@ async def preview():
     }
 
 
+# ─────────────────────────────────────────────────────────────
+# DOSYA YÜKLEME VE İŞLEME
+# ─────────────────────────────────────────────────────────────
+
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "storage", "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {
+    ".pdf": "document",
+    ".png": "image", ".jpg": "image", ".jpeg": "image", ".gif": "image", ".webp": "image", ".svg": "image",
+    ".py": "code", ".js": "code", ".ts": "code", ".jsx": "code", ".tsx": "code",
+    ".html": "code", ".css": "code", ".json": "code", ".xml": "code", ".yaml": "code", ".yml": "code",
+    ".md": "code", ".txt": "code", ".csv": "data", ".tsv": "data",
+    ".docx": "document", ".doc": "document"
+}
+
+def parse_uploaded_file(file_path: str, ext: str) -> dict:
+    ext = ext.lower()
+    content = ""
+    preview = ""
+    file_type = ALLOWED_EXTENSIONS.get(ext, "unknown")
+    try:
+        if ext in (".png", ".jpg", ".jpeg", ".gif", ".webp"):
+            with open(file_path, "rb") as f:
+                import base64
+                b64 = base64.b64encode(f.read()).decode()
+                preview = f"data:image/{ext.lstrip('.')};base64,{b64[:100]}..."
+                content = f"[Image: {os.path.basename(file_path)}]"
+        elif ext == ".pdf":
+            try:
+                import PyPDF2
+                with open(file_path, "rb") as f:
+                    reader = PyPDF2.PdfReader(f)
+                    pages = [p.extract_text() for p in reader.pages[:10]]
+                    content = "\n\n".join(pages)
+                    preview = content[:500]
+            except ImportError:
+                content = f"[PDF: {os.path.basename(file_path)} (PyPDF2 gerekli)]"
+                preview = content
+        elif ext == ".csv":
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()[:30]
+                content = "".join(lines)
+                preview = content[:500]
+        elif ext == ".docx":
+            try:
+                from docx import Document
+                doc = Document(file_path)
+                paras = [p.text for p in doc.paragraphs[:50]]
+                content = "\n".join(paras)
+                preview = content[:500]
+            except ImportError:
+                content = f"[DOCX: {os.path.basename(file_path)} (python-docx gerekli)]"
+                preview = content
+        else:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                preview = content[:500]
+    except Exception as e:
+        content = f"[Dosya okunamadı: {e}]"
+        preview = content
+    return {"content": content, "preview": preview, "type": file_type, "extension": ext}
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...), project_id: str = Form(default="")):
+    try:
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            return {"success": False, "error": f"Desteklenmeyen dosya türü: {ext}. İzin verilenler: {', '.join(ALLOWED_EXTENSIONS.keys())}"}
+
+        file_id = uuid.uuid4().hex[:8]
+        safe_name = f"{file_id}_{file.filename}"
+        file_path = os.path.join(UPLOAD_DIR, safe_name)
+
+        content_bytes = await file.read()
+        with open(file_path, "wb") as f:
+            f.write(content_bytes)
+
+        parsed = parse_uploaded_file(file_path, ext)
+        file_info = {
+            "id": file_id,
+            "name": file.filename,
+            "path": file_path,
+            "size": len(content_bytes),
+            "type": parsed["type"],
+            "extension": ext,
+            "preview": parsed["preview"][:300]
+        }
+
+        if project_id:
+            from glassescat_core import get_core
+            c = get_core()
+            if c.get_project(project_id):
+                c.add_file_to_project(project_id, file_info)
+
+        return {
+            "success": True,
+            "file": file_info,
+            "content": parsed["content"],
+            "message": f"{file.filename} yüklendi ({len(content_bytes)} bayt)"
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.get("/api/upload/{file_id}")
+async def get_uploaded_file(file_id: str):
+    try:
+        for fname in os.listdir(UPLOAD_DIR):
+            if fname.startswith(file_id):
+                path = os.path.join(UPLOAD_DIR, fname)
+                ext = os.path.splitext(fname)[1].lower()
+                parsed = parse_uploaded_file(path, ext)
+                return {"success": True, "file": {"name": fname, "path": path}, **parsed}
+        return {"success": False, "error": "Dosya bulunamadı"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ─────────────────────────────────────────────────────────────
+# KONUŞMA PAYLAŞMA LİNKİ
+# ─────────────────────────────────────────────────────────────
+
+SHARES: Dict[str, dict] = {}
+
+@app.post("/api/share")
+async def share_conversation(data: dict):
+    try:
+        share_id = uuid.uuid4().hex[:10]
+        SHARES[share_id] = {
+            "messages": data.get("messages", []),
+            "title": data.get("title", "Paylaşılan Sohbet"),
+            "created": datetime.now().isoformat()
+        }
+        return {"success": True, "share_id": share_id, "url": f"/share/{share_id}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/share/{share_id}")
+async def get_share(share_id: str):
+    share = SHARES.get(share_id)
+    if not share:
+        return {"success": False, "error": "Paylaşım bulunamadı"}
+    return {"success": True, **share}
+
+@app.get("/share/{share_id}", response_class=HTMLResponse)
+async def share_page(share_id: str):
+    share = SHARES.get(share_id)
+    if not share:
+        return HTMLResponse("<h1>Paylaşım bulunamadı</h1>")
+    msgs_html = ""
+    for m in share.get("messages", []):
+        role = m.get("role", "user")
+        content = m.get("content", "")
+        label = "👤 Kullanıcı" if role == "user" else "🤖 GlassesCat"
+        msgs_html += f'<div style="margin-bottom:16px;padding:12px;background:{ "#f5f5f5" if role=="user" else "#f3e8ff" };border-radius:8px"><strong>{label}</strong><p style="margin-top:4px">{content}</p></div>'
+    return HTMLResponse(f"""<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>{share["title"]} — GlassesCat</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><style>*{{margin:0;padding:0;box-sizing:border-box}}body{{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;padding:40px 24px;max-width:720px;margin:0 auto}}h1{{font-size:1.1rem;font-weight:600;margin-bottom:24px;color:#7c3aed}}.meta{{font-size:0.75rem;color:#888;margin-bottom:32px}}</style></head><body><h1>{share["title"]}</h1><div class="meta">{share.get("created","")} · Paylaşılan Sohbet</div>{msgs_html}</body></html>""")
+
+
 # Admin Paneli Endpoint'leri
 from dotenv import load_dotenv
 load_dotenv()
@@ -538,6 +700,161 @@ async def set_mode(data: dict):
         mode = data.get("mode", "normal")
         c.set_mode(mode)
         return {"success": True, "mode": mode}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/settings/style")
+async def set_style(data: dict):
+    """Yanıt stilini değiştir: normal, concise, explanatory, formal, code_first"""
+    try:
+        from glassescat_core import get_core, BUILTIN_STYLES, STYLES
+        c = get_core()
+        style = data.get("style", "normal")
+        if style not in BUILTIN_STYLES:
+            return {"success": False, "error": f"Geçersiz stil. Seçenekler: {', '.join(BUILTIN_STYLES)}"}
+        c.set_style(style)
+        return {"success": True, "style": style, "description": STYLES[style]}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/settings/style")
+async def get_style():
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        return {"success": True, "style": c.get_style()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/settings/preferences")
+async def set_preferences(data: dict):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        text = data.get("text", "")
+        c.set_personal_preferences(text)
+        return {"success": True, "length": len(text)}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/settings/preferences")
+async def get_preferences():
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        return {"success": True, "text": c.get_personal_preferences()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/settings/extended-thinking")
+async def set_extended_thinking(data: dict):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        enabled = data.get("enabled", False)
+        c.set_extended_thinking(enabled)
+        return {"success": True, "enabled": enabled}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ─────────────────────────────────────────────────────────────
+# PROJE YÖNETİMİ API
+# ─────────────────────────────────────────────────────────────
+
+@app.post("/api/projects")
+async def create_project(data: dict):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        proj = c.create_project(
+            project_id=data.get("id", ""),
+            name=data.get("name", ""),
+            instructions=data.get("instructions", "")
+        )
+        return {"success": True, "project": proj}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/projects")
+async def list_projects():
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        return {"success": True, "projects": c.list_projects()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/projects/{project_id}")
+async def get_project(project_id: str):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        proj = c.get_project(project_id)
+        if not proj:
+            return {"success": False, "error": "Proje bulunamadı"}
+        return {"success": True, "project": proj}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/projects/{project_id}/activate")
+async def activate_project(project_id: str):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        success = c.set_active_project(project_id)
+        return {"success": success, "active_project": project_id if success else None}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.delete("/api/projects/{project_id}")
+async def delete_project(project_id: str):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        success = c.delete_project(project_id)
+        return {"success": success}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ─────────────────────────────────────────────────────────────
+# MESAJ DÜZENLEME / BRANCHING API
+# ─────────────────────────────────────────────────────────────
+
+@app.post("/api/conversations/{conv_id}/edit")
+async def edit_message(conv_id: str, data: dict):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        msg_index = data.get("message_index", -1)
+        new_content = data.get("new_content", "")
+        branch_id = c.edit_message(conv_id, msg_index, new_content)
+        return {"success": True, "branch_id": branch_id, "message": "Yeni branch oluşturuldu"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/conversations/{conv_id}/branches")
+async def get_branches(conv_id: str):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        branches = c.get_branches(conv_id)
+        return {"success": True, "branches": branches}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/conversations/branches/{branch_id}/switch")
+async def switch_branch(branch_id: str):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        success = c.switch_branch(branch_id)
+        msgs = []
+        for m in c.conversation_history:
+            msgs.append({"role": m.role, "content": m.content})
+        return {"success": success, "messages": msgs}
     except Exception as e:
         return {"success": False, "error": str(e)}
 

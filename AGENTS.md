@@ -2,9 +2,9 @@
 
 ## ZORUNLU: Push & Yayınla Workflow (Unutma!)
 Berkay "push la", "yayınla", "github'a at" dediğinde HER ZAMAN:
-1. `git add glasses_vibe.py gulmzcetiner/Modelfile && git commit -m "V5_NEXUS_CORE: ..." && git push origin main`
+1. `git add glasses_vibe.py gulmzcetiner/Modelfile docs/ web/ main.py .github/workflows/pages.yml && git commit -m "V5_NEXUS_CORE: ..." && git push origin main`
 2. `cd gulmzcetiner && ollama create glassesglitchstudio/gulmzcetiner:V5_NEXUS_CORE -f Modelfile && ollama push glassesglitchstudio/gulmzcetiner:V5_NEXUS_CORE`
-3. Link göster: GitHub (glasses-cat-ai) + Ollama (V5_NEXUS_CORE)
+3. Link göster: GitHub (glasses-cat-ai) + Ollama (V5_NEXUS_CORE) + GitHub Pages (https://glassesglitchstudio-lab.github.io/glasses-cat-ai)
 
 ## ZORUNLU: Oturum Başlangıcı
 Her yeni oturumda BU KOMUTU ÇALIŞTIRARAK başla:
@@ -103,6 +103,25 @@ Bundan sonra VS Code yerine **Orca IDE** (stablyai/orca) kullanılacak. Orca:
 - Mobil uygulaması var (iOS + Android)
 - Windows desteği var (.exe)
 - Adres: onorca.dev
+
+### Session Notları (2026-07-30)
+
+#### Claude-Purple UI Tamamlandı
+- **docs/index.html**: Bug fix (extra closing tags, cursor none) + Claude-purple landing page (light theme, purple accent #7c3aed, cat logo)
+- **web/templates/chat.html**: Full Claude-style chat UI — left sidebar with chat history + new chat, model selector dropdown, welcome screen with suggestion chips, avatar-based messages (cat logo for AI), purple send button, demo mode toggle
+- **docs/chat.html**: Synced same design for GitHub Pages standalone
+- **.github/workflows/pages.yml**: Created for GitHub Actions deployment
+- **Commit**: `eaf328b` → pushed, Pages ✅
+- Tüm temalar denendi: warm dark → brass/rust → neon purple → Gemini light → Claude-purple (kabul edildi)
+
+#### Claude Feature Set Implementation (2026-07-30)
+**Core v3.1.0** — Style selector, Extended thinking, Project Manager, Message branching, File Upload, Artifacts, Slash commands, Share link, Semantic search
+- **glassescat_core.py**: Added STYLES dict, `set_style()`, `set_personal_preferences()`, `set_extended_thinking()`, `build_custom_system_prompt()`, project CRUD (`create_project`, `list_projects`, `set_active_project`, `add_file_to_project`), message branching (`edit_message`, `switch_branch`, `get_branches`)
+- **glassescat_agent_loop.py**: `run()` accepts `custom_prompt` param, `_build_system_prompt()` appends custom prompt
+- **main.py**: API endpoints for styles (`POST/GET /api/settings/style`), preferences (`POST/GET /api/settings/preferences`), extended thinking (`POST /api/settings/extended-thinking`), projects CRUD (`/api/projects`), message branching (`/api/conversations/*/edit`, branches), file upload (`POST /api/upload` with PDF/image/CSV/code parsing), share link (`POST /api/share`, `GET /share/{id}`)
+- **web/templates/chat.html**: Complete Claude-style UI with artifacts panel, file upload modal, drag & drop, style selector overlay with personal preferences, extended thinking toggle, web search toggle, slash commands menu, message editing/branching, sidebar search, project tab
+- **docs/chat.html**: Synced standalone version for GitHub Pages
+- **Commit**: `next`
 
 ### Projeler
 | Proje | Durum |

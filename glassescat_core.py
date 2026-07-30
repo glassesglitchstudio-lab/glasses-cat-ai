@@ -70,9 +70,19 @@ except ImportError:
 # SABİTLER
 # ─────────────────────────────────────────────────────────────
 
-VERSION = "3.0.0"
+VERSION = "3.1.0"
 AGENT_NAME = "GlassesCat"
 OWNER = "ErCuM"
+
+STYLES = {
+    "normal": "Yanıtlarını doğal, dengeli ve açık bir şekilde ver.",
+    "concise": "Yanıtlarını kısa ve öz tut. Gereksiz detaylara girme. Mümkünse 2-3 cümlede cevapla.",
+    "explanatory": "Detaylı açıklamalar yap. Adım adım anlat. Konuyu derinlemesine ele al.",
+    "formal": "Resmi ve profesyonel bir dille konuş. Akademik üslup kullan.",
+    "code_first": "Önce kodu göster, sonra açıklama yap. Yazılımcıya hitap eder gibi konuş."
+}
+
+BUILTIN_STYLES = list(STYLES.keys())
 
 # ─────────────────────────────────────────────────────────────
 # VERİ SINIFLARI
@@ -162,6 +172,14 @@ class GlassescatCore:
         self.web_agent = None
         self.feedback = None
         self.error_fix = None
+        
+        # Claude-style features
+        self.style: str = "normal"
+        self.personal_preferences: str = ""
+        self.extended_thinking: bool = False
+        self.projects: Dict[str, dict] = {}
+        self.active_project: Optional[str] = None
+        self.conversation_branches: Dict[str, List] = {}
         
         logger.info("🐱 GlassesCat Core instance oluşturuldu")
     
@@ -580,6 +598,121 @@ class GlassescatCore:
             self.mcp_bridge = None
     
     # ─────────────────────────────────────────────────────────
+    # CLAUDE-STYLE FEATURES
+    # ─────────────────────────────────────────────────────────
+
+    def set_style(self, style: str) -> bool:
+        """Yanıt stilini ayarla: normal, concise, explanatory, formal, code_first"""
+        if style in STYLES:
+            self.style = style
+            logger.info(f"📝 Stil değiştirildi: {style}")
+            return True
+        return False
+
+    def get_style(self) -> str:
+        return self.style
+
+    def set_personal_preferences(self, text: str):
+        self.personal_preferences = text
+        logger.info(f"📋 Kişisel tercihler güncellendi ({len(text)} karakter)")
+
+    def get_personal_preferences(self) -> str:
+        return self.personal_preferences
+
+    def set_extended_thinking(self, enabled: bool):
+        self.extended_thinking = enabled
+        logger.info(f"🧠 Extended thinking: {'açık' if enabled else 'kapalı'}")
+
+    def build_custom_system_prompt(self) -> str:
+        parts = []
+        style_instruction = STYLES.get(self.style, STYLES["normal"])
+        parts.append(f"[STIL] {style_instruction}")
+        if self.personal_preferences:
+            parts.append(f"[TERCIHLER] {self.personal_preferences}")
+        if self.extended_thinking:
+            parts.append("[DUSUNME] Karmaşık sorularda adım adım düşün, ara çıkarımlarını göster, cevabını doğrula.")
+        if self.active_project and self.active_project in self.projects:
+            proj = self.projects[self.active_project]
+            parts.append(f"[PROJE] Aktif proje: {proj.get('name', self.active_project)}")
+            if proj.get("instructions"):
+                parts.append(f"[PROJE_TALIMAT] {proj['instructions']}")
+        return "\n".join(parts)
+
+    # ─────────────────────────────────────────────────────────
+    # PROJE YÖNETİMİ
+    # ─────────────────────────────────────────────────────────
+
+    def create_project(self, project_id: str, name: str = "", instructions: str = "") -> dict:
+        project_id = project_id or f"proj_{uuid.uuid4().hex[:6]}"
+        self.projects[project_id] = {
+            "id": project_id,
+            "name": name or project_id,
+            "instructions": instructions,
+            "created": datetime.now().isoformat(),
+            "files": [],
+            "conversations": []
+        }
+        logger.info(f"📁 Proje oluşturuldu: {project_id}")
+        return self.projects[project_id]
+
+    def get_project(self, project_id: str) -> Optional[dict]:
+        return self.projects.get(project_id)
+
+    def list_projects(self) -> List[dict]:
+        return list(self.projects.values())
+
+    def delete_project(self, project_id: str) -> bool:
+        if project_id in self.projects:
+            del self.projects[project_id]
+            if self.active_project == project_id:
+                self.active_project = None
+            return True
+        return False
+
+    def set_active_project(self, project_id: Optional[str]) -> bool:
+        if project_id is None or project_id in self.projects:
+            self.active_project = project_id
+            return True
+        return False
+
+    def add_file_to_project(self, project_id: str, file_info: dict) -> bool:
+        if project_id in self.projects:
+            self.projects[project_id]["files"].append(file_info)
+            return True
+        return False
+
+    # ─────────────────────────────────────────────────────────
+    # MESAJ DÜZENLEME / BRANCHING
+    # ─────────────────────────────────────────────────────────
+
+    def edit_message(self, conversation_id: str, message_index: int, new_content: str) -> Optional[str]:
+        branch_id = f"branch_{uuid.uuid4().hex[:8]}"
+        branch = {
+            "parent": conversation_id,
+            "edited_index": message_index,
+            "new_content": new_content,
+            "messages": self.conversation_history[:message_index + 1][:-1] + [
+                AgentMessage(role="user", content=new_content)
+            ],
+            "created": datetime.now().isoformat()
+        }
+        self.conversation_branches[branch_id] = branch
+        self.conversation_history = branch["messages"]
+        return branch_id
+
+    def get_branches(self, conversation_id: str) -> List[dict]:
+        return [
+            {"id": bid, **b} for bid, b in self.conversation_branches.items()
+            if b.get("parent") == conversation_id
+        ]
+
+    def switch_branch(self, branch_id: str) -> bool:
+        if branch_id in self.conversation_branches:
+            self.conversation_history = self.conversation_branches[branch_id]["messages"]
+            return True
+        return False
+
+    # ─────────────────────────────────────────────────────────
     # ANA İŞLEME AKIŞI
     # ─────────────────────────────────────────────────────────
     
@@ -622,15 +755,17 @@ class GlassescatCore:
         # --- ADIM 1: Hafızada ara (ilgili geçmiş bağlamı bul) ---
         memory_context = self._get_memory_context(user_input)
         
-        # --- ADIM 2: Agent Loop'u çalıştır ---
+        # --- ADIM 2: Agent Loop'u çalıştır (custom prompt ile) ---
         try:
             from glassescat_agent_loop import get_agent_loop
             agent_loop = get_agent_loop(core=self)
+            custom_prompt = self.build_custom_system_prompt()
             loop_result = agent_loop.run(
                 user_input=user_input,
                 conversation_history=self.conversation_history,
                 memory_context=memory_context,
-                session_id=session_id
+                session_id=session_id,
+                custom_prompt=custom_prompt
             )
         except ImportError:
             # Agent loop yoksa toolformer ile direkt işle
