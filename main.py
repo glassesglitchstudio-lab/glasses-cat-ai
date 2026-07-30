@@ -251,15 +251,15 @@ async def root(request: Request):
         logger.error(f"Error: {type(e).__name__}: {str(e)}")
         return HTMLResponse(content="<h1>GlassesCat AI</h1><p>Template yüklenemedi</p>")
 
-@app.get("/legacy", response_class=HTMLResponse)
-async def legacy_root(request: Request):
-    """Eski ana sayfa"""
+@app.get("/docs", response_class=HTMLResponse)
+async def docs_page(request: Request):
+    """Dokümantasyon sayfası - static HTML"""
     try:
-        return templates.TemplateResponse(
-            request=request,
-            name="index.html",
-            context={"request": request}
-        )
+        docs_path = os.path.join(os.path.dirname(__file__), "docs", "index.html")
+        if os.path.exists(docs_path):
+            with open(docs_path, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read())
+        return HTMLResponse(content="<h1>GlassesCat AI</h1><p>Doküman bulunamadı</p>")
     except Exception as e:
         logger.error(f"Error: {type(e).__name__}: {str(e)}")
         return HTMLResponse(content="<h1>GlassesCat AI</h1><p>Template yüklenemedi</p>")
@@ -487,22 +487,46 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Degistirilmeli123!")
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_panel(request: Request):
-    """Admin paneli"""
-    return templates.TemplateResponse(
-        request=request,
-        name="admin.html",
-        context={"request": request}
-    )
+    """Admin paneli - basit dashboard"""
+    return HTMLResponse(content=f"""<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin — GlassesCat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:#0c0a09;color:#f5f0eb;padding:40px 24px}}
+h1{{font-size:1.3rem;font-weight:600;margin-bottom:24px}}
+.card{{background:#141110;border:1px solid #1e1b18;border-radius:6px;padding:20px;margin-bottom:16px;max-width:500px}}
+.card h2{{font-size:0.9rem;font-weight:500;margin-bottom:8px;color:#a8a29e}}
+.card p{{font-size:0.8rem;color:#6b6560}}
+</style></head><body>
+<h1>GlassesCat Admin</h1>
+<div class="card"><h2>Dashboard</h2><p>Admin paneli yapım aşamasında.</p></div>
+<div class="card"><h2>Sistem Durumu</h2><p id="status">Yükleniyor...</p></div>
+<script>
+fetch('/api/core/status').then(r=>r.json()).then(d=>{{document.getElementById('status').textContent='Sürüm: '+(d.version||'?')+' | Mod: '+((d.state&&d.state.mode)||'normal')}}).catch(()=>{{document.getElementById('status').textContent='Bağlantı kurulamadı'}})
+</script>
+</body></html>""")
 
 
 @app.get("/manage", response_class=HTMLResponse)
 async def manage_panel(request: Request):
     """Yönetim paneli"""
-    return templates.TemplateResponse(
-        request=request,
-        name="manage.html",
-        context={"request": request}
-    )
+    return HTMLResponse(content=f"""<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Yönetim — GlassesCat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:#0c0a09;color:#f5f0eb;padding:40px 24px}}
+h1{{font-size:1.3rem;font-weight:600;margin-bottom:24px}}
+.card{{background:#141110;border:1px solid #1e1b18;border-radius:6px;padding:20px;margin-bottom:16px;max-width:500px}}
+.card h2{{font-size:0.9rem;font-weight:500;margin-bottom:8px;color:#a8a29e}}
+.card p{{font-size:0.8rem;color:#6b6560}}
+</style></head><body>
+<h1>GlassesCat Yönetim</h1>
+<div class="card"><h2>Yönetim Paneli</h2><p>Yapım aşamasında.</p></div>
+</body></html>""")
 
 
 @app.post("/api/settings/mode")
