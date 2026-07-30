@@ -99,6 +99,8 @@
         .model-opt { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; transition:background 0.12s; }
         .model-opt:hover { background:rgba(255,255,255,0.04); }
         .model-opt.active { background:rgba(255,107,0,0.08); border:1px solid rgba(255,107,0,0.12); }
+        .model-opt.disabled { opacity:0.4; cursor:not-allowed; }
+        .model-opt.disabled:hover { background:transparent; }
         .model-opt .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
         .model-opt .info { flex:1; }
         .model-opt .name { font-size:0.8125rem; font-weight:500; color:#f0f0f5; }
@@ -243,7 +245,7 @@
             const list=document.getElementById('modelList');
             const q=(filter||'').toLowerCase();
             list.innerHTML=MODELS.filter(m=>!q||m.name.toLowerCase().includes(q)||m.desc.toLowerCase().includes(q))
-                .map(m=>'<div class="model-opt'+(m.id===selectedModel?' active':'')+'" onclick="selectModel(\''+m.id+'\')">'+
+                .map(m=>'<div class="model-opt'+(m.id===selectedModel?' active':'')+(m.soon?' disabled':'')+'" onclick="'+(m.soon?'':'selectModel(\''+m.id+'\')')+'">'+
                     '<span class="dot" style="background:'+m.color+'"></span>'+
                     '<div class="info"><div class="name">'+m.name+(m.soon?' <span class="badge soon">Yakında</span>':'')+'</div>'+
                     '<div class="desc">'+m.desc+'</div></div></div>').join('');
