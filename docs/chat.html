@@ -67,7 +67,7 @@
         .msgs-inner{width:100%;max-width:720px;margin:0 auto;flex:1;display:flex;flex-direction:column;padding:20px 24px 8px}
 
         .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:0 24px 10vh}
-        .welcome-logo{width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:20px}
+        .welcome-logo{width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:20px;font-size:1.6rem}
         .welcome-logo img{width:100%;height:100%;object-fit:contain;border-radius:50%}
         .welcome h1{font-size:1.5rem;font-weight:600;letter-spacing:-.02em;color:#1a1a1a}
         .welcome .sub{color:#888;font-size:.85rem;margin-top:4px}
@@ -169,8 +169,9 @@
 
 <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
-        <a href="#" class="sidebar-brand">
-            <img src="glassescat-logo.png" alt="" onerror="this.style.display='none'">
+            <a href="#" class="sidebar-brand">
+            <img src="glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block'">
+            <span class="fallback" style="display:none;font-size:1.2rem">🐱</span>
             <div>
                 <div class="sidebar-brand-text">GlassesCat</div>
                 <div class="sidebar-brand-sub">by Elythra-AI</div>
@@ -224,7 +225,10 @@
     <div class="content-area">
         <div class="msgs-wrap" id="msgsWrap">
             <div id="welcome" class="welcome">
-                <div class="welcome-logo"><img src="glassescat-logo.png" alt="" onerror="this.style.display='none'"></div>
+                <div class="welcome-logo">
+                    <img src="glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline'">
+                    <span class="fallback" style="display:none">🐱</span>
+                </div>
                 <h1>Merhaba</h1>
                 <div class="sub">Size nasıl yardımcı olabilirim?</div>
                 <div class="chips">
@@ -540,7 +544,7 @@
         const av = document.createElement('div');
         av.className = 'av';
         if (role === 'user') av.textContent = 'S';
-        else av.innerHTML = '<img src="glassescat-logo.png" alt="" onerror="this.style.display=\'none\'">';
+        else av.innerHTML = '<img src="glassescat-logo.png" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\'🐱\'">';
         hdr.appendChild(av);
         const nm = document.createElement('span');
         nm.className = 'nm';
