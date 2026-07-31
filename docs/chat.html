@@ -420,6 +420,7 @@
         <div style="display:flex;gap:8px;margin-top:12px">
             <button id="setTabPers" class="sk-tab active" onclick="switchSettingsTab('pers')">🎨 Kişiselleştirme</button>
             <button id="setTabSkill" class="sk-tab" onclick="switchSettingsTab('skill')">🛠️ Skill'ler</button>
+            <button id="setTabAgent" class="sk-tab" onclick="switchSettingsTab('agent')">🤖 Agent</button>
         </div>
         <div id="settingsPers" style="margin-top:16px">
             <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Varsayılan Model</label>
@@ -456,7 +457,22 @@
                 <button onclick="toggleSkillModal();hideSettings()" style="margin-top:14px;padding:9px 22px;border-radius:8px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.8rem;font-family:inherit">📂 Skill Panelini Aç</button>
                 <div style="margin-top:10px;font-size:.7rem;color:#999">Aktifleştirme, düzenleme ve GitHub Store'da indirme orada. Ya da <b>/skills</b> yazın.</div>
             </div>
+        
+        <div id="settingsAgent" style="display:none;margin-top:16px">
+            <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Agent Modu</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="settingsModes">
+                <button class="sk-tab" data-mode="normal" onclick="setAgentMode('normal')">Normal</button>
+                <button class="sk-tab" data-mode="developer" onclick="setAgentMode('developer')">Geliştirici</button>
+                <button class="sk-tab" data-mode="silent" onclick="setAgentMode('silent')">Sessiz</button>
+                <button class="sk-tab" data-mode="game" onclick="setAgentMode('game')">Oyun</button>
+                <button class="sk-tab active" data-mode="memory_agent" onclick="setAgentMode('memory_agent')">Hafiza Ajan</button>
+            </div>
+            <div style="margin-top:10px;padding:10px;background:#f8f8f8;border-radius:6px;font-size:.7rem;color:#666">
+                <b>Hafiza Ajan Modu:</b> Obsidian hafizayi aktif dusunce alani olarak kullanir.
+                Konular arasi baglantilar bulur, oruntuler tespit eder, icgoru uretir.
+            </div>
         </div>
+</div>
     </div>
 </div>
 
@@ -565,8 +581,28 @@
     function switchSettingsTab(tab) {
         document.getElementById('setTabPers').classList.toggle('active', tab === 'pers');
         document.getElementById('setTabSkill').classList.toggle('active', tab === 'skill');
+        const setAgent = document.getElementById('setTabAgent'); if(setAgent) setAgent.classList.toggle('active', tab === 'agent');
         document.getElementById('settingsPers').style.display = tab === 'pers' ? '' : 'none';
         document.getElementById('settingsSkill').style.display = tab === 'skill' ? '' : 'none';
+        const agentDiv = document.getElementById('settingsAgent'); if(agentDiv) agentDiv.style.display = tab === 'agent' ? '' : 'none';
+    }
+
+    function setAgentMode(mode) {
+        document.querySelectorAll('#settingsModes .sk-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+        if (!demoMode) {
+            fetch('/api/set_mode', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({mode: mode})
+            }).then(r => r.json()).then(d => {
+                if (d.success) toast('Agent modu: ' + mode);
+                else toast('Hata: ' + d.error);
+            }).catch(e => toast('Hata: ' + e.message));
+        } else {
+            toast('Agent modu: ' + mode);
+        }
     }
 
     function renderSettingsStyles() {

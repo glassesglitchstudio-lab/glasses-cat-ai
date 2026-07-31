@@ -815,6 +815,25 @@ async def set_mode(data: dict):
         return {"success": False, "error": str(e)}
 
 
+class SetModeRequest(BaseModel):
+    mode: str
+
+
+@app.post("/api/set_mode")
+async def api_set_mode(req: SetModeRequest):
+    """Agent modunu degistir: normal, developer, silent, game, memory_agent"""
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        ok = c.set_mode(req.mode)
+        if ok:
+            return {"success": True, "mode": req.mode}
+        else:
+            return {"success": False, "error": f"Gecersiz mode: {req.mode}. Gecerli modlar: normal, developer, silent, game, memory_agent"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 @app.post("/api/settings/style")
 async def set_style(data: dict):
     """Yanıt stilini değiştir: normal, concise, explanatory, formal, code_first"""

@@ -363,24 +363,57 @@ class AgentLoop:
             max_iterations=self.max_iterations
         )
         
+        # Memory Agent modu - hafizayi aktif dusunce alani olarak kullan
+        if self.core and hasattr(self.core, 'state') and self.core.state.mode == "memory_agent":
+            base += """
+
+## 🧠 HAFIZA AJAN MODU
+Bu modda SEN bir Hafiza Ajanisin. Görevin:
+1. Kullanicinin sorusunu Obsidian hafizada arat
+2. Bulunan bilgiler arasinda baglantilar bul
+3. Ornekler, yontemler ve deneyimlerden yaratici ciktimlar uret
+4. Hafizadaki entry'leri kategorilere gore sinla (kisisel, calisma, proje, bilim, vs.)
+5. Eksik bilgi varsa "Hafizada bu konu yok" degil "Bu konuya odaklanarak hafizayi guncellemem gerekir" seklinde cevap ver
+6. Her yanitinda hafizadan alinan bilgilerin kaynaklarini belirt
+
+## HAFIZA ARAMA KURALLARI
+- Tum entry'leri dikkatli oku, yuzey donme
+- Ayni konuyu farkli acilardan ele alan entry'leri birlesik bir tablo olarak sun
+- Eski entry'ler ve yeni entry'ler arasindaki baglantilari vurgula
+- Belirsizlik varsa "hafizada bu konu sinirli" deme, kullanicidan detay iste
+
+## CIKTI FORMATI
+Her yanitinda kullan:
+- **Baglanti**: Hafizadaki hangi entry'lerle iliskili
+- **Ozet**: Konunun ozeti  
+- **Insight**: Yeni ciktim veya gorus
+- **Oneriler**: Konusu hakkinda daha fazla bilgi icin oneriler
+"""
+        
         if custom_prompt:
-            base += f"\n\n## Kullanıcı Tercihleri\n{custom_prompt}"
+            base += f"\n\n## Kullanici Tercihleri\n{custom_prompt}"
         
         return base
     
-    def _build_user_prompt(self, user_input: str, memory_context: str,
-                          conversation_history: List = None) -> str:
-        """Kullanıcı prompt'unu oluştur (bağlamla zenginleştirilmiş)"""
+def _build_user_prompt(self, user_input: str, memory_context: str,
+                           conversation_history: List = None) -> str:
+        """Kullanıcı prompt'unu oluştur (bagimla zenginlestirilmis)"""
         parts = []
         
-        # Skill bağlamı
+        # Skill baglami
         skill_context = self._get_skill_context()
         if skill_context:
             parts.append(skill_context + "\n")
         
-        # Hafıza bağlamı
+        # Hafiza baglami
         if memory_context:
             parts.append(f"## 🧠 Hafızamdan Hatırladıklarım\n{memory_context}\n")
+        
+        # Memory Agent modu - derin hafiza analizi
+        if self.core and hasattr(self.core, 'state') and self.core.state.mode == "memory_agent":
+            deep_context = self._memory_agent_deep_search(user_input)
+            if deep_context:
+                parts.append(f"## 🔍 Derin Hafiza Analizi\n{deep_context}\n")
         
         # Konuşma geçmişi (son 3 mesaj)
         if conversation_history:
@@ -399,8 +432,53 @@ class AgentLoop:
         # ReAct formatı
         parts.append("## Şimdi Düşün ve Yanıtla\n🧠 DÜŞÜN: ...\n⚡ KARAR VER: ...\n🛠️ UYGULA: ...\n✅ YANITLA: ...")
         
-        return "\n".join(parts)
-    
+return "\n".join(parts)
+
+    def _memory_agent_deep_search(self, query: str) -> str:
+        """Hafiza Ajan icin derin hafiza arama ve baglanti tespiti."""
+        if not self.core or not self.core.memory:
+            return ""
+        try:
+            results = self.core.memory.recall(query, max_results=15)
+            if not results:
+                return ""
+            lines = []
+            lines.append(f"Sorgu: '{query}'")
+            lines.append(f"Bulunan entry: {len(results)}")
+            lines.append("")
+            for i, r in enumerate(results[:8]):
+                if not isinstance(r, dict):
+                    continue
+                title = r.get("title", "Bilinmeyen")
+                content = r.get("content", "")[:300]
+                tags = r.get("tags", [])
+                category = r.get("category", "genel")
+                lines.append(f"### [{i+1}] {title} ({category})")
+                if tags:
+                    lines.append(f"Etiketler: {', '.join(tags)}")
+                lines.append(content)
+                lines.append("")
+            # Baglantilari bul
+            all_tags = []
+            for r in results:
+                if isinstance(r, dict):
+                    all_tags.extend(r.get("tags", []))
+            tag_counts = {}
+            for t in all_tags:
+                tag_counts[t] = tag_counts.get(t, 0) + 1
+            common_tags = [t for t, c in sorted(tag_counts.items(), key=lambda x: -x[1]) if c >= 2][:5]
+            if common_tags:
+                lines.append(f"**Ortak baglanti etiketleri**: {', '.join(common_tags)}")
+                lines.append("Bu etiketlere sahip entry'ler arasindaki iliskiler:")
+                for tag in common_tags:
+                    tag_results = self.core.memory.recall(tag, max_results=3)
+                    for tr in tag_results:
+                        if isinstance(tr, dict) and tr.get("title") != results[0].get("title"):
+                            lines.append(f"  - {tr.get('title', '?')}: {tr.get('content', '')[:100]}")
+            return "\n".join(lines)
+        except Exception:
+            return ""
+
     def _build_continuation_prompt(self, original_input: str, tool_summary: str,
                                   natural_response: str) -> str:
         """Araç çağrısından sonra devam prompt'u"""

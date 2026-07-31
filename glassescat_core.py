@@ -404,7 +404,39 @@ class GlassescatCore:
             "thought": f"'{topic}' hakkında düşünülüyor...",
             "status": "thinking"
         }
-    
+
+    def _handler_memory_agent(self, query: str) -> Dict:
+        """Hafiza Ajan modu - Obsidian hafizayi aktif dusunce alani olarak kullanir."""
+        if not self.memory:
+            return {"success": False, "error": "Hafiza sistemi aktif degil"}
+        try:
+            recall_results = self.memory.recall(query, max_results=10)
+            stats = self.memory.get_stats() if hasattr(self.memory, 'get_stats') else {"total": 0}
+            categories = []
+            if hasattr(self.memory, 'memories'):
+                all_mem = self.memory.memories if isinstance(self.memory.memories, list) else []
+                categories = list(set(m.get("category", "genel") for m in all_mem if isinstance(m, dict)))
+            related = []
+            if recall_results:
+                for r in recall_results:
+                    if isinstance(r, dict):
+                        tags = r.get("tags", [])
+                        for tag in tags:
+                            if tag != query:
+                                tag_results = self.memory.recall(tag, max_results=3)
+                                related.extend(tag_results)
+            summary = {
+                "query": query,
+                "recall_count": len(recall_results) if recall_results else 0,
+                "related_connections": len(related),
+                "categories_found": categories,
+                "memory_stats": stats,
+                "top_recall": recall_results[:3] if recall_results else []
+            }
+            return {"success": True, "mode": "memory_agent", "summary": summary}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     def _handler_agent_plan(self, task: str, steps: int = 5) -> Dict:
         return {
             "success": True,
@@ -1006,7 +1038,7 @@ class GlassescatCore:
     
     def set_mode(self, mode: str):
         """Agent modunu değiştir"""
-        valid_modes = ["normal", "developer", "silent", "game"]
+        valid_modes = ["normal", "developer", "silent", "game", "memory_agent"]
         if mode in valid_modes:
             self.state.mode = mode
             logger.info(f"🔄 Mod değiştirildi: {mode}")
