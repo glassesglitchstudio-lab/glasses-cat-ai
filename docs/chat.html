@@ -175,6 +175,20 @@
         .ref{color:#7c3aed;text-decoration:none;border-bottom:1px dashed #7c3aed;margin-right:4px}
         .ref:hover{border-bottom-style:solid}
 
+        .skill-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;max-height:300px;overflow-y:auto}
+        .skill-card{padding:12px;border:1px solid #e0ddd5;border-radius:10px;background:#fff;transition:all .15s;text-align:left}
+        .skill-card:hover{border-color:#7c3aed;box-shadow:0 2px 8px rgba(124,58,237,.08)}
+        .skill-card.sel{border-color:#7c3aed;background:rgba(124,58,237,.04)}
+        .skill-card .sk-ico{font-size:1.1rem}
+        .skill-card .sk-tag{font-size:.62rem;color:#aaa;margin-left:auto}
+        .skill-card .sk-name{font-size:.8rem;font-weight:600;color:#1a1a1a;margin-top:4px}
+        .skill-card .sk-desc{font-size:.68rem;color:#888;margin-top:2px;line-height:1.4}
+        .skill-card .sk-acts{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+        .skill-card .sk-acts button{padding:3px 8px;border-radius:5px;border:1px solid #e0ddd5;background:#fff;font-size:.65rem;cursor:pointer;font-family:inherit;color:#555;transition:all .1s}
+        .skill-card .sk-acts button:hover{border-color:#7c3aed;color:#7c3aed}
+        .skill-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);color:#7c3aed;font-size:.72rem;font-weight:600;margin:4px 0;animation:pillIn .3s ease}
+        .skill-form-row{display:flex;gap:6px;margin-bottom:6px}
+
         @media(max-width:900px){.artifacts{position:fixed;right:0;top:0;z-index:60;height:100vh;box-shadow:-4px 0 24px rgba(0,0,0,0.06)}.artifacts.open{width:90vw!important}}
         @media(max-width:768px){.welcome .chips{flex-direction:column;align-items:stretch}.msg .ct{margin-left:0}.think{margin-left:0}.topbar{padding:8px 12px}.tb-group{gap:2px}.tb-btn{font-size:.68rem;padding:4px 8px}}
     </style>
@@ -229,6 +243,7 @@
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
+            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler">🛠️ Skill</button>
             <button class="tb-btn" id="webSearchBtn" onclick="toggleWebSearch()" title="Web arama">🔍 Web</button>
             <button class="tb-btn" id="thinkBtn" onclick="toggleThinking()" title="Derin düşünme">🧠 Derin</button>
             <button class="tb-btn" onclick="toggleArtifacts()" id="artifactsBtn" title="Artifacts">📦 Çıktılar</button>
@@ -274,6 +289,7 @@
             <div class="slash-opt" onclick="runSlash('/new')"><span class="key">/new</span><span class="desc">Yeni sohbet</span></div>
             <div class="slash-opt" onclick="runSlash('/clear')"><span class="key">/clear</span><span class="desc">Geçmişi temizle</span></div>
             <div class="slash-opt" onclick="runSlash('/help')"><span class="key">/help</span><span class="desc">Komut listesi</span></div>
+            <div class="slash-opt" onclick="runSlash('/skills')"><span class="key">/skills</span><span class="desc">Skill listesi</span></div>
             <div class="slash-opt" onclick="runSlash('/search')"><span class="key">/search</span><span class="desc">Web'de ara</span></div>
             <div class="slash-opt" onclick="runSlash('/export')"><span class="key">/export</span><span class="desc">Sohbeti dışa aktar</span></div>
             <div class="slash-opt" onclick="runSlash('/share')"><span class="key">/share</span><span class="desc">Paylaşım linki</span></div>
@@ -314,6 +330,28 @@
     </div>
 </div>
 
+<div id="skillOverlay" class="upload-overlay" onclick="if(event.target===this)hideSkillModal()">
+    <div class="upload-modal" style="text-align:left;max-width:540px">
+        <button class="close-overlay" onclick="hideSkillModal()">✕</button>
+        <h2 style="text-align:center">🛠️ Skill'ler</h2>
+        <div class="sub" style="text-align:center">Hazır + kişisel skill'ler — GlassesCat'e yetenek verir</div>
+        <div id="skillGrid" class="skill-grid"></div>
+        <button onclick="toggleSkillForm()" style="margin-top:12px;width:100%;padding:8px;border-radius:8px;border:1px dashed #7c3aed;background:transparent;color:#7c3aed;cursor:pointer;font-size:.78rem;font-family:inherit">+ Yeni Skill Ekle</button>
+        <div id="skillForm" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e0ddd5">
+            <div class="skill-form-row">
+                <input id="skName" placeholder="Ad (örn: seo-uzmani)" style="flex:1;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-size:.78rem;font-family:inherit;outline:none">
+                <input id="skIcon" placeholder="İkon" maxlength="4" style="width:70px;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-size:.78rem;font-family:inherit;outline:none">
+            </div>
+            <input id="skDesc" placeholder="Açıklama (otomatik tetikleme anahtar kelimeleri)" style="width:100%;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-size:.78rem;margin-bottom:6px;font-family:inherit;outline:none;box-sizing:border-box">
+            <textarea id="skInst" rows="4" placeholder="Talimatlar — GlassesCat bu skill aktifken nasıl davransın?" style="width:100%;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-size:.78rem;resize:vertical;font-family:inherit;outline:none;box-sizing:border-box"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button onclick="saveUserSkill()" style="flex:1;padding:8px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.78rem;font-family:inherit">Kaydet</button>
+                <button onclick="toggleSkillForm()" style="padding:8px 16px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;color:#555;cursor:pointer;font-size:.78rem;font-family:inherit">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="styleOverlay" class="upload-overlay" onclick="if(event.target===this)hideStyleModal()">
     <div class="upload-modal" style="text-align:left;max-width:400px">
         <button class="close-overlay" onclick="hideStyleModal()">✕</button>
@@ -337,6 +375,18 @@
     let artifacts = [];
     let pendingFile = null;
     let activeTab = 'chats';
+    let activeSkill = null;
+    let userSkills = [];
+    try { userSkills = JSON.parse(localStorage.getItem('glassescat_skills') || '[]'); } catch(e) { userSkills = []; }
+
+    const BUILTIN_SKILLS = [
+        {id:'site-builder', name:'Site Builder', desc:'Web sitesi ve arayüz geliştirme, HTML/CSS/JS', icon:'🛠️'},
+        {id:'tailwind-css', name:'Tailwind CSS', desc:'Utility-first CSS framework, responsive tasarım', icon:'🎨'},
+        {id:'ui-pro-max-engine', name:'UI Pro Max', desc:'Animasyon motorları, neon stil, glassmorphism', icon:'✨'},
+        {id:'ui-ux-pro-max', name:'UI/UX Pro Max', desc:'Tasarım zekası, kullanıcı deneyimi analizi', icon:'🧩'}
+    ];
+
+    function getAllSkills() { return BUILTIN_SKILLS.map(s => Object.assign({}, s, {builtin:true})).concat(userSkills.map(s => Object.assign({}, s, {builtin:false}))); }
 
     const STYLES = {
         normal: 'Doğal ve dengeli',
@@ -365,7 +415,8 @@
         const c = cmd.toLowerCase();
         if (c === '/new') { newChat(); return 'Yeni sohbet başlatıldı.'; }
         if (c === '/clear') { chats = {}; chatId = null; newChat(); return 'Geçmiş temizlendi.'; }
-        if (c === '/help') return '**Komutlar:**\n- `/new` — Yeni sohbet\n- `/clear` — Geçmişi temizle\n- `/help` — Bu menü\n- `/search <sorgu>` — Web\'de ara\n- `/export` — Sohbeti dışa aktar\n- `/share` — Paylaşım linki oluştur';
+        if (c === '/help') return '**Komutlar:**\n- `/new` — Yeni sohbet\n- `/clear` — Geçmişi temizle\n- `/help` — Bu menü\n- `/skills` — Skill listesi\n- `/search <sorgu>` — Web\'de ara\n- `/export` — Sohbeti dışa aktar\n- `/share` — Paylaşım linki oluştur';
+        if (c === '/skills') { toggleSkillModal(); return '🛠️ Skill paneli açıldı. Aktifleştir veya yenisi oluştur.'; }
         if (c.startsWith('/search ')) return `**Web arama:** "${cmd.slice(8)}" için sonuçlar hazırlanıyor... (demo)`;
         if (c === '/export') { const t = JSON.stringify(chats[chatId], null, 2); navigator.clipboard.writeText(t); return 'Sohbet panoya kopyalandı.'; }
         if (c === '/share') return '**Paylaşım linki:** `https://demo.glassescat.ai/share/demo123` (demo)';
@@ -431,6 +482,115 @@
         webSearchEnabled = !webSearchEnabled;
         document.getElementById('webSearchBtn').classList.toggle('active', webSearchEnabled);
         toast(webSearchEnabled ? 'Web arama açık' : 'Web arama kapalı');
+    }
+
+    function toggleSkillModal() {
+        const o = document.getElementById('skillOverlay');
+        o.classList.toggle('show');
+        if (o.classList.contains('show')) renderSkills();
+    }
+
+    function hideSkillModal() { document.getElementById('skillOverlay').classList.remove('show'); }
+
+    function renderSkills() {
+        const el = document.getElementById('skillGrid');
+        el.innerHTML = '';
+        getAllSkills().forEach(s => {
+            const d = document.createElement('div');
+            d.className = 'skill-card' + (activeSkill === s.id ? ' sel' : '');
+            d.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span class="sk-ico">' + s.icon + '</span><span class="sk-tag">' + (s.builtin ? 'hazır' : 'kişisel') + '</span></div>'
+                + '<div class="sk-name">' + esc(s.name) + '</div>'
+                + '<div class="sk-desc">' + esc(s.desc) + '</div>'
+                + '<div class="sk-acts"><button onclick="toggleSkillActive(\'' + s.id + '\')">' + (activeSkill === s.id ? 'Kapat' : 'Aktifleştir') + '</button>'
+                + (s.builtin ? '' : '<button onclick="editUserSkill(\'' + s.id + '\')">Düzenle</button><button onclick="delUserSkill(\'' + s.id + '\')">Sil</button>')
+                + '</div>';
+            el.appendChild(d);
+        });
+    }
+
+    function toggleSkillActive(id) {
+        activeSkill = activeSkill === id ? null : id;
+        renderSkills();
+        const s = getAllSkills().find(x => x.id === id);
+        toast(activeSkill ? s.icon + ' ' + s.name + ' aktif' : s.name + ' kapatıldı');
+    }
+
+    function toggleSkillForm() {
+        const f = document.getElementById('skillForm');
+        f.style.display = f.style.display === 'none' ? 'block' : 'none';
+        if (f.style.display === 'none') {
+            document.getElementById('skName').value = '';
+            document.getElementById('skIcon').value = '';
+            document.getElementById('skDesc').value = '';
+            document.getElementById('skInst').value = '';
+            delete window._editSkillId;
+        }
+    }
+
+    function fillSkillForm(s) {
+        document.getElementById('skName').value = s.name;
+        document.getElementById('skIcon').value = s.icon || '';
+        document.getElementById('skDesc').value = s.desc || '';
+        document.getElementById('skInst').value = s.inst || '';
+        document.getElementById('skillForm').style.display = 'block';
+    }
+
+    function saveUserSkill() {
+        const name = document.getElementById('skName').value.trim();
+        const icon = document.getElementById('skIcon').value.trim() || '🧠';
+        const desc = document.getElementById('skDesc').value.trim();
+        const inst = document.getElementById('skInst').value.trim();
+        if (!name || !inst) { toast('Ad ve talimatlar zorunlu'); return; }
+        const id = (window._editSkillId || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+        const skill = {id, name, icon, desc, inst};
+        const ix = userSkills.findIndex(s => s.id === id);
+        if (ix >= 0) userSkills[ix] = skill; else userSkills.push(skill);
+        localStorage.setItem('glassescat_skills', JSON.stringify(userSkills));
+        toggleSkillForm();
+        renderSkills();
+        toast(icon + ' Skill kaydedildi');
+    }
+
+    function editUserSkill(id) {
+        const s = userSkills.find(x => x.id === id);
+        if (!s) return;
+        window._editSkillId = id;
+        fillSkillForm(s);
+    }
+
+    function delUserSkill(id) {
+        userSkills = userSkills.filter(s => s.id !== id);
+        if (activeSkill === id) activeSkill = null;
+        localStorage.setItem('glassescat_skills', JSON.stringify(userSkills));
+        renderSkills();
+        toast('Skill silindi');
+    }
+
+    function matchSkill(t) {
+        const l = t.toLowerCase();
+        if (activeSkill) return getAllSkills().find(s => s.id === activeSkill) || null;
+        for (const s of getAllSkills()) {
+            const keys = (s.name + ' ' + (s.desc || '') + ' ' + s.id).toLowerCase();
+            const words = keys.split(/[^a-z0-9çğıöşü]+/).filter(w => w.length > 2);
+            for (const w of words) if (l.includes(w)) return s;
+        }
+        return null;
+    }
+
+    function showSkillBadge(sk) {
+        const inner = document.getElementById('msgsInner');
+        const b = document.createElement('div');
+        b.className = 'skill-badge';
+        b.textContent = sk.icon + ' ' + sk.name + ' skill\'i aktif — yönergeler uygulanıyor';
+        inner.appendChild(b);
+        scrollBottom();
+    }
+
+    function skillResponse(sk, q) {
+        if (sk.inst) {
+            return '**' + sk.icon + ' ' + sk.name + '** skill\'i uygulandı.\n\n**Yönergeler:** ' + sk.inst + '\n\n"' + q + '" talebi bu yönergeler doğrultusunda işlendi (demo mod — tam motor localhost admin sürümünde aktif).';
+        }
+        return reply(q);
     }
 
     function toggleThinking() {
@@ -706,6 +866,7 @@
         const thinkEl = document.getElementById('think');
         const thinkText = document.getElementById('thinkText');
         const wantSearch = webSearchEnabled || t.toLowerCase().startsWith('/search ');
+        const sk = (!wantSearch && !isSlash) ? matchSkill(t) : null;
         if (wantSearch) {
             const query = t.toLowerCase().startsWith('/search ') ? t.slice(8) : t;
             thinkEl.style.display = 'flex';
@@ -715,6 +876,14 @@
             thinkEl.style.display = 'none';
             const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
             addMsg('ai', appendSources(base, sources), true);
+        } else if (sk) {
+            thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : sk.icon + ' ' + sk.name + ' skill\'i uygulanıyor...';
+            thinkEl.style.display = 'flex';
+            await new Promise(r => setTimeout(r, 450));
+            showSkillBadge(sk);
+            await new Promise(r => setTimeout(r, 400));
+            const r = skillResponse(sk, t);
+            addMsg('ai', r, true);
         } else {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'yanıt hazırlanıyor...';
             thinkEl.style.display = 'flex';
