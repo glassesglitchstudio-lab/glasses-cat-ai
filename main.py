@@ -1392,6 +1392,106 @@ async def agent_loop_status():
 
 
 # ═══════════════════════════════════════════════════════════════
+# SITE BUILDER — AI ile web sitesi olusturma
+# ═══════════════════════════════════════════════════════════════
+
+class SiteBuilderRequest(BaseModel):
+    message: str
+    current_html: str = ""
+
+class SiteBuilderEditRequest(BaseModel):
+    selector: str
+    instruction: str
+    html: str
+
+DEFAULT_SITE_HTML = """<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sitem</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#faf8f4;color:#1f2937;line-height:1.6}
+.hero{text-align:center;padding:80px 24px 60px}
+.hero h1{font-size:2.5rem;font-weight:800;margin-bottom:12px}
+.hero p{color:#6b7280;max-width:480px;margin:0 auto 24px}
+.cta-btn{background:#7c3aed;color:#fff;border:none;border-radius:999px;padding:12px 32px;font-size:1rem;cursor:pointer}
+</style>
+</head>
+<body>
+<section class="hero">
+<h1>Hoş Geldiniz</h1>
+<p>Burasi sizin siteniz. AI'ya soyleyerek duzenleyin.</p>
+<button class="cta-btn">Baslayalim</button>
+</section>
+</body>
+</html>"""
+
+def _site_builder_agent_logic(message: str, current_html: str = "") -> dict:
+    """Site Builder mantigi: mesaji analiz et, HTML guncelle, AI yaniti hazirla"""
+    prompt = (
+        f"Kullanici site hakkinda su talepte bulundu: \"{message}\"\n\n"
+        f"Su anki HTML:\n```html\n{current_html or DEFAULT_SITE_HTML}\n```\n\n"
+        "Gorevlerin:\n"
+        "1. Talebi anla (ekleme, degisiklik, silme, stil vs)\n"
+        "2. HTML'i guncelle\n"
+        "3. Sadece degisen kismi degil, TUM HTML'i dondur\n"
+        "4. Tum CSS inline veya <style> icinde olsun\n"
+        "5. Elementlere anlamli class adlari ver (navbar, hero, card, footer vb)\n\n"
+        "Yanit format:\n"
+        "---HTML---\n[guncellenmis HTML kodu]\n---MESAJ---\n[kullaniciya kisa aciklama, 1-2 cumle]\n"
+    )
+    return {"prompt": prompt, "current_html": current_html or DEFAULT_SITE_HTML}
+
+@app.post("/api/site-builder/chat")
+async def site_builder_chat(req: SiteBuilderRequest):
+    """Site Builder sohbet — mesaj alir, HTML gunceller, AI yaniti doner"""
+    try:
+        logic = _site_builder_agent_logic(req.message, req.current_html)
+        ai_resp = await get_ai_response(logic["prompt"])
+
+        if ai_resp and "❌" not in ai_resp and "---HTML---" in ai_resp:
+            import re
+            m = re.search(r'---HTML---\s*\n(.*?)\n---MESAJ---', ai_resp, re.DOTALL)
+            if m:
+                new_html = m.group(1).strip()
+                msg_part = ai_resp.split("---MESAJ---")[-1].strip()[:300] if "---MESAJ---" in ai_resp else "Site guncellendi!"
+                return {"success": True, "html": new_html, "message": msg_part}
+        
+        # Fallback: AI yaniti direkt HTML olarak dene
+        if ai_resp and "❌" not in ai_resp and ("<html" in ai_resp or "<body" in ai_resp or "<!doctype" in ai_resp.lower()):
+            return {"success": True, "html": ai_resp.strip()[:10000], "message": "Site guncellendi!"}
+        
+        return {"success": True, "html": logic["current_html"], "message": "Anlamadim. Lutfen net bir istek yazin."}
+    except Exception as e:
+        logger.error(f"Site Builder hatasi: {e}")
+        return {"success": False, "error": str(e), "html": req.current_html or DEFAULT_SITE_HTML}
+
+@app.post("/api/site-builder/edit")
+async def site_builder_edit(req: SiteBuilderEditRequest):
+    """Site Builder element duzeltme — secili elemente CSS uygula"""
+    try:
+        edit_prompt = (
+            f"Kullanici su elementi duzenlemek istiyor:\n"
+            f"CSS selector: `{req.selector}`\n"
+            f"Talimat: {req.instruction}\n\n"
+            f"Sayfanin HTML'i:\n```html\n{req.html[:8000]}\n```\n\n"
+            "Sadece bir CSS kural blogu dondur: `{ selector { property: value; } }` seklinde.\n"
+            "Aciklama yazma, markdown kullanma."
+        )
+        result = await get_ai_response(edit_prompt)
+        if result and "❌" not in result:
+            m = re.search(r'\{[\s\S]*\}', result)
+            if m:
+                css = m.group(0).strip()
+                return {"success": True, "css": css}
+        return {"success": False, "error": "CSS uretilemedi", "css": ""}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ═══════════════════════════════════════════════════════════════
 # SWARM SUBAGENT — Paralel Alt Ajan Sistemi
 # ═══════════════════════════════════════════════════════════════
 
