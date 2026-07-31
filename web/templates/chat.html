@@ -303,7 +303,7 @@
     </div>
 
     <div id="think" class="think" style="display:none">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="pulse"><circle cx="8" cy="8" r="6" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="28" stroke-dashoffset="10"/></svg>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="pulse" id="thinkIcon"><circle cx="8" cy="8" r="6" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="28" stroke-dashoffset="10"/></svg>
         <span class="pulse" id="thinkText">yanıt hazırlanıyor...</span>
     </div>
 
@@ -1583,6 +1583,22 @@ function renderSettingsStyles() {
 
     function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    function showThinkDone() {
+        const thinkEl = document.getElementById('think');
+        const icon = document.getElementById('thinkIcon');
+        const text = document.getElementById('thinkText');
+        if (icon) {
+            icon.classList.remove('pulse');
+            icon.innerHTML = '<circle cx="8" cy="8" r="6" fill="none" stroke="#16a34a" stroke-width="1.5"/><path d="M5 8.5L7 10.5L11 6" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>';
+        }
+        if (text) {
+            text.classList.remove('pulse');
+            text.textContent = '✓ tamam';
+            text.style.color = '#16a34a';
+        }
+        setTimeout(() => { if (thinkEl) thinkEl.style.display = 'none'; }, 500);
+    }
+
     function scrollBottom() { setTimeout(() => document.getElementById('msgsWrap').scrollTop = document.getElementById('msgsWrap').scrollHeight, 20); }
 
     function resize(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; }
@@ -1653,7 +1669,7 @@ function renderSettingsStyles() {
                 renderSwarmSubtasks(tasks);
                 const res = await fetch('/api/swarm', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})});
                 const d = await res.json();
-                thinkEl.style.display = 'none';
+                showThinkDone();
                 if (d.success) {
                     renderSwarmSubtasks(d.subtasks || tasks.map(s=>({...s,status:'done'})));
                     await typeText(d.response, true);
@@ -1682,7 +1698,7 @@ function renderSettingsStyles() {
                 thinkText.textContent = 'web araması başlatılıyor...';
                 await new Promise(r => setTimeout(r, 300));
                 const sources = await showWebSearchAnim(query);
-                thinkEl.style.display = 'none';
+                showThinkDone();
                 const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
                 await typeText(appendSources(base, sources), true);
             }
@@ -1713,7 +1729,7 @@ function renderSettingsStyles() {
             await typeText(r, true);
         }
         renderList();
-        busy = false; thinkEl.style.display = 'none'; updateBtn(); i.focus();
+        busy = false; showThinkDone(); updateBtn(); i.focus();
     }
 
     function genSources(q) {
