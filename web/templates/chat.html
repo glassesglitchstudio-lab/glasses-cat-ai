@@ -406,6 +406,53 @@
     </div>
 </div>
 
+<div id="settingsOverlay" class="upload-overlay" onclick="if(event.target===this)hideSettings()">
+    <div class="upload-modal" style="text-align:left;max-width:460px">
+        <button class="close-overlay" onclick="hideSettings()">✕</button>
+        <h2 style="text-align:center">⚙️ Ayarlar</h2>
+        <div style="display:flex;gap:8px;margin-top:12px">
+            <button id="setTabPers" class="sk-tab active" onclick="switchSettingsTab('pers')">🎨 Kişiselleştirme</button>
+            <button id="setTabSkill" class="sk-tab" onclick="switchSettingsTab('skill')">🛠️ Skill'ler</button>
+        </div>
+        <div id="settingsPers" style="margin-top:16px">
+            <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Varsayılan Model</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="settingsModels">
+                <button class="sk-tab" data-model="X_OPUS" onclick="selectModel('X_OPUS')">X_OPUS</button>
+                <button class="sk-tab" data-model="X_GLITCH_OPUS" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS</button>
+                <button class="sk-tab" data-model="X_FABLE_CODER" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER</button>
+            </div>
+            <div style="margin-top:18px">
+                <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Yanıt Stili</label>
+                <div id="settingsStyleList" style="margin-top:6px"></div>
+            </div>
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid #e0ddd5">
+                <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Kişisel Tercihler</label>
+                <textarea id="settingsPrefs" rows="3" style="width:100%;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-family:inherit;font-size:.78rem;resize:none;outline:none;box-sizing:border-box" placeholder="Örn: Kıdemli bir yazılımcıyım, temel bilgileri atla, önce kodu göster..."></textarea>
+                <button style="margin-top:8px;padding:6px 16px;border-radius:6px;border:1px solid #e0ddd5;background:#7c3aed;color:#fff;cursor:pointer;font-size:.78rem;font-family:inherit" onclick="savePrefsFromSettings()">Kaydet</button>
+            </div>
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid #e0ddd5">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0">
+                    <span style="font-size:.82rem;color:#333">🧠 Derin düşünme</span>
+                    <button class="tb-btn" id="settingsThink" onclick="toggleThinking()">Kapalı</button>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0">
+                    <span style="font-size:.82rem;color:#333">🔍 Web arama</span>
+                    <button class="tb-btn" id="settingsWeb" onclick="toggleWebSearch()">Kapalı</button>
+                </div>
+            </div>
+        </div>
+        <div id="settingsSkill" style="display:none;margin-top:16px">
+            <div style="text-align:center;padding:20px 0">
+                <div style="font-size:2rem">🛠️</div>
+                <div style="font-size:.9rem;font-weight:600;margin-top:8px">Skill Yönetimi</div>
+                <div class="sub" style="text-align:center" id="settingsSkillInfo">Yükleniyor...</div>
+                <button onclick="toggleSkillModal();hideSettings()" style="margin-top:14px;padding:9px 22px;border-radius:8px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.8rem;font-family:inherit">📂 Skill Panelini Aç</button>
+                <div style="margin-top:10px;font-size:.7rem;color:#999">Aktifleştirme, düzenleme ve GitHub Store'da indirme orada. Ya da <b>/skills</b> yazın.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="/static/skills-library.js"></script>
@@ -496,6 +543,67 @@
         const s = document.getElementById('styleOverlay');
         s.classList.toggle('show');
         if (s.classList.contains('show')) renderStyleList();
+    }
+
+    function toggleSettings() {
+        const o = document.getElementById('settingsOverlay');
+        o.classList.toggle('show');
+        if (o.classList.contains('show')) {
+            renderSettingsStyles();
+            renderSettingsSkillInfo();
+        }
+    }
+
+    function hideSettings() { document.getElementById('settingsOverlay').classList.remove('show'); }
+
+    function switchSettingsTab(tab) {
+        document.getElementById('setTabPers').classList.toggle('active', tab === 'pers');
+        document.getElementById('setTabSkill').classList.toggle('active', tab === 'skill');
+        document.getElementById('settingsPers').style.display = tab === 'pers' ? '' : 'none';
+        document.getElementById('settingsSkill').style.display = tab === 'skill' ? '' : 'none';
+    }
+
+    function renderSettingsStyles() {
+        const el = document.getElementById('settingsStyleList');
+        el.innerHTML = '';
+        Object.entries(STYLES).forEach(([k, v]) => {
+            const d = document.createElement('div');
+            d.style.cssText = 'padding:7px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;gap:8px;transition:all .1s';
+            d.onmouseover = () => { d.style.background = '#f5f5f5'; };
+            d.onmouseout = () => { d.style.background = k === currentStyle ? 'rgba(124,58,237,0.06)' : 'transparent'; };
+            d.onclick = () => { setStyle(k); };
+            const radio = document.createElement('span');
+            radio.style.cssText = 'width:14px;height:14px;border-radius:50%;border:2px solid ' + (k === currentStyle ? '#7c3aed' : '#ccc') + ';display:inline-flex;align-items:center;justify-content:center';
+            if (k === currentStyle) radio.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:#7c3aed"></span>';
+            d.appendChild(radio);
+            const txt = document.createElement('span');
+            txt.textContent = v;
+            d.appendChild(txt);
+            el.appendChild(d);
+        });
+        document.getElementById('settingsPrefs').value = savedPrefs || '';
+        document.querySelectorAll('#settingsModels button').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-model') === currentModel);
+        });
+        const t = document.getElementById('settingsThink');
+        t.textContent = extendedThinking ? 'Açık' : 'Kapalı';
+        t.classList.toggle('active', extendedThinking);
+        const w = document.getElementById('settingsWeb');
+        w.textContent = webSearchEnabled ? 'Açık' : 'Kapalı';
+        w.classList.toggle('active', webSearchEnabled);
+    }
+
+    function savePrefsFromSettings() {
+        savedPrefs = document.getElementById('settingsPrefs').value;
+        fetch('/api/settings/preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:savedPrefs})});
+        toast('Tercihler kaydedildi');
+    }
+
+    function renderSettingsSkillInfo() {
+        const el = document.getElementById('settingsSkillInfo');
+        const total = getAllSkills().length;
+        const active = activeSkill ? getAllSkills().find(s => s.id === activeSkill) : null;
+        el.textContent = (active ? 'Aktif: ' + active.icon + ' ' + active.name + ' • ' : '') + 'Toplam ' + total + ' skill yüklü';
     }
 
     function hideStyleModal() { document.getElementById('styleOverlay').classList.remove('show'); }
