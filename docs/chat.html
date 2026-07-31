@@ -1636,6 +1636,39 @@ function startHunt() {
 
     function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    function createTyper(el) {
+        let buf = '', timer = null;
+        function pump() {
+            const n = Math.min(buf.length, 4);
+            if (n > 0) { el.textContent += buf.slice(0, n); buf = buf.slice(n); scrollBottom(); }
+            if (buf.length) timer = setTimeout(pump, 14);
+            else timer = null;
+        }
+        return {
+            push(tok) { buf += tok; if (!timer) pump(); },
+            flush() { if (buf.length) { el.textContent += buf; buf = ''; } }
+        };
+    }
+
+    async function typeText(text, save = true) {
+        addMsg('ai', '', save);
+        const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
+        const typer = createTyper(ct);
+        const tokens = text.split(/(?<=\s)/);
+        for (const tok of tokens) {
+            typer.push(tok);
+            await new Promise(r => setTimeout(r, 6));
+        }
+        typer.flush();
+        ct.innerHTML = format(text);
+        if (save && chatId && chats[chatId]) {
+            const ms = chats[chatId].msgs;
+            if (ms.length) ms[ms.length - 1].text = text;
+        }
+        setTimeout(() => hljs.highlightAll(), 50);
+        return text;
+    }
+
     function scrollBottom() { setTimeout(() => document.getElementById('msgsWrap').scrollTop = document.getElementById('msgsWrap').scrollHeight, 20); }
 
     function resize(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; }
@@ -1708,16 +1741,8 @@ function startHunt() {
             renderSwarmSubtasks(tasks);
             thinkEl.style.display = 'none';
             const base = reply(t);
-            addMsg('ai', '', true);
-            const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
-            const typer = createTyper(ct);
             const full = '🐝 **Swarm Agent — Alt Ajanlar Çalıştı**\n\n' + base + '\n\n---\n_Tüm alt ajanlar paralel çalıştırıldı ve sonuçlar birleştirildi._';
-            const tokens = full.split(/(?<=\s)/);
-            for (const tok of tokens) { typer.push(tok); await new Promise(r => setTimeout(r, 8)); }
-            typer.flush();
-            ct.innerHTML = format(full);
-            if (chatId && chats[chatId]) { const ms = chats[chatId].msgs; if (ms.length) ms[ms.length-1].text = full; }
-            setTimeout(() => hljs.highlightAll(), 50);
+            await typeText(full, true);
         } else if (wantSearch) {
             const query = t.toLowerCase().startsWith('/search ') ? t.slice(8) : t;
             thinkEl.style.display = 'flex';
@@ -1726,7 +1751,7 @@ function startHunt() {
             const sources = await showWebSearchAnim(query);
             thinkEl.style.display = 'none';
             const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
-            addMsg('ai', appendSources(base, sources), true);
+            await typeText(appendSources(base, sources), true);
         } else if (sk) {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : sk.icon + ' ' + sk.name + ' skill\'i uygulanıyor...';
             thinkEl.style.display = 'flex';
@@ -1734,13 +1759,13 @@ function startHunt() {
             showSkillBadge(sk);
             await new Promise(r => setTimeout(r, 400));
             const r = skillResponse(sk, t);
-            addMsg('ai', r, true);
+            await typeText(r, true);
         } else {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'yanıt hazırlanıyor...';
             thinkEl.style.display = 'flex';
             await new Promise(r => setTimeout(r, isSlash ? 200 : 600));
             const r = isSlash ? handleSlash(t) : reply(t);
-            addMsg('ai', r, true);
+            await typeText(r, true);
         }
         renderList();
         busy = false; thinkEl.style.display = 'none'; updateBtn(); i.focus();

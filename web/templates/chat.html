@@ -1656,18 +1656,7 @@ function renderSettingsStyles() {
                 thinkEl.style.display = 'none';
                 if (d.success) {
                     renderSwarmSubtasks(d.subtasks || tasks.map(s=>({...s,status:'done'})));
-                    addMsg('ai', '', true);
-                    const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
-                    const typer = createTyper(ct);
-                    const tokens = d.response.split(/(?<=\s)/);
-                    for (const tok of tokens) {
-                        typer.push(tok);
-                        await new Promise(r => setTimeout(r, 8));
-                    }
-                    typer.flush();
-                    ct.innerHTML = format(d.response);
-                    if (chatId && chats[chatId]) { const ms = chats[chatId].msgs; if (ms.length) ms[ms.length-1].text = d.response; }
-                    setTimeout(() => hljs.highlightAll(), 50);
+                    await typeText(d.response, true);
                 } else {
                     renderSwarmSubtasks([]);
                     addMsg('ai', '⚠️ Swarm hatası: ' + (d.error || 'bilinmeyen'), true);
@@ -1695,7 +1684,7 @@ function renderSettingsStyles() {
                 const sources = await showWebSearchAnim(query);
                 thinkEl.style.display = 'none';
                 const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
-                addMsg('ai', appendSources(base, sources), true);
+                await typeText(appendSources(base, sources), true);
             }
         } else if (sk) {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : sk.icon + ' ' + sk.name + ' skill\'i uygulanıyor...';
@@ -1704,7 +1693,7 @@ function renderSettingsStyles() {
             showSkillBadge(sk);
             await new Promise(r => setTimeout(r, 400));
             const r = await skillResponse(sk, t);
-            addMsg('ai', r, true);
+            await typeText(r, true);
         } else if (!demoMode) {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'GlassesCatCore yanıt hazırlıyor...';
             thinkEl.style.display = 'flex';
@@ -1721,7 +1710,7 @@ function renderSettingsStyles() {
             thinkEl.style.display = 'flex';
             await new Promise(r => setTimeout(r, isSlash ? 200 : 600));
             const r = isSlash ? handleSlash(t) : reply(t);
-            addMsg('ai', r, true);
+            await typeText(r, true);
         }
         renderList();
         busy = false; thinkEl.style.display = 'none'; updateBtn(); i.focus();
@@ -1959,6 +1948,25 @@ function renderSettingsStyles() {
             push(tok) { buf += tok; if (!timer) pump(); },
             flush() { if (buf.length) { el.textContent += buf; buf = ''; } }
         };
+    }
+
+    async function typeText(text, save = true) {
+        addMsg('ai', '', save);
+        const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
+        const typer = createTyper(ct);
+        const tokens = text.split(/(?<=\s)/);
+        for (const tok of tokens) {
+            typer.push(tok);
+            await new Promise(r => setTimeout(r, 6));
+        }
+        typer.flush();
+        ct.innerHTML = format(text);
+        if (save && chatId && chats[chatId]) {
+            const ms = chats[chatId].msgs;
+            if (ms.length) ms[ms.length - 1].text = text;
+        }
+        setTimeout(() => hljs.highlightAll(), 50);
+        return text;
     }
 
     async function streamReply(t) {
