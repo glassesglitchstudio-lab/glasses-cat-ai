@@ -393,10 +393,10 @@
     try { userSkills = JSON.parse(localStorage.getItem('glassescat_skills') || '[]'); } catch(e) { userSkills = []; }
 
     const BUILTIN_SKILLS = [
-        {id:'site-builder', name:'Site Builder', desc:'Web sitesi ve arayüz geliştirme, HTML/CSS/JS', icon:'🛠️'},
-        {id:'tailwind-css', name:'Tailwind CSS', desc:'Utility-first CSS framework, responsive tasarım', icon:'🎨'},
-        {id:'ui-pro-max-engine', name:'UI Pro Max', desc:'Animasyon motorları, neon stil, glassmorphism', icon:'✨'},
-        {id:'ui-ux-pro-max', name:'UI/UX Pro Max', desc:'Tasarım zekası, kullanıcı deneyimi analizi', icon:'🧩'}
+        {id:'site-builder', name:'Site Builder', desc:'Web sitesi ve arayüz geliştirme, HTML/CSS/JS', icon:'🛠️', keywords:['site','web sitesi','web sayfası','arayüz']},
+        {id:'tailwind-css', name:'Tailwind CSS', desc:'Utility-first CSS framework, responsive tasarım', icon:'🎨', keywords:['tailwind','responsive tasarım']},
+        {id:'ui-pro-max-engine', name:'UI Pro Max', desc:'Animasyon motorları, neon stil, glassmorphism', icon:'✨', keywords:['animasyon','glassmorphism','neon stil']},
+        {id:'ui-ux-pro-max', name:'UI/UX Pro Max', desc:'Tasarım zekası, kullanıcı deneyimi analizi', icon:'🧩', keywords:['ui/ux','tasarım zekası','kullanıcı deneyimi']}
     ];
 
     function getAllSkills() {
@@ -688,20 +688,27 @@
         }).catch(e => toast('❌ İndirilemedi: ' + e.message));
     }
 
+    function wordRx(w) {
+        const e = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp('(^|[^a-z0-9çğıöşü])' + e + '($|[^a-z0-9çğıöşü])', 'i');
+    }
+
     function matchSkill(t) {
         const l = t.toLowerCase();
         if (activeSkill) return getAllSkills().find(s => s.id === activeSkill) || null;
         const lib = window.SKILL_LIBRARY || [];
         for (const s of lib) {
-            if (s.keywords && s.keywords.some(k => l.includes(k))) return s;
+            if (s.keywords && s.keywords.some(k => wordRx(k).test(l))) return s;
         }
         for (const s of lib) {
             if (s.match && s.match.test(l)) return s;
         }
         for (const s of BUILTIN_SKILLS.concat(userSkills)) {
-            const keys = (s.name + ' ' + (s.desc || '') + ' ' + s.id).toLowerCase();
-            const words = keys.split(/[^a-z0-9çğıöşü]+/).filter(w => w.length > 2);
-            for (const w of words) if (l.includes(w)) return s;
+            const toks = (s.keywords || []).concat((s.id + ' ' + s.name).toLowerCase().split(/[^a-z0-9çğıöşü]+/)).filter(w => w.length >= 3);
+            const hits = toks.filter(w => wordRx(w).test(l));
+            if (hits.length >= 2) return s;
+            if (s.id.length >= 3 && l.includes(s.id.toLowerCase())) return s;
+            if (hits.length === 1 && hits[0].length >= 4) return s;
         }
         return null;
     }
@@ -724,7 +731,8 @@
             } catch(e) { }
         }
         if (sk.inst) {
-            return '**' + sk.icon + ' ' + sk.name + '** skill\'i uygulandı.\n\n**Yönergeler:** ' + sk.inst + '\n\n"' + q + '" talebi bu yönergeler doğrultusunda işlendi (demo mod — tam motor localhost admin sürümünde aktif).';
+            const inst = sk.inst.length > 600 ? sk.inst.slice(0, 600) + '\n\n_... devamı 🛠️ Skill panelinde_ (_' + sk.id + '_)' : sk.inst;
+            return '**' + sk.icon + ' ' + sk.name + '** skill\'i uygulandı.\n\n**Yönergeler:** ' + inst + '\n\n"' + q + '" talebi bu yönergeler doğrultusunda işlendi (demo mod — tam motor localhost admin sürümünde aktif).';
         }
         return reply(q);
     }
