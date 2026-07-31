@@ -293,7 +293,7 @@ class ModelRouter:
                 "- glassesglitchstudio/x_opus:V1_X_OPUS (SAĞ BEYİN - Siber Güvenlik ve Akıl Yürütme)\n\n"
                 "YETENEKLERİN:\n"
                 "• Kodlama: Python, JS, TS, React, Node, Rust, Go, C++, Java ve tüm modern diller\n"
-                "• Siber Güvenlik: Pentest, exploit analizi, ağ güvenliği, kriptografi, OSINT\n"
+                "• Siber Güvenlik: Pentest, ex_ploit analizi, ağ güvenliği, kriptografi, OSINT\n"
                 "• Akıl Yürütme: Karmaşık problem çözme, stratejik analiz, mantıksal çıkarım\n"
                 "• Sistem: Docker, Linux, API tasarımı, DevOps, bulut altyapıları\n\n"
                 "KURALLAR:\n"

@@ -123,7 +123,39 @@ Kullanabileceğin araçlar şunlardır:
 6. Türkçe yanıt ver
 7. Arkadaş canlısı ve yardımsever ol
 8. Maksimum {max_iterations} adımda sonuca ulaş
+9. DÜŞÜN, KARAR VER, UYGULA, GÖZLEMLE blokları iç düşüncedir, kullanıcıya asla gösterilmez. Sadece ✅ YANITLA bölümünde kullanıcıya cevabını yaz.
 """
+
+
+def extract_answer(text: str) -> str:
+    """ReAct düşünce bloklarını (DÜŞÜN/KARAR/UYGULA/GÖZLEMLE) çıkarır,
+    sadece kullanıcıya gösterilecek final yanıtı döndürür."""
+    if not text:
+        return text
+    react_header_re = re.compile(
+        r"^\s*#{2,4}\s*[^\n]{0,40}?(?:DÜŞÜN|DUSUN|THINK|KARAR VER|DECIDE|UYGULA|ACT|GÖZLEMLE|OBSERVE|YANITLA|ANSWER)",
+        re.IGNORECASE | re.MULTILINE,
+    )
+    answer_header_re = re.compile(
+        r"^\s*#{2,4}\s*[^\n]{0,40}?(?:YANITLA|ANSWER)",
+        re.IGNORECASE | re.MULTILINE,
+    )
+    m = answer_header_re.search(text)
+    if m:
+        tail = text[m.end():].strip()
+        if tail:
+            return tail
+    lines = text.split("\n")
+    out = []
+    skip = False
+    for ln in lines:
+        if react_header_re.match(ln):
+            skip = not answer_header_re.match(ln)
+            continue
+        if not skip:
+            out.append(ln)
+    joined = "\n".join(out).strip()
+    return joined if joined else text
 
 
 # ─────────────────────────────────────────────────────────────
@@ -278,17 +310,18 @@ class AgentLoop:
                     continue
             
             # --- YANITLA (Answer) - Araç çağrısı yoksa yanıtla ---
+            final_response = extract_answer(llm_response)
             self.thoughts.append(Thought(
                 step=self.iteration,
                 type="answer",
-                content=llm_response[:200]
+                content=final_response[:200]
             ))
             
             # --- PLUGIN: after_chat ---
-            self._run_plugin_hook(HookPoint.AFTER_CHAT, response=llm_response, tool_calls=tool_calls)
+            self._run_plugin_hook(HookPoint.AFTER_CHAT, response=final_response, tool_calls=tool_calls)
             
             return {
-                "response": llm_response,
+                "response": final_response,
                 "thoughts": [asdict(t) for t in self.thoughts],
                 "tool_calls": tool_calls,
                 "iterations": self.iteration,

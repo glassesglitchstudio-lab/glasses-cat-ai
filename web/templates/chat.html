@@ -50,10 +50,11 @@
         .tb-btn:hover{border-color:#ccc}
         .tb-btn.active{background:rgba(124,58,237,0.06);border-color:#7c3aed;color:#7c3aed}
         .tb-btn .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-        .model-selector{padding:5px 10px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;cursor:pointer;font-size:.72rem;font-weight:500;color:#444;transition:all .15s;position:relative;display:flex;align-items:center;gap:4px;font-family:inherit}
+        .model-selector{padding:5px 10px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;cursor:pointer;font-size:.72rem;font-weight:500;color:#444;transition:all .15s;position:relative;display:flex;align-items:center;gap:4px;font-family:inherit;max-width:190px}
         .model-selector:hover{border-color:#7c3aed}
-        .model-selector .dot{width:6px;height:6px;border-radius:50%;background:#7c3aed;display:inline-block}
-        .model-dropdown{position:absolute;top:calc(100%+4px);left:0;min-width:180px;background:#fff;border:1px solid #e0ddd5;border-radius:10px;padding:4px;z-index:70;display:none;box-shadow:0 8px 40px rgba(0,0,0,0.06)}
+        .model-selector .dot{width:6px;height:6px;border-radius:50%;background:#7c3aed;display:inline-block;flex-shrink:0}
+        #modelName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;display:inline-block}
+        .model-dropdown{position:absolute;top:calc(100%+4px);left:0;min-width:210px;max-width:calc(100vw - 24px);background:#fff;border:1px solid #e0ddd5;border-radius:10px;padding:4px;z-index:70;display:none;box-shadow:0 8px 40px rgba(0,0,0,0.06)}
         .model-dropdown.show{display:block}
         .model-opt{padding:7px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;color:#333;transition:background .1s}
         .model-opt:hover{background:#f5f5f5}
@@ -268,7 +269,6 @@
                     <div class="model-opt disabled">ShadowCat R:1<span class="sub">yakında</span></div>
                 </div>
             </div>
-            <span id="modeBadge" class="mode-badge demo" title="Backend durumu">◌ demo</span>
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
@@ -1219,8 +1219,7 @@
                 thinkText.textContent = 'web araması + AI derliyor...';
                 await new Promise(r => setTimeout(r, 300));
                 try {
-                    const real = await callChat(t);
-                    addMsg('ai', real, true);
+                    await streamReply(t);
                 } catch(e) {
                     addMsg('ai', '⚠️ Backend hatası: ' + e.message, true);
                 }
@@ -1246,9 +1245,11 @@
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'GlassesCatCore yanıt hazırlıyor...';
             thinkEl.style.display = 'flex';
             try {
-                const r = await callChat(t);
-                addMsg('ai', r, true);
+                await streamReply(t);
             } catch(e) {
+                const inner = document.getElementById('msgsInner');
+                const last = inner.lastElementChild;
+                if (last && last.classList.contains('msg') && last.querySelector('.ct') && !last.querySelector('.ct').textContent) last.remove();
                 addMsg('ai', '⚠️ Backend hatası: ' + e.message + '\n\nDemo modda devam etmek için sayfayı yenile.', true);
             }
         } else {
@@ -1448,6 +1449,67 @@
         const d = await res.json();
         if (!d.success) throw new Error(d.error || 'Backend hata döndürdü');
         return d.response || '';
+    }
+
+    async function streamChat(msg, onToken) {
+        const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel, stream: true})});
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (!res.body) {
+            const d = await res.json();
+            if (!d.success) throw new Error(d.error || 'Backend hata döndürdü');
+            if (d.response) onToken(d.response);
+            return d.response || '';
+        }
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        let buf = '', full = '', streamDone = false;
+        while (!streamDone) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            buf += dec.decode(value, {stream:true});
+            let idx;
+            while ((idx = buf.indexOf('\n\n')) !== -1) {
+                const chunk = buf.slice(0, idx);
+                buf = buf.slice(idx + 2);
+                const line = chunk.trim();
+                if (!line.startsWith('data:')) continue;
+                let d;
+                try { d = JSON.parse(line.slice(5).trim()); } catch(e) { continue; }
+                if (d.error) throw new Error(d.error);
+                if (d.token) { full += d.token; onToken(d.token); }
+                if (d.done) { streamDone = true; break; }
+            }
+        }
+        return full;
+    }
+
+    function createTyper(el) {
+        let buf = '', timer = null;
+        function pump() {
+            const n = Math.min(buf.length, 4);
+            if (n > 0) { el.textContent += buf.slice(0, n); buf = buf.slice(n); scrollBottom(); }
+            if (buf.length) timer = setTimeout(pump, 14);
+            else timer = null;
+        }
+        return {
+            push(tok) { buf += tok; if (!timer) pump(); },
+            flush() { if (buf.length) { el.textContent += buf; buf = ''; } }
+        };
+    }
+
+    async function streamReply(t) {
+        addMsg('ai', '', true);
+        const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
+        const typer = createTyper(ct);
+        const full = await streamChat(t, tok => typer.push(tok));
+        typer.flush();
+        ct.innerHTML = format(full);
+        if (chatId && chats[chatId]) {
+            const ms = chats[chatId].msgs;
+            if (ms.length) ms[ms.length - 1].text = full;
+        }
+        setTimeout(() => hljs.highlightAll(), 50);
+        return full;
     }
 
     async function checkBackend() {

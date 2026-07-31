@@ -17,7 +17,7 @@
 """
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -142,6 +142,7 @@ class ChatRequest(BaseModel):
     model: Optional[str] = None
     username: Optional[str] = None
     token: Optional[str] = None
+    stream: Optional[bool] = False
 
 
 class LaunchRequest(BaseModel):
@@ -293,6 +294,71 @@ async def chat(request: ChatRequest):
         username = request.username
         if request.token and request.token in SESSIONS:
             username = SESSIONS[request.token]["username"]
+        
+        # Model seçimi: frontend'den gelen modele göre yönlendir
+        model_choice = (request.model or "X_OPUS").upper()
+        
+        # ── STREAMING MODU ──
+        if request.stream:
+            def sse(data: dict):
+                return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
+            
+            async def stream_gen():
+                try:
+                    if model_choice in ("X_GLITCH_OPUS", "X_FABLE_CODER"):
+                        from xopus_router import get_xopus, GLITCH_MODEL, CODE_MODEL
+                        xopus = get_xopus()
+                        override = GLITCH_MODEL if model_choice == "X_GLITCH_OPUS" else CODE_MODEL
+                        for ch in xopus.chat_stream(
+                            message=request.message,
+                            system_prompt=None,
+                            model=override
+                        ):
+                            yield sse(ch)
+                        yield sse({"done": True})
+                    elif CORE_AVAILABLE:
+                        import threading
+                        from glassescat_agent_loop import extract_answer
+                        holder = {}
+                        def run_core():
+                            try:
+                                core = get_core()
+                                res = core.process_message(request.message)
+                                holder["text"] = res.get("response", "")
+                            except Exception as e:
+                                holder["error"] = str(e)
+                        th = threading.Thread(target=run_core, daemon=True)
+                        th.start()
+                        th.join(timeout=120)
+                        if holder.get("error"):
+                            yield sse({"error": holder["error"]})
+                            return
+                        text = holder.get("text", "")
+                        if isinstance(text, dict):
+                            text = text.get("response") or text.get("text") or text.get("error") or str(text)
+                        elif isinstance(text, str) and text.startswith("{") and ("'response'" in text[:80] or "'error'" in text[:80]):
+                            try:
+                                inner = json.loads(text.replace("'", '"'))
+                                if isinstance(inner, dict):
+                                    text = inner.get("response") or inner.get("text") or inner.get("error") or str(inner)
+                            except Exception:
+                                pass
+                        text = extract_answer(text or "")
+                        yield sse({"token": text, "done": False})
+                        yield sse({"done": True})
+                    else:
+                        text = await get_ai_response(request.message, request.model)
+                        yield sse({"token": text, "done": False})
+                        yield sse({"done": True})
+                except Exception as e:
+                    logger.error(f"Stream hatasi: {e}")
+                    yield sse({"error": str(e)})
+            
+            return StreamingResponse(
+                stream_gen(),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+            )
         
         # Düşünme gösterimi
         logger.info("🤔 Düşünüyorum...")
