@@ -1392,6 +1392,281 @@ async def agent_loop_status():
 
 
 # ═══════════════════════════════════════════════════════════════
+# SWARM SUBAGENT — Paralel Alt Ajan Sistemi
+# ═══════════════════════════════════════════════════════════════
+
+class SwarmRequest(BaseModel):
+    message: str
+
+@app.post("/api/swarm")
+async def swarm_execute(request: SwarmRequest):
+    """Swarm Agent — mesajı alt görevlere böl, paralel çalıştır, birleştir"""
+    try:
+        msg = request.message
+        subtask_status = [
+            {"name": "web_search", "label": "Web'de ara", "icon": "🌐", "status": "running"},
+            {"name": "memory_search", "label": "Hafızada ara", "icon": "📚", "status": "running"},
+            {"name": "ai_analyze", "label": "AI analiz", "icon": "🤖", "status": "running"},
+            {"name": "code_gen", "label": "Kod üretimi", "icon": "💻", "status": "running"},
+            {"name": "skill_matcher", "label": "Skill eşleştirme", "icon": "🎯", "status": "running"},
+            {"name": "translate", "label": "Çeviri", "icon": "🌍", "status": "running"},
+        ]
+
+        # 6 alt ajanı paralel çalıştır
+        web_task = _swarm_web_search(msg)
+        memory_task = _swarm_memory_search(msg)
+        ai_task = _swarm_ai_analyze(msg)
+        code_task = _swarm_code_gen(msg)
+        skill_task = _swarm_skill_matcher(msg)
+        translate_task = _swarm_translate(msg)
+
+        web_result, memory_result, ai_result, code_result, skill_result, translate_result = await asyncio.gather(
+            web_task, memory_task, ai_task, code_task, skill_task, translate_task, return_exceptions=True
+        )
+
+        # Hataları temizle
+        def clean(r):
+            return "" if isinstance(r, Exception) else (r or "")
+        web_result = clean(web_result)
+        memory_result = clean(memory_result)
+        ai_result = clean(ai_result)
+        code_result = clean(code_result)
+        skill_result = clean(skill_result)
+        translate_result = clean(translate_result)
+
+        # Subtask durumlarını güncelle
+        for s in subtask_status:
+            s["status"] = "done"
+
+        # Birleştir
+        combined = _swarm_combine(msg, web_result, memory_result, ai_result, code_result, skill_result, translate_result)
+
+        # Tüm alt ajanlar boş döndüyse direkt AI'ya sor
+        if not combined:
+            direct = await get_ai_response(msg)
+            if direct and "❌" not in direct:
+                combined = (
+                    f"🐝 **Swarm Agent** — Alt ajanlar veri bulamadı, direkt AI yanıtı:\n\n"
+                    f"{direct}"
+                )
+            else:
+                combined = "⚠️ Swarm Agent şu anda yanıt üretemedi. Lütfen tekrar dene."
+
+        return {
+            "success": True,
+            "response": combined,
+            "subtasks": subtask_status
+        }
+    except Exception as e:
+        logger.error(f"Swarm hatası: {e}")
+        return {"success": False, "error": str(e), "subtasks": []}
+
+
+async def _swarm_web_search(query: str) -> str:
+    """🌐 Web arama alt ajanı — DuckDuckGo üzerinden anlık bilgi toplar"""
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(
+                "https://api.duckduckgo.com/",
+                params={"q": query, "format": "json", "no_html": 1, "skip_disambig": 1},
+                headers={"User-Agent": "GlassesCat-Swarm/1.0"}
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                abstract = data.get("AbstractText", "") or ""
+                source = data.get("AbstractSource", "") or ""
+                if abstract:
+                    result = abstract[:600]
+                    if source:
+                        result += f"\nKaynak: {source}"
+                    return result
+                # Fallback: İlgili başlıklar
+                topics = data.get("RelatedTopics", [])
+                if topics:
+                    lines = []
+                    for t in topics[:3]:
+                        if isinstance(t, dict):
+                            text = t.get("Text", "") or t.get("Result", "") or ""
+                            if text:
+                                lines.append(text[:200])
+                    if lines:
+                        return "\n".join(lines)
+    except Exception as e:
+        logger.warning(f"Swarm web_search hatası: {e}")
+    return ""
+
+
+async def _swarm_memory_search(query: str) -> str:
+    """📚 Hafıza arama alt ajanı — Obsidian'dan ilgili bilgileri getirir"""
+    if not CORE_AVAILABLE:
+        return ""
+    try:
+        core = get_core()
+        if core.memory:
+            results = core.memory.recall(query, max_results=5)
+            if results:
+                parts = []
+                seen = set()
+                for r in results:
+                    path = r.get("path", "")
+                    if path in seen:
+                        continue
+                    seen.add(path)
+                    preview = r.get("content_preview", "")[:200].replace("\n", " ").strip()
+                    mtype = r.get("type", "not")
+                    parts.append(f"{'📄' if mtype != 'konusma' else '💬'} {preview}")
+                if parts:
+                    return "\n".join(parts[:3])
+    except Exception as e:
+        logger.warning(f"Swarm memory_search hatası: {e}")
+    return ""
+
+
+async def _swarm_ai_analyze(query: str) -> str:
+    """🤖 AI analiz alt ajanı — mesajı derinlemesine analiz eder"""
+    try:
+        analysis_prompt = (
+            f"Kullanıcı şunu dedi: \"{query}\"\n\n"
+            "Bunu analiz et:\n"
+            "1. Bu ne tür bir istek/soru?\n"
+            "2. Hangi alt başlıkları var?\n"
+            "3. Kısa bir özet çıkar (2-3 cümle)\n\n"
+            "Format:\n"
+            "Tür: ...\n"
+            "Özet: ..."
+        )
+        result = await get_ai_response(analysis_prompt)
+        if result and "❌" not in result:
+            return result[:400]
+    except Exception as e:
+        logger.warning(f"Swarm ai_analyze hatası: {e}")
+    return ""
+
+
+async def _swarm_code_gen(query: str) -> str:
+    """💻 Kod üretim alt ajanı — kod taleplerini algılar, artifact hazırlar"""
+    try:
+        # Kod talebi var mı kontrol et
+        code_keywords = ["yaz", "kod", "kodla", "fonksiyon", "program", "script", "python", "javascript", "html", "css", "yap", "oluştur", "üret"]
+        ql = query.lower()
+        if not any(k in ql for k in code_keywords):
+            return ""
+
+        code_prompt = (
+            f"Kullanıcı şunu istedi: \"{query}\"\n\n"
+            "Sadece kod üret. Açıklama yazma. Markdown kullanma.\n"
+            "Dil: python, javascript, html veya uygun olan neyse.\n"
+            "Kodu ```python veya ```javascript veya ```html blokları içinde döndür."
+        )
+        result = await get_ai_response(code_prompt)
+        if result and "❌" not in result:
+            # Kod bloğu yakala
+            import re
+            blocks = re.findall(r'```(\w+)?\n(.*?)```', result, re.DOTALL)
+            if blocks:
+                parts = []
+                for lang, code in blocks[:2]:
+                    lang_label = lang or "text"
+                    code_clean = code.strip()[:300]
+                    parts.append(f"```{lang_label}\n{code_clean}\n```")
+                if parts:
+                    return "\n\n".join(parts)
+            return result[:500]
+    except Exception as e:
+        logger.warning(f"Swarm code_gen hatası: {e}")
+    return ""
+
+
+async def _swarm_skill_matcher(query: str) -> str:
+    """🎯 Skill eşleştirme alt ajanı — mesaja en uygun skill'i bulur"""
+    try:
+        ql = query.lower()
+        # Skill kontrolü (frontend'deki BUILTIN_SKILLS ile senkron)
+        skills_db = [
+            ("site-builder", "🛠️", ["site", "web sitesi", "web sayfası", "arayüz", "tasarım"], "Web sitesi ve arayüz geliştirme"),
+            ("tailwind-css", "🎨", ["tailwind", "responsive tasarım", "css framework"], "Utility-first CSS framework"),
+            ("ui-pro-max", "✨", ["animasyon", "glassmorphism", "neon stil", "ui"], "Animasyon motorları"),
+            ("ui-ux-pro-max", "🧩", ["ui/ux", "tasarım zekası", "kullanıcı deneyimi"], "Tasarım zekası"),
+        ]
+        matches = []
+        for sid, icon, keywords, desc in skills_db:
+            if any(k in ql for k in keywords):
+                matches.append(f"{icon} **{sid}** — {desc}")
+        if matches:
+            return "Eşleşen skill'ler:\n" + "\n".join(matches[:3])
+    except Exception as e:
+        logger.warning(f"Swarm skill_matcher hatası: {e}")
+    return ""
+
+
+async def _swarm_translate(query: str) -> str:
+    """🌍 Çeviri alt ajanı — dil algılar ve çeviri yapar"""
+    try:
+        ql = query.lower()
+        # Çeviri talebi kontrolü
+        translate_triggers = ["çevir", "çeviri", "translate", "ingilizce", "türkçe", "english", "turkish", "şu metni"]
+        if not any(t in ql for t in translate_triggers):
+            return ""
+
+        translate_prompt = (
+            f"Kullanıcı mesajı: \"{query}\"\n\n"
+            "Bu bir çeviri talebi. Şunları yap:\n"
+            "1. Kaynak dili ve hedef dili tespit et\n"
+            "2. Çeviriyi yap\n"
+            "3. Çevrilen metni döndür\n\n"
+            "Format:\n"
+            "Dil: kaynak → hedef\n"
+            "Çeviri: ..."
+        )
+        result = await get_ai_response(translate_prompt)
+        if result and "❌" not in result:
+            return result[:400]
+    except Exception as e:
+        logger.warning(f"Swarm translate hatası: {e}")
+    return ""
+
+
+def _swarm_combine(query: str, web: str, memory: str, ai: str, code: str = "", skill: str = "", translate: str = "") -> str:
+    """Alt ajan sonuçlarını birleştirip tek bir yanıt oluşturur"""
+    parts = []
+    has_any = False
+
+    if code:
+        has_any = True
+        parts.append(f"💻 **Kod Çıktısı**\n{code}")
+
+    if skill:
+        has_any = True
+        parts.append(f"🎯 **Skill Eşleşmesi**\n{skill}")
+
+    if translate:
+        has_any = True
+        parts.append(f"🌍 **Çeviri**\n{translate}")
+
+    if memory:
+        has_any = True
+        parts.append(f"📚 **Hafızamdan Bulduklarım**\n{memory}")
+
+    if web:
+        has_any = True
+        parts.append(f"🌐 **Web'den Anlık Bilgiler**\n{web}")
+
+    if ai:
+        has_any = True
+        parts.append(f"🤖 **Analizim**\n{ai}")
+
+    if not has_any:
+        return ""
+
+    return (
+        f"🐝 **Swarm Agent — Paralel İşleme Tamamlandı**\n\n"
+        f"Sorgun: _{query}_\n\n"
+        + "\n\n".join(parts) +
+        "\n\n---\n_Tüm alt ajanlar paralel çalıştırıldı ve sonuçlar birleştirildi._"
+    )
+
+
+# ═══════════════════════════════════════════════════════════════
 # V4+ TEXT-TO-IMAGE API ENDPOINT
 # ═══════════════════════════════════════════════════════════════
 

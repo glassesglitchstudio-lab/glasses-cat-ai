@@ -267,6 +267,7 @@
             <button class="tb-btn" id="thinkBtn" onclick="toggleThinking()" title="Derin düşünme">🧠 Derin</button>
             <button class="tb-btn" onclick="toggleArtifacts()" id="artifactsBtn" title="Artifacts">📦 Çıktılar</button>
             <button class="tb-btn" onclick="showUploadModal()" title="Dosya yükle">📎</button>
+            <button class="tb-btn" id="swarmBtn" onclick="toggleSwarm()" title="Swarm Agent">🐝 Swarm</button>
         </div>
     </div>
 
@@ -495,6 +496,8 @@
     let currentStyle = 'normal';
     let webSearchEnabled = false;
     let extendedThinking = false;
+    let swarmMode = false;
+    let swarmSubtasks = [];
     let artifacts = [];
     let pendingFile = null;
     let activeTab = 'chats';
@@ -1176,6 +1179,39 @@ function renderSettingsStyles() {
         toast(extendedThinking ? 'Derin düşünme açık' : 'Derin düşünme kapalı');
     }
 
+    function toggleSwarm() {
+        swarmMode = !swarmMode;
+        document.getElementById('swarmBtn').classList.toggle('active', swarmMode);
+        document.getElementById('swarmBtn').innerHTML = swarmMode ? '🐝 Swarm: Açık' : '🐝 Swarm';
+        renderSwarmSubtasks([]);
+        toast(swarmMode ? '🐝 Swarm Agent açık — paralel alt ajanlar çalışacak' : 'Swarm kapalı');
+    }
+
+    function renderSwarmSubtasks(tasks) {
+        const inner = document.getElementById('msgsInner');
+        let existing = document.getElementById('swarmPanel');
+        if (!tasks || !tasks.length) {
+            if (existing) existing.remove();
+            return;
+        }
+        if (!existing) {
+            existing = document.createElement('div');
+            existing.id = 'swarmPanel';
+            existing.style.cssText = 'margin-bottom:8px;padding:12px 14px;background:#f8f8f8;border:1px solid #e0ddd5;border-radius:10px;font-size:.75rem';
+            inner.appendChild(existing);
+        }
+        existing.innerHTML = '<div style="font-weight:600;margin-bottom:8px;color:#7c3aed">🐝 Swarm Agent — Alt Ajanlar</div>'
+            + tasks.map(t =>
+                '<div style="display:flex;align-items:center;gap:8px;padding:4px 0">'
+                + '<span>' + (t.status === 'running' ? '⏳' : t.status === 'done' ? '✅' : '⏸️') + '</span>'
+                + '<span>' + t.icon + '</span>'
+                + '<span style="color:#333">' + t.label + '</span>'
+                + '<span style="margin-left:auto;font-size:.65rem;color:' + (t.status === 'done' ? '#16a34a' : '#7c3aed') + '">' + t.status + '</span>'
+                + '</div>'
+            ).join('');
+        scrollBottom();
+    }
+
     function toggleArtifacts() {
         const p = document.getElementById('artifactsPanel');
         p.classList.toggle('open');
@@ -1597,7 +1633,34 @@ function renderSettingsStyles() {
         const thinkText = document.getElementById('thinkText');
         const wantSearch = webSearchEnabled || t.toLowerCase().startsWith('/search ');
         const sk = (!wantSearch && !isSlash) ? matchSkill(t) : null;
-        if (wantSearch) {
+        if (swarmMode && !isSlash) {
+            thinkEl.style.display = 'flex';
+            thinkText.textContent = '🐝 Swarm Agent paralel alt ajanlar çalışıyor...';
+            await new Promise(r => setTimeout(r, 300));
+            try {
+                const tasks = [
+                    {name:'web_search', label:'Web\'de ara', icon:'🌐', status:'running'},
+                    {name:'memory_search', label:'Hafızada ara', icon:'📚', status:'running'},
+                    {name:'ai_analyze', label:'AI analiz', icon:'🤖', status:'running'},
+                    {name:'code_gen', label:'Kod üretimi', icon:'💻', status:'running'},
+                    {name:'skill_matcher', label:'Skill eşleştirme', icon:'🎯', status:'running'},
+                    {name:'translate', label:'Çeviri', icon:'🌍', status:'running'}
+                ];
+                renderSwarmSubtasks(tasks);
+                const res = await fetch('/api/swarm', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})});
+                const d = await res.json();
+                if (d.success) {
+                    renderSwarmSubtasks(d.subtasks || tasks.map(s=>({...s,status:'done'})));
+                    addMsg('ai', d.response, true);
+                } else {
+                    renderSwarmSubtasks([]);
+                    addMsg('ai', '⚠️ Swarm hatası: ' + (d.error || 'bilinmeyen'), true);
+                }
+            } catch(e) {
+                renderSwarmSubtasks([]);
+                addMsg('ai', '⚠️ Swarn hatası: ' + e.message, true);
+            }
+        } else if (wantSearch) {
             if (!demoMode) {
                 thinkEl.style.display = 'flex';
                 thinkText.textContent = 'web araması + AI derliyor...';
