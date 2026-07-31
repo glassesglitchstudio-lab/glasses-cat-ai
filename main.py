@@ -945,6 +945,44 @@ async def execute_task(request: TaskRequest):
         return {"success": False, "error": str(e)}
 
 
+@app.post("/api/artifacts/edit")
+async def edit_artifact(req: dict):
+    """Secili HTML elementi icin AI ile CSS duzenlemesi uretir"""
+    selector = (req.get("selector") or "").strip()
+    instruction = (req.get("instruction") or "").strip()
+    html_src = (req.get("html") or "").strip()[:20000]
+    if not selector or not instruction:
+        return {"success": False, "error": "selector ve instruction gerekli"}
+    if not CORE_AVAILABLE:
+        return {"success": False, "error": "GlassescatCore yuklu degil"}
+    
+    prompt = (
+        "Sen bir web tasarim asistanisin. Kullanici, olusturulan HTML sayfasinda tek bir elementi duzenlemek istiyor.\n"
+        f"Secili element (CSS selector): `{selector}`\n"
+        f"Kullanici talimati: {instruction}\n\n"
+        "Sayfanin HTML'i:\n```html\n" + html_src + "\n```\n\n"
+        "Sadece bu element icin bir CSS kural blogu dondur: `{ selector { property: value; } }` seklinde.\n"
+        "Sayfanin geri kalanini degistirme. Aciklama yazma, markdown kullanma."
+    )
+    
+    try:
+        core = get_core()
+        result = core.process_message(prompt)
+        resp = (result.get("response") or "").strip()
+    except Exception as e:
+        return {"success": False, "error": f"AI motoru hatasi: {e}"}
+    
+    if not resp:
+        return {"success": False, "error": "AI yaniti bos"}
+    
+    m = re.search(r"\{[\s\S]*\}", resp)
+    if not m:
+        return {"success": False, "error": "Gecerli CSS uretilemedi"}
+    
+    css = f"{selector} {m.group(0)}".strip()
+    return {"success": True, "css": css, "engine_used": "GlassescatCore"}
+
+
 @app.get("/api/memory/search")
 async def search_memory(query: str, max_results: int = 5):
     """Hafizada ara"""
