@@ -994,11 +994,11 @@ class GlassescatNotes:
 
 # ===== AI ENTEGRASYONU =====
 class GlassescatAI:
-    """AI sohbet sistemi (Ollama - GulmezCetiner V3A)"""
+    """AI sohbet sistemi (Ollama - X_OPUS serisi)"""
     
     OLLAMA_URL = "http://localhost:11434/api/generate"
-    DEFAULT_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"
-    ALT_MODEL = "gulmzcetinermax:latest"
+    DEFAULT_MODEL = "glassesglitchstudio/x_opus:V1_X_OPUS"
+    ALT_MODEL = "glassesglitchstudio/glitch_opus:X_GLITCH_OPUS"
     
     @staticmethod
     def chat(message: str, model: str = None) -> Dict:

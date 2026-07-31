@@ -409,6 +409,7 @@
 <script src="/static/skills-library.js"></script>
 <script>
     let chats = {}, chatId = null, busy = false, demoMode = true;
+    let currentModel = 'X_OPUS';
     let currentStyle = 'normal';
     let webSearchEnabled = false;
     let extendedThinking = false;
@@ -481,10 +482,12 @@
     }
 
     function selectModel(id) {
+        currentModel = id;
         document.getElementById('modelName').textContent = id.replace('_', ' ');
         document.getElementById('sidebarModel').textContent = id;
+        document.querySelectorAll('.model-opt').forEach(o => o.classList.toggle('active', o.getAttribute('onclick').indexOf(id) >= 0));
         document.getElementById('modelDropdown').classList.remove('show');
-        toast(id);
+        toast(id + ' seçildi');
     }
 
     function toggleStyle() {
@@ -1441,7 +1444,7 @@
     }
 
     async function callChat(msg) {
-        const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg})});
+        const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel})});
         const d = await res.json();
         if (!d.success) throw new Error(d.error || 'Backend hata döndürdü');
         return d.response || '';

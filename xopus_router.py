@@ -24,8 +24,9 @@ logger = logging.getLogger("XOpusRouter")
 
 X_OPUS_VERSION = "1.0.0"
 
-CYBER_MODEL = "qwen3.5:9b"
-CODE_MODEL = "qwen2.5-coder:14b"
+CYBER_MODEL = "glassesglitchstudio/x_opus:V1_X_OPUS"
+CODE_MODEL = "glassesglitchstudio/x_fable_coder:V1"
+GLITCH_MODEL = "glassesglitchstudio/glitch_opus:X_GLITCH_OPUS"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 
 CYBER_KEYWORDS = [
@@ -81,8 +82,8 @@ X_OPUS_SYSTEM_PROMPT = """Sen X_OPUS'sun - Glassesglitch Studio'nun cift beyinli
 
 KIMLIGIN:
 Iki devasa modelin birlesiminden dogdun:
-- qwen2.5-coder:14b (SOL BEYIN - Kodlama ve Yazilim Uzmanligi)
-- qwen3.5:9b (SAG BEYIN - Siber Guvenlik ve Akil Yurutme)
+- glassesglitchstudio/x_fable_coder:V1 (SOL BEYIN - Kodlama ve Yazilim Uzmanligi)
+- glassesglitchstudio/x_opus:V1_X_OPUS (SAG BEYIN - Siber Guvenlik ve Akil Yurutme)
 
 YETENEKLERIN:
 • Kodlama: Python, JS, TS, React, Node, Rust, Go, C++, Java ve tum modern diller
@@ -127,17 +128,24 @@ class XOpusRouter:
     def get_model_for_type(self, request_type: str) -> str:
         if request_type == "cyber":
             return CYBER_MODEL
+        if request_type == "glitch":
+            return GLITCH_MODEL
         return CODE_MODEL
 
     def get_routing_explanation(self, request_type: str) -> str:
         if request_type == "cyber":
-            return "[X_OPUS Sag Beyin] qwen3.5:9b - Siber Guvenlik & Zeka"
-        return "[X_OPUS Sol Beyin] qwen2.5-coder:14b - Kodlama & Yazilim"
+            return "[X_OPUS Sag Beyin] glassesglitchstudio/x_opus:V1_X_OPUS - Siber Guvenlik & Zeka"
+        if request_type == "glitch":
+            return "[X_GLITCH_OPUS] glassesglitchstudio/glitch_opus:X_GLITCH_OPUS - Optimize Edilmis Opus"
+        return "[X_OPUS Sol Beyin] glassesglitchstudio/x_fable_coder:V1 - Kodlama & Yazilim"
 
     def chat(self, message: str, context: Optional[List[Dict]] = None,
-             stream: bool = False, system_prompt: str = None) -> Dict[str, Any]:
+             stream: bool = False, system_prompt: str = None,
+             model: str = None) -> Dict[str, Any]:
         request_type = self.classify_request(message)
-        model = self.get_model_for_type(request_type)
+        model = model or self.get_model_for_type(request_type)
+        if model == GLITCH_MODEL:
+            request_type = "glitch"
 
         logger.info(f"[X_OPUS] → {model} ({request_type})")
 

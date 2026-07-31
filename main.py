@@ -302,7 +302,30 @@ async def chat(request: ChatRequest):
         tool_calls = []
         thoughts = []
         
-        if CORE_AVAILABLE:
+        # Model seçimi: frontend'den gelen modele göre yönlendir
+        model_choice = (request.model or "X_OPUS").upper()
+        
+        if model_choice in ("X_GLITCH_OPUS", "X_FABLE_CODER"):
+            try:
+                from xopus_router import get_xopus, GLITCH_MODEL, CODE_MODEL
+                xopus = get_xopus()
+                override = GLITCH_MODEL if model_choice == "X_GLITCH_OPUS" else CODE_MODEL
+                result = xopus.chat(
+                    message=request.message,
+                    system_prompt=None,
+                    model=override
+                )
+                response_text = result.get("response", "")
+                if result.get("routing"):
+                    thoughts = [result["routing"]]
+                if not response_text:
+                    response_text = f"Üzgünüm, {model_choice} yanıt üretemedi: {result.get('error', 'bilinmeyen hata')}"
+            except ImportError:
+                response_text = "X_OPUS modülü bulunamadı. `xopus_router.py` eksik."
+            except Exception as e:
+                logger.error(f"X_OPUS hatası: {e}")
+                response_text = f"⚠️ {model_choice} hatası: {e}"
+        elif CORE_AVAILABLE:
             try:
                 core = get_core()
                 result = core.process_message(request.message)
@@ -339,7 +362,7 @@ async def chat(request: ChatRequest):
         return {
             "success": True,
             "response": response_text,
-            "engine_used": "GlassescatCore" if CORE_AVAILABLE else "Hybrid",
+            "engine_used": model_choice,
             "username": username,
             "tool_calls": tool_calls[:5] if tool_calls else [],
             "thoughts": thoughts[-3:] if thoughts else []

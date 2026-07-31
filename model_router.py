@@ -41,6 +41,30 @@ import requests
 
 # Model bilgileri - Türkçe açıklamalar
 MODELS_INFO = {
+    "glassesglitchstudio/x_opus:V1_X_OPUS": {
+        "name": "X_OPUS V1",
+        "size": "6.6 GB",
+        "purpose": "ANA - Hibrit Beyin (Siber Güvenlik + Kodlama)",
+        "description": "Glassesglitch Studio'nun çift beyinli hibrit modeli. Siber güvenlik, akıl yürütme ve genel görevlerde uzman.",
+        "language": "Türkçe + İngilizce",
+        "color": "#00ff88"  # Neon yeşil
+    },
+    "glassesglitchstudio/glitch_opus:X_GLITCH_OPUS": {
+        "name": "X_GLITCH_OPUS",
+        "size": "6.6 GB",
+        "purpose": "GLITCH - Optimizasyonlu Opus",
+        "description": "Glitch optimizasyonuyla hızlandırılmış X_OPUS varyantı. Hızlı yanıt ve verimli akıl yürütme.",
+        "language": "Türkçe + İngilizce",
+        "color": "#00ff88"  # Neon yeşil
+    },
+    "glassesglitchstudio/x_fable_coder:V1": {
+        "name": "X_FABLE_CODER",
+        "size": "9.0 GB",
+        "purpose": "KOD - Kod Üretim ve Debug",
+        "description": "Kod yazma, hata ayıklama ve yazılım geliştirme uzmanı. Python, JS, backend, frontend.",
+        "language": "Türkçe + İngilizce",
+        "color": "#f59e0b"  # Turuncu
+    },
     "glassesglitchstudio/gulmzcetiner:V3A": {
         "name": "GulmezCetiner V3A",
         "size": "8.0 GB",
@@ -91,16 +115,16 @@ MODELS_INFO = {
     }
 }
 
-# Model tanımları - V3A birincil model, GulmezCetinerMax alternatif
-PRIMARY_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"       # ANA AGI - Tüm görevler
-PRIMARY_MODEL_ALT = "GulmezCetinerMax:latest"   # Alternatif AGI
-CHAT_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"          # Birincil: V3A
-CHAT_MODEL_ALT = "GulmezCetinerMax:latest"      # Alternatif: GulmezCetinerMax
-CODING_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"        # Birincil: V3A
-CODING_MODEL_ALT = "qwen2.5-coder:14b"         # Alternatif: Qwen Coder
-ANALYSIS_MODEL = "glassesglitchstudio/gulmzcetiner:V3A"      # Birincil: V3A
-ANALYSIS_MODEL_ALT = "deepseek-r1:8b"          # Alternatif: DeepSeek
-VISION_MODEL = "llava:latest"                  # Vizyon: LLaVA (değişmedi)
+# Model tanımları - X_OPUS serisi birincil, gerçek ollama modelleri
+PRIMARY_MODEL = "glassesglitchstudio/x_opus:V1_X_OPUS"       # ANA - Tüm görevler
+PRIMARY_MODEL_ALT = "glassesglitchstudio/glitch_opus:X_GLITCH_OPUS"   # Alternatif: Glitch Opus
+CHAT_MODEL = "glassesglitchstudio/x_opus:V1_X_OPUS"          # Birincil: X_OPUS
+CHAT_MODEL_ALT = "glassesglitchstudio/glitch_opus:X_GLITCH_OPUS"      # Alternatif: Glitch Opus
+CODING_MODEL = "glassesglitchstudio/x_fable_coder:V1"        # Kodlama: Fable Coder
+CODING_MODEL_ALT = "glassesglitchstudio/x_fable_coder:V1"    # Alternatif: Fable Coder
+ANALYSIS_MODEL = "glassesglitchstudio/x_opus:V1_X_OPUS"      # Analiz: X_OPUS
+ANALYSIS_MODEL_ALT = "glassesglitchstudio/glitch_opus:X_GLITCH_OPUS"  # Alternatif: Glitch Opus
+VISION_MODEL = "llava:latest"                  # Vizyon: LLaVA (opsiyonel, yoksa vizyon devre dışı)
 
 # AGI modu - V3A kullanılsın mı?
 # X_OPUS Hibrit Model
@@ -265,8 +289,8 @@ class ModelRouter:
             "xopus": (
                 "Sen X_OPUS'sun - Glassesglitch Studio'nun çift beyinli hibrit yapay zekasısın.\n\n"
                 "İki devasa modelin birleşiminden doğdun:\n"
-                "- qwen2.5-coder:14b (SOL BEYİN - Kodlama ve Yazılım Uzmanlığı)\n"
-                "- qwen3.5:9b (SAĞ BEYİN - Siber Güvenlik ve Akıl Yürütme)\n\n"
+                "- glassesglitchstudio/x_fable_coder:V1 (SOL BEYİN - Kodlama ve Yazılım Uzmanlığı)\n"
+                "- glassesglitchstudio/x_opus:V1_X_OPUS (SAĞ BEYİN - Siber Güvenlik ve Akıl Yürütme)\n\n"
                 "YETENEKLERİN:\n"
                 "• Kodlama: Python, JS, TS, React, Node, Rust, Go, C++, Java ve tüm modern diller\n"
                 "• Siber Güvenlik: Pentest, exploit analizi, ağ güvenliği, kriptografi, OSINT\n"

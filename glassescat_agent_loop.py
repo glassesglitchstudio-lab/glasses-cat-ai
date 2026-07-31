@@ -500,12 +500,12 @@ class AgentLoop:
                 except Exception:
                     pass
                 
-                # Ollama - V3A ile dene
+                # Ollama - X_OPUS ile dene
                 try:
                     resp = session.post(
                         "http://localhost:11434/v1/chat/completions",
                         json={
-                            "model": "glassesglitchstudio/gulmzcetiner:V3A",
+                            "model": "glassesglitchstudio/x_opus:V1_X_OPUS",
                             "messages": [
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
@@ -531,10 +531,10 @@ class AgentLoop:
                 result_container.append(self._get_fallback_response(system_prompt, user_prompt))
                 done_event.set()
         
-        # Thread ile calistir (maks 5 saniye)
+        # Thread ile calistir (maks 120 saniye - buyuk modeller icin yeterli)
         thread = threading.Thread(target=try_llm, daemon=True)
         thread.start()
-        thread.join(timeout=5)
+        thread.join(timeout=120)
         
         if result_container:
             return result_container[0]
