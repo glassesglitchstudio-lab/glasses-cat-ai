@@ -369,6 +369,11 @@
         </div>
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e0ddd5">
             <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">🤖 Skill Avcısı</label>
+            <div style="display:flex;gap:4px;margin-bottom:8px">
+                <button id="srcGithub" class="src-tab active" onclick="setHuntSource('github')" style="padding:5px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.68rem;font-family:inherit">GitHub</button>
+                <button id="srcSkillsllm" class="src-tab" onclick="setHuntSource('skillsllm')" style="padding:5px 12px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;color:#555;cursor:pointer;font-size:.68rem;font-family:inherit">🧠 skillsllm.com</button>
+                <button id="srcBoth" class="src-tab" onclick="setHuntSource('both')" style="padding:5px 12px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;color:#555;cursor:pointer;font-size:.68rem;font-family:inherit">Hepsi</button>
+            </div>
             <div style="display:flex;gap:6px">
                 <input id="huntQuery" placeholder="Örn: pdf işleme, tablo okuma..." style="flex:1;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-size:.75rem;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')startHunt()">
                 <button onclick="startHunt()" style="padding:8px 14px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.75rem;font-family:inherit;white-space:nowrap">🔎 Ara & Yükle</button>
@@ -829,6 +834,15 @@
     }
 
     let huntBusy = false;
+    let huntSource = 'github';
+
+    function setHuntSource(src) {
+        huntSource = src;
+        document.querySelectorAll('.src-tab').forEach(b => { b.style.background = '#fff'; b.style.color = '#555'; b.style.borderColor = '#e0ddd5'; });
+        if (src === 'github') { document.getElementById('srcGithub').style.cssText = 'padding:5px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.68rem;font-family:inherit'; }
+        else if (src === 'skillsllm') { document.getElementById('srcSkillsllm').style.cssText = 'padding:5px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.68rem;font-family:inherit'; }
+        else { document.getElementById('srcBoth').style.cssText = 'padding:5px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.68rem;font-family:inherit'; }
+    }
 
     function setHuntStatus(msg) {
         const el = document.getElementById('huntStatus');
@@ -844,16 +858,18 @@
         return sk;
     }
 
-    function startHunt() {
+function startHunt() {
         if (huntBusy) return;
         const q = document.getElementById('huntQuery').value.trim();
-        if (!q) { toast('Aramak için bir konu yaz'); return; }
+        if (!q) { toast('Aramak i�in bir konu yaz'); return; }
         const auto = document.getElementById('huntAuto').checked;
         const box = document.getElementById('huntResults');
         box.innerHTML = '';
         document.getElementById('skillGrid').style.display = 'none';
         document.getElementById('ghStore').style.display = 'none';
-        huntSkill(q, auto);
+        if (huntSource === 'github') { huntSkill(q, auto); }
+        else if (huntSource === 'skillsllm') { huntFromSkillsllm(q, auto); }
+        else { huntBoth(q, auto); }
     }
 
     async function huntSkill(q, auto) {
@@ -964,6 +980,152 @@
         toggleSkillActive(c.sk.id);
         setHuntStatus('✅ ' + c.sk.name + ' yüklendi ve aktifleştirildi!');
         toast('🐾 ' + c.sk.name + ' yüklendi');
+    }
+
+    function huntFromSkillsllm(q, auto) {
+        huntBusy = true;
+        (async () => {
+            try {
+                setHuntStatus('\U0001f916 skillsllm.com aranıyor: "' + q + '"');
+                const res = await fetch('https://skillsllm.com/api/skills?limit=20&sort=stars');
+                if (!res.ok) throw new Error('API hatası');
+                const data = await res.json();
+                const skills = data.skills || data || [];
+                if (!skills.length) { setHuntStatus('\u274c skillsllm.com da sonuç gelmedi'); huntBusy = false; return; }
+                setHuntStatus('\U0001f916 ' + skills.length + ' skill değerlendiriliyor...');
+                const qw = q.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+                const candidates = [];
+                skills.forEach(s => {
+                    let score = 0;
+                    score += Math.min(s.stars || 0, 500) / 20;
+                    const hay = ((s.name || '') + ' ' + (s.description || '') + ' ' + (s.tags || []).join(' ')).toLowerCase();
+                    qw.forEach(w => { if (hay.includes(w)) score += 5; });
+                    candidates.push({...s, score: Math.round(score)});
+                });
+                candidates.sort((a, b) => b.score - a.score);
+                renderHuntResultsSk(candidates, auto);
+                if (auto && candidates.length) {
+                    const best = candidates[0];
+                    setHuntStatus('\u2b07\u0020 En iyi aday: ' + best.name + ' ⭐' + best.score + ' — kurulum hazirlandiya aktifle�tirildi');
+                    toast('\U0001f916 ' + best.name + ' yakalandı');
+                }
+            } catch(e) {
+                setHuntStatus('\u274c skillsllm.com av hatas�: ' + e.message);
+            }
+            huntBusy = false;
+        })();
+    }
+
+    function huntBoth(q, auto) {
+        huntBusy = true;
+        (async () => {
+            try {
+                setHuntStatus('\U0001f50e GitHub + skillsllm.com aranıyor...');
+                const [ghRes, slRes] = await Promise.all([
+                    fetch('https://api.github.com/search/repositories?q=' + encodeURIComponent(q + ' skill') + '&per_page=10&sort=stars'),
+                    fetch('https://skillsllm.com/api/skills?limit=20&sort=stars')
+                ]);
+                const repos = ghRes.ok ? ((await ghRes.json()).items || []) : [];
+                const slData = slRes.ok ? ((await slRes.json()).skills || []) : [];
+                setHuntStatus('\U0001f50e ' + repos.length + ' GitHub + ' + slData.length + ' skillsllm.com aday�...');
+                const qw = q.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+                const candidates = [];
+                const seen = new Set();
+                repos.forEach(r => {
+                    let score = 0;
+                    score += Math.min(r.stargazers_count || 0, 500) / 20;
+                    const ageDays = (Date.now() - new Date(r.updated_at).getTime()) / 86400000;
+                    score += Math.max(0, 15 - ageDays / 30);
+                    const hay = (r.full_name + ' ' + (r.description || '')).toLowerCase();
+                    qw.forEach(w => { if (hay.includes(w)) score += 5; });
+                    candidates.push({repo: r.full_name, name: r.name, desc: r.description, stars: r.stargazers_count, score: Math.round(score), source: 'github', repoUrl: r.html_url});
+                    seen.add(r.full_name.toLowerCase());
+                });
+                slData.forEach(s => {
+                    if (seen.has((s.repoUrl || '').toLowerCase())) return;
+                    let score = 0;
+                    score += Math.min(s.stars || 0, 500) / 20;
+                    const hay = ((s.name || '') + ' ' + (s.description || '')).toLowerCase();
+                    qw.forEach(w => { if (hay.includes(w)) score += 5; });
+                    candidates.push({repo: s.repoUrl?.replace('https://github.com/', '') || s.name, name: s.name, desc: s.description, stars: s.stars, score: Math.round(score), source: 'skillsllm', repoUrl: s.repoUrl});
+                });
+                candidates.sort((a, b) => b.score - a.score);
+                renderHuntResultsBoth(candidates, auto);
+                if (auto && candidates.length) {
+                    const best = candidates[0];
+                    setHuntStatus('\u2b07\u0020 En iyi aday: ' + best.name + ' ⭐' + best.score + ' (y�r�: ' + (best.source === 'skillsllm' ? 'skillsllm.com' : 'GitHub') + ')');
+                    saveUserSkillObj({id: best.repo, name: best.name, desc: best.desc || '', icon: '\U0001f916', instructions: ''});
+                    toggleSkillActive(best.repo);
+                    setHuntStatus('\u2705 ' + best.name + ' yükledi ve aktifleşti');
+                    toast('\U0001f916 ' + best.name + ' yakalandı');
+                }
+            } catch(e) {
+                setHuntStatus('\u274c Av hatası: ' + e.message);
+            }
+            huntBusy = false;
+        })();
+    }
+
+    function renderHuntResultsSk(candidates, auto) {
+        const box = document.getElementById('huntResults');
+        box.innerHTML = '';
+        const cap = document.createElement('div');
+        cap.style.cssText = 'font-size:.68rem;color:#999;margin-bottom:6px';
+        cap.textContent = auto ? 'En iyi aday seçildi' : 'Adaylar (puan: yildiz + konu eslesmesi):';
+        box.appendChild(cap);
+        candidates.slice(0, 5).forEach((c, i) => {
+            const d = document.createElement('div');
+            d.style.cssText = 'background:#f8f8f8;border:1px solid ' + (i === 0 ? '#7c3aed' : '#e0ddd5') + ';border-radius:8px;padding:8px 10px;margin-bottom:6px';
+            d.innerHTML = '<div style="display:flex;align-items:center;gap:8px;justify-content:space-between">'
+                + '<span style="font-weight:600;font-size:.75rem;color:#1a1a1a">' + (i === 0 ? '\u2b50 ' : '') + esc(c.name || c.slug) + '</span>'
+                + '<span style="font-size:.68rem;color:#7c3aed;font-weight:600">\u2605' + c.score + '</span></div>'
+                + '<div style="font-size:.65rem;color:#888;margin-top:2px">skillsllm.com' + (c.stars ? ' \u2605' + c.stars + ' yildiz' : '') + '</div>'
+                + (c.description ? '<div style="font-size:.68rem;color:#555;margin-top:4px">' + esc(c.description.slice(0, 200)) + '</div>' : '')
+                + (auto && i === 0 ? '' : '<button onclick="installHuntedSkill(' + i + ')" style="margin-top:6px;padding:4px 12px;border-radius:6px;border:1px solid #7c3aed;background:' + (i === 0 ? '#7c3aed' : '#fff') + ';color:' + (i === 0 ? '#fff' : '#7c3aed') + ';cursor:pointer;font-size:.68rem;font-family:inherit">' + (i === 0 ? 'En iyisini kur' : 'Kur') + '</button>');
+            d.querySelector('button').dataset.idx = i;
+            d.querySelector('button').onclick = () => installHuntedSkill(candidates, i);
+            box.appendChild(d);
+        });
+    }
+
+    function installHuntedSkill(candidates, i) {
+        const c = candidates[i];
+        setHuntStatus('\u2b07\u0020 Kuruluyor: ' + c.name);
+        saveUserSkillObj({id: c.slug || c.name, name: c.name, desc: c.description || '', icon: '\U0001f916', instructions: ''});
+        toggleSkillActive(c.slug || c.name);
+        setHuntStatus('\u2705 ' + c.name + ' yüklendi ve aktifleşti');
+        toast('\U0001f916 ' + c.name + ' yüklendi');
+    }
+
+    function renderHuntResultsBoth(candidates, auto) {
+        const box = document.getElementById('huntResults');
+        box.innerHTML = '';
+        const cap = document.createElement('div');
+        cap.style.cssText = 'font-size:.68rem;color:#999;margin-bottom:6px';
+        cap.textContent = auto ? 'En iyi aday seçildi' : 'Adaylar (GitHub + skillsllm.com):';
+        box.appendChild(cap);
+        candidates.slice(0, 6).forEach((c, i) => {
+            const d = document.createElement('div');
+            d.style.cssText = 'background:#f8f8f8;border:1px solid ' + (i === 0 ? '#7c3aed' : '#e0ddd5') + ';border-radius:8px;padding:8px 10px;margin-bottom:6px';
+            d.innerHTML = '<div style="display:flex;align-items:center;gap:8px;justify-content:space-between">'
+                + '<span style="font-weight:600;font-size:.75rem;color:#1a1a1a">' + (i === 0 ? '\u2b50 ' : '') + esc(c.name) + '</span>'
+                + '<span style="font-size:.68rem;color:#7c3aed;font-weight:600">\u2605' + c.score + '</span></div>'
+                + '<div style="font-size:.65rem;color:#888;margin-top:2px">' + (c.source === 'skillsllm' ? '\U0001f916 skillsllm.com' : '\U0001f416 GitHub') + ' \u2022 \u2605' + (c.stars || 0) + ' yildiz</div>'
+                + (c.desc ? '<div style="font-size:.68rem;color:#555;margin-top:4px">' + esc(c.desc.slice(0, 200)) + '</div>' : '')
+                + (auto && i === 0 ? '' : '<button onclick="installHuntedBoth(' + i + ')" style="margin-top:6px;padding:4px 12px;border-radius:6px;border:1px solid #7c3aed;background:' + (i === 0 ? '#7c3aed' : '#fff') + ';color:' + (i === 0 ? '#fff' : '#7c3aed') + ';cursor:pointer;font-size:.68rem;font-family:inherit">' + (i === 0 ? 'En iyisini kur' : 'Kur') + '</button>');
+            d.querySelector('button').dataset.idx = i;
+            d.querySelector('button').onclick = () => installHuntedBoth(candidates, i);
+            box.appendChild(d);
+        });
+    }
+
+    function installHuntedBoth(candidates, i) {
+        const c = candidates[i];
+        setHuntStatus('\u2b07\u0020 Kuruluyor: ' + c.name);
+        saveUserSkillObj({id: c.repo, name: c.name, desc: c.desc || '', icon: '\U0001f916', instructions: ''});
+        toggleSkillActive(c.repo);
+        setHuntStatus('\u2705 ' + c.name + ' yüklendi ve aktifleşti');
+        toast('\U0001f916 ' + c.name + ' yüklendi');
     }
 
     function wordRx(w) {

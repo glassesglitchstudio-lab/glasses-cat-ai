@@ -145,6 +145,15 @@ class ChatRequest(BaseModel):
     stream: Optional[bool] = False
 
 
+class SkillHuntRequest(BaseModel):
+    query: str
+    source: str = "both"
+
+
+class SkillInstallRequest(BaseModel):
+    command: str
+
+
 class LaunchRequest(BaseModel):
     app_name: str
 
@@ -1091,6 +1100,180 @@ async def edit_artifact(req: dict):
     
     css = m.group(0).strip()
     return {"success": True, "css": css, "engine_used": "GlassescatCore"}
+
+
+# ─────────────────────────────────────────────
+# SKILL AVCIISI — skillsllm.com + GitHub araştırması + terminal kurulumu
+# ─────────────────────────────────────────────
+
+def _gh_headers():
+    return {"User-Agent": "glassescat-skill-hunter", "Accept": "application/vnd.github+json"}
+
+
+def _hunt_skillsllm(query: str) -> List[Dict]:
+    """skillsllm.com ana listesinden (yildiz sirali) aday toplar."""
+    out = []
+    try:
+        resp = httpx.get("https://skillsllm.com/?sort=stars", timeout=30, follow_redirects=True,
+                         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        if resp.status_code != 200:
+            return out
+        html = resp.text
+        # Kartlar: github.com/owner/repo baglantilari + /skill/slug linkleri
+        for m in re.finditer(r'github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)', html):
+            repo = m.group(1).rstrip("/")
+            if repo not in [c["repo"] for c in out]:
+                out.append({"repo": repo, "source": "skillsllm", "stars": 0})
+        # Yildiz sayilari: "234,966" formatinda
+        stars = re.findall(r'([\d,]{4,9})\s*[Ss]tars?', html)
+        # slug'lar
+        slugs = re.findall(r'/skill/([A-Za-z0-9_.-]+)', html)
+        if slugs:
+            slug_map = {}
+            for i, s in enumerate(slugs):
+                slug_map.setdefault(s, stars[i] if i < len(stars) else 0)
+            for c in out:
+                slug = c["repo"].split("/")[-1]
+                for s, st in slug_map.items():
+                    if s == slug or s.replace("-", "") == slug.replace("-", ""):
+                        c["stars"] = st
+                        c["slug"] = s
+                        break
+                if "slug" not in c:
+                    c["slug"] = slug
+        for c in out:
+            c.setdefault("slug", c["repo"].split("/")[-1])
+        return out[:30]
+    except Exception:
+        return out
+
+
+def _hunt_github(query: str) -> List[Dict]:
+    """GitHub aramasi ile skill koleksiyonu repolari bulur."""
+    out = []
+    try:
+        resp = httpx.get(
+            "https://api.github.com/search/repositories",
+            params={"q": f"{query} skill", "per_page": 10, "sort": "stars"},
+            headers=_gh_headers(), timeout=30,
+        )
+        if resp.status_code == 200:
+            for r in resp.json().get("items", []):
+                out.append({
+                    "repo": r["full_name"],
+                    "stars": r.get("stargazers_count") or 0,
+                    "updated_at": r.get("updated_at", ""),
+                    "desc": (r.get("description") or "")[:200],
+                    "source": "github",
+                })
+    except Exception:
+        pass
+    return out
+
+
+def _skill_install_command(repo: str, slug: str = "") -> str:
+    """Skill sayfasindaki / repo'daki kurulum komutunu bulur (npx, git clone vs)."""
+    tries = []
+    if slug:
+        tries.append(f"https://skillsllm.com/skill/{slug}")
+    tries.append(f"https://raw.githubusercontent.com/{repo}/main/SKILL.md")
+    tries.append(f"https://raw.githubusercontent.com/{repo}/main/README.md")
+    for url in tries:
+        try:
+            resp = httpx.get(url, timeout=20, follow_redirects=True,
+                             headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                continue
+            text = resp.text
+            # ``` bash/code bloklari icinde npx/git clone/curl komutu ara
+            for m in re.finditer(r'```(?:bash|sh|shell|console)?\s*\n([\s\S]{0,600}?)```', text):
+                block = m.group(1)
+                for line in block.splitlines():
+                    line = line.strip()
+                    if re.match(r'^(npx|npm|git clone|curl|pip install|uv tool|brew install)', line):
+                        return line
+            # duz satirlarda da ara
+            for line in text.splitlines():
+                line = line.strip()
+                if line.startswith("npx ") or line.startswith("git clone https://github.com/" + repo):
+                    return line
+        except Exception:
+            continue
+    return f"git clone https://github.com/{repo}.git"
+
+
+@app.post("/api/skills/hunt")
+async def skills_hunt(req: SkillHuntRequest):
+    """skillsllm.com + GitHub uzerinden skill arastirir, en iyi adaylari puanlar."""
+    query = (req.query or "").strip()
+    source = (req.source or "both").strip()
+    if not query:
+        return {"success": False, "error": "arama metni gerekli"}
+    try:
+        llm_candidates = []
+        gh_candidates = []
+        if source in ("both", "skillsllm"):
+            llm_candidates = _hunt_skillsllm(query)
+        if source in ("both", "github"):
+            gh_candidates = _hunt_github(query)
+
+        seen = set()
+        merged = []
+        for c in llm_candidates + gh_candidates:
+            if c["repo"].lower() in seen:
+                continue
+            seen.add(c["repo"].lower())
+            merged.append(c)
+
+        # Puanla: yildiz + konu eslesmesi
+        qw = [w for w in re.split(r"\W+", query.lower()) if len(w) >= 2]
+        for c in merged:
+            repo_l = c["repo"].lower()
+            c["score"] = int(min(int(c.get("stars") or 0), 5000) / 50)
+            c["keywords_hit"] = sum(1 for w in qw if w in repo_l)
+            c["score"] += c["keywords_hit"] * 10
+            c["score"] = min(c["score"], 100)
+
+        merged.sort(key=lambda c: (c["score"], c.get("stars") or 0), reverse=True)
+        top = merged[:8]
+
+        for c in top:
+            slug = c.get("slug", "")
+            if not slug:
+                slug = c["repo"].split("/")[-1]
+                c["slug"] = slug
+            c["install_command"] = _skill_install_command(c["repo"], slug)
+            c["zip_url"] = f"https://github.com/{c['repo']}/archive/refs/heads/main.zip"
+
+        return {"success": True, "query": query, "candidates": top}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/skills/install")
+async def skills_install(req: SkillInstallRequest):
+    """Verilen kurulum komutunu GlassesCat'in kendi terminalinde calistirir."""
+    command = (req.command or "").strip()
+    if not command:
+        return {"success": False, "error": "komut gerekli"}
+    if not re.match(r"^(git clone|npx\s|npm\s)", command):
+        return {"success": False, "error": "Sadece 'git clone', 'npx' veya 'npm' komutlari calistirilabilir"}
+    workdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "downloaded_skills")
+    os.makedirs(workdir, exist_ok=True)
+    try:
+        import subprocess
+        proc = subprocess.run(
+            command, shell=True, cwd=workdir, capture_output=True, text=True,
+            timeout=600, encoding="utf-8", errors="replace",
+        )
+        output = (proc.stdout or "")[-4000:]
+        if proc.returncode != 0:
+            return {"success": False, "error": (proc.stderr or output)[-2000:], "output": output}
+        return {"success": True, "output": output, "workdir": workdir}
+    except subprocess.TimeoutExpired:
+        return {"success": False, "error": "Komut 10 dakikada bitmedi"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 def fallback_element_css(selector, instruction):
