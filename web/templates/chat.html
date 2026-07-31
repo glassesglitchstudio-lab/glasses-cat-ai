@@ -108,6 +108,8 @@
 
         .input-area{padding:10px 20px 16px;display:flex;justify-content:center}
         .input-outer{width:100%;max-width:720px;background:#fff;border:1px solid #e0ddd5;border-radius:12px;padding:10px 10px 10px 16px;display:flex;align-items:flex-end;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.02);transition:border-color .15s}
+        .inline-model{flex-shrink:0;margin-bottom:3px;border-color:transparent;background:rgba(124,58,237,0.05)}
+        .inline-model:hover{border-color:#7c3aed}
         .input-outer:focus-within{border-color:#7c3aed;box-shadow:0 2px 16px rgba(124,58,237,0.04)}
         .input-outer.drag{border-color:#7c3aed;background:rgba(124,58,237,0.02);border-style:dashed}
         .input-box{flex:1;background:transparent;border:none;color:#1a1a1a;font-family:inherit;font-size:.88rem;line-height:1.5;resize:none;outline:none;max-height:140px}
@@ -218,7 +220,7 @@
         .sk-tab.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
 
         @media(max-width:900px){.artifacts{position:fixed;right:0;top:0;z-index:60;height:100vh;box-shadow:-4px 0 24px rgba(0,0,0,0.06)}.artifacts.open{width:90vw!important}}
-        @media(max-width:768px){.welcome .chips{flex-direction:column;align-items:stretch}.msg .ct{margin-left:0}.think{margin-left:0}.topbar{padding:8px 12px}.tb-group{gap:2px}.tb-btn{font-size:.68rem;padding:4px 8px}}
+        @media(max-width:768px){.welcome .chips{flex-direction:column;align-items:stretch}.msg .ct{margin-left:0}.think{margin-left:0}.topbar{padding:8px 12px}.tb-group{gap:2px}.tb-btn{font-size:.68rem;padding:4px 8px}.inline-model{max-width:130px}.inline-model #modelName{max-width:70px}}
     </style>
 </head>
 <body>
@@ -257,18 +259,6 @@
         <div class="topbar-left">
             <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
             <span id="modeBadge" class="mode-badge demo" title="Backend durumu">◌ demo</span>
-            <div class="model-selector" onclick="toggleDropdown('modelDropdown')">
-                <span class="dot"></span>
-                <span id="modelName">X_OPUS</span>
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                <div id="modelDropdown" class="model-dropdown">
-                    <div class="model-opt active" onclick="selectModel('X_OPUS')">X_OPUS<span class="sub">hibrit çift beyin routing</span></div>
-                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS<span class="sub">glitch optimizasyonlu opus</span></div>
-                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER<span class="sub">kod üretim ve debug</span></div>
-                    <div class="sep"></div>
-                    <div class="model-opt disabled">ShadowCat R:1<span class="sub">yakında</span></div>
-                </div>
-            </div>
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
@@ -325,6 +315,18 @@
             <div class="slash-opt" onclick="runSlash('/share')"><span class="key">/share</span><span class="desc">Paylaşım linki</span></div>
         </div>
         <div class="input-outer" id="inputOuter">
+            <div class="model-selector inline-model" onclick="toggleDropdown('modelDropdown')">
+                <span class="dot"></span>
+                <span id="modelName">X_OPUS</span>
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <div id="modelDropdown" class="model-dropdown">
+                    <div class="model-opt active" onclick="selectModel('X_OPUS')">X_OPUS<span class="sub">hibrit çift beyin routing</span></div>
+                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS<span class="sub">glitch optimizasyonlu opus</span></div>
+                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER<span class="sub">kod üretim ve debug</span></div>
+                    <div class="sep"></div>
+                    <div class="model-opt disabled">ShadowCat R:1<span class="sub">yakında</span></div>
+                </div>
+            </div>
             <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yazın veya / komutları..." oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
             <div class="input-tools">
                 <button onclick="showUploadModal()" title="Dosya yükle">📎</button>
