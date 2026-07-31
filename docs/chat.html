@@ -367,6 +367,7 @@
 
 <div id="toast" class="toast"></div>
 
+<script src="skills-library.js"></script>
 <script>
     let chats = {}, chatId = null, busy = false, demoMode = true;
     let currentStyle = 'normal';
@@ -386,7 +387,10 @@
         {id:'ui-ux-pro-max', name:'UI/UX Pro Max', desc:'Tasarım zekası, kullanıcı deneyimi analizi', icon:'🧩'}
     ];
 
-    function getAllSkills() { return BUILTIN_SKILLS.map(s => Object.assign({}, s, {builtin:true})).concat(userSkills.map(s => Object.assign({}, s, {builtin:false}))); }
+    function getAllSkills() {
+        const lib = (window.SKILL_LIBRARY || []).map(s => Object.assign({}, s, {builtin:true}));
+        return lib.concat(BUILTIN_SKILLS.map(s => Object.assign({}, s, {builtin:true})), userSkills.map(s => Object.assign({}, s, {builtin:false})));
+    }
 
     const STYLES = {
         normal: 'Doğal ve dengeli',
@@ -498,7 +502,7 @@
         getAllSkills().forEach(s => {
             const d = document.createElement('div');
             d.className = 'skill-card' + (activeSkill === s.id ? ' sel' : '');
-            d.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span class="sk-ico">' + s.icon + '</span><span class="sk-tag">' + (s.builtin ? 'hazır' : 'kişisel') + '</span></div>'
+            d.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span class="sk-ico">' + s.icon + '</span><span class="sk-tag">' + (s.run ? '⚡ fonksiyon' : (s.builtin ? 'hazır' : 'kişisel')) + '</span></div>'
                 + '<div class="sk-name">' + esc(s.name) + '</div>'
                 + '<div class="sk-desc">' + esc(s.desc) + '</div>'
                 + '<div class="sk-acts"><button onclick="toggleSkillActive(\'' + s.id + '\')">' + (activeSkill === s.id ? 'Kapat' : 'Aktifleştir') + '</button>'
@@ -569,7 +573,12 @@
     function matchSkill(t) {
         const l = t.toLowerCase();
         if (activeSkill) return getAllSkills().find(s => s.id === activeSkill) || null;
-        for (const s of getAllSkills()) {
+        const lib = window.SKILL_LIBRARY || [];
+        for (const s of lib) {
+            if (s.match && s.match.test(l)) return s;
+            if (s.keywords && s.keywords.some(k => l.includes(k))) return s;
+        }
+        for (const s of BUILTIN_SKILLS.concat(userSkills)) {
             const keys = (s.name + ' ' + (s.desc || '') + ' ' + s.id).toLowerCase();
             const words = keys.split(/[^a-z0-9çğıöşü]+/).filter(w => w.length > 2);
             for (const w of words) if (l.includes(w)) return s;
@@ -581,12 +590,19 @@
         const inner = document.getElementById('msgsInner');
         const b = document.createElement('div');
         b.className = 'skill-badge';
-        b.textContent = sk.icon + ' ' + sk.name + ' skill\'i aktif — yönergeler uygulanıyor';
+        b.textContent = sk.icon + ' ' + sk.name + ' skill\'i aktif — ' + (sk.run ? 'fonksiyon çalıştırılıyor' : 'yönergeler uygulanıyor');
         inner.appendChild(b);
         scrollBottom();
     }
 
     function skillResponse(sk, q) {
+        if (sk.run) {
+            try {
+                const res = sk.run(q);
+                if (res && res.ok) return '**' + sk.icon + ' ' + sk.name + '** ⚡\n\n' + res.text;
+                if (sk.example) return '**' + sk.icon + ' ' + sk.name + '** — parametre çıkaramadım. Dene: `' + sk.example + '`';
+            } catch(e) { }
+        }
         if (sk.inst) {
             return '**' + sk.icon + ' ' + sk.name + '** skill\'i uygulandı.\n\n**Yönergeler:** ' + sk.inst + '\n\n"' + q + '" talebi bu yönergeler doğrultusunda işlendi (demo mod — tam motor localhost admin sürümünde aktif).';
         }
