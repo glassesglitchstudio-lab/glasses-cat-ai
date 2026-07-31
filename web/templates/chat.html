@@ -1653,17 +1653,30 @@ function renderSettingsStyles() {
                 renderSwarmSubtasks(tasks);
                 const res = await fetch('/api/swarm', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})});
                 const d = await res.json();
+                thinkEl.style.display = 'none';
                 if (d.success) {
                     renderSwarmSubtasks(d.subtasks || tasks.map(s=>({...s,status:'done'})));
-                    addMsg('ai', d.response, true);
+                    addMsg('ai', '', true);
+                    const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
+                    const typer = createTyper(ct);
+                    const tokens = d.response.split(/(?<=\s)/);
+                    for (const tok of tokens) {
+                        typer.push(tok);
+                        await new Promise(r => setTimeout(r, 8));
+                    }
+                    typer.flush();
+                    ct.innerHTML = format(d.response);
+                    if (chatId && chats[chatId]) { const ms = chats[chatId].msgs; if (ms.length) ms[ms.length-1].text = d.response; }
+                    setTimeout(() => hljs.highlightAll(), 50);
                 } else {
                     renderSwarmSubtasks([]);
                     addMsg('ai', '⚠️ Swarm hatası: ' + (d.error || 'bilinmeyen'), true);
                 }
             } catch(e) {
                 renderSwarmSubtasks([]);
-                addMsg('ai', '⚠️ Swarn hatası: ' + e.message, true);
+                addMsg('ai', '⚠️ Swarm hatası: ' + e.message, true);
             }
+            thinkEl.style.display = 'none';
         } else if (wantSearch) {
             if (!demoMode) {
                 thinkEl.style.display = 'flex';

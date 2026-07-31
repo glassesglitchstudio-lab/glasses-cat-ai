@@ -1703,12 +1703,21 @@ function startHunt() {
                 {name:'translate', label:'Çeviri', icon:'🌍', status:'running'}
             ];
             renderSwarmSubtasks(tasks);
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 1000));
             tasks.forEach(t => t.status = 'done');
             renderSwarmSubtasks(tasks);
             thinkEl.style.display = 'none';
             const base = reply(t);
-            addMsg('ai', '🐝 **Swarm Agent — Alt Ajanlar Çalıştı**\n\n' + base + '\n\n---\n_Tüm alt ajanlar paralel çalıştırıldı ve sonuçlar birleştirildi._', true);
+            addMsg('ai', '', true);
+            const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
+            const typer = createTyper(ct);
+            const full = '🐝 **Swarm Agent — Alt Ajanlar Çalıştı**\n\n' + base + '\n\n---\n_Tüm alt ajanlar paralel çalıştırıldı ve sonuçlar birleştirildi._';
+            const tokens = full.split(/(?<=\s)/);
+            for (const tok of tokens) { typer.push(tok); await new Promise(r => setTimeout(r, 8)); }
+            typer.flush();
+            ct.innerHTML = format(full);
+            if (chatId && chats[chatId]) { const ms = chats[chatId].msgs; if (ms.length) ms[ms.length-1].text = full; }
+            setTimeout(() => hljs.highlightAll(), 50);
         } else if (wantSearch) {
             const query = t.toLowerCase().startsWith('/search ') ? t.slice(8) : t;
             thinkEl.style.display = 'flex';
