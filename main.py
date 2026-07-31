@@ -307,6 +307,19 @@ async def chat(request: ChatRequest):
                 core = get_core()
                 result = core.process_message(request.message)
                 response_text = result.get("response", "")
+                
+                # Güvenlik ağı: response dict/dict-repr gelirse metni ayıkla
+                if isinstance(response_text, dict):
+                    response_text = response_text.get("response") or response_text.get("text") or response_text.get("error") or str(response_text)
+                elif isinstance(response_text, str) and response_text.startswith("{") and ("'response'" in response_text[:80] or "'error'" in response_text[:80]):
+                    try:
+                        import ast
+                        inner = ast.literal_eval(response_text)
+                        if isinstance(inner, dict):
+                            response_text = inner.get("response") or inner.get("text") or inner.get("error") or str(inner)
+                    except Exception:
+                        pass
+                
                 tool_calls = result.get("tool_calls", [])
                 thoughts = result.get("thoughts", [])
                 

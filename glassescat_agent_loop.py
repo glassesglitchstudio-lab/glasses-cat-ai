@@ -462,7 +462,14 @@ class AgentLoop:
                             )
                             if response:
                                 if isinstance(response, dict):
-                                    result_container.append(response.get('response') or response.get('text') or str(response))
+                                    text = response.get('response') or response.get('text') or response.get('answer') or ''
+                                    if isinstance(text, dict):
+                                        text = text.get('response') or text.get('text') or str(text)
+                                    if text:
+                                        result_container.append(str(text))
+                                    else:
+                                        err = response.get('error') or response.get('message') or ''
+                                        result_container.append(f"[AI motoru yanıt vermedi] {err}" if err else "[AI motoru yanıt vermedi]")
                                 else:
                                     result_container.append(str(response))
                                 done_event.set()
