@@ -2000,21 +2000,6 @@ function renderSettingsStyles() {
         return full;
     }
 
-    async function checkBackend() {
-        const b = document.getElementById('modeBadge');
-        try {
-            const r = await fetch('/api/core/status', {method:'GET'});
-            const d = await r.json();
-            if (d && d.available) {
-                demoMode = false;
-                if (b) { b.textContent = '● canlı'; b.className = 'mode-badge live'; }
-            } else {
-                if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
-            }
-        } catch(e) {
-            if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
-        }
-    }
 
     async function realSiteBuild(q) {
         try {
