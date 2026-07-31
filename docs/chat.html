@@ -575,8 +575,10 @@
         if (activeSkill) return getAllSkills().find(s => s.id === activeSkill) || null;
         const lib = window.SKILL_LIBRARY || [];
         for (const s of lib) {
-            if (s.match && s.match.test(l)) return s;
             if (s.keywords && s.keywords.some(k => l.includes(k))) return s;
+        }
+        for (const s of lib) {
+            if (s.match && s.match.test(l)) return s;
         }
         for (const s of BUILTIN_SKILLS.concat(userSkills)) {
             const keys = (s.name + ' ' + (s.desc || '') + ' ' + s.id).toLowerCase();
