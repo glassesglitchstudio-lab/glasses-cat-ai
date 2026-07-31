@@ -972,15 +972,55 @@ async def edit_artifact(req: dict):
     except Exception as e:
         return {"success": False, "error": f"AI motoru hatasi: {e}"}
     
-    if not resp:
-        return {"success": False, "error": "AI yaniti bos"}
+    # Model yaniti gercek bir metin degilse (dict-string / hata / bos) fallback'e dus
+    if (not resp or resp.startswith("{")
+            or "Ollama baglantisi yok" in resp
+            or "'success': False" in resp
+            or '"success": false' in resp):
+        css = fallback_element_css(selector, instruction)
+        return {"success": True, "css": css, "engine_used": "FallbackCSS"}
     
-    m = re.search(r"\{[\s\S]*\}", resp)
+    m = re.search(re.escape(selector) + r"\s*\{[\s\S]*\}", resp)
     if not m:
-        return {"success": False, "error": "Gecerli CSS uretilemedi"}
+        m = re.search(r"[^{}\n]+\{[\s\S]*\}", resp)
+    if not m:
+        css = fallback_element_css(selector, instruction)
+        return {"success": True, "css": css, "engine_used": "FallbackCSS"}
     
-    css = f"{selector} {m.group(0)}".strip()
+    css = m.group(0).strip()
     return {"success": True, "css": css, "engine_used": "GlassescatCore"}
+
+
+def fallback_element_css(selector, instruction):
+    """AI motoru yanit veremediginde kelime -> CSS kurali uretir"""
+    l = instruction.lower()
+    props = []
+    colors = {
+        "mor": "#7c3aed", "turuncu": "#ff6a00", "kirmizi": "#e11d48", "kırmızı": "#e11d48",
+        "mavi": "#2563eb", "yesil": "#16a34a", "yeşil": "#16a34a", "siyah": "#111111",
+        "beyaz": "#ffffff", "sari": "#eab308", "sarı": "#eab308", "pembe": "#ec4899"
+    }
+    for k, v in colors.items():
+        if k in l:
+            props.append(f"color: {v}")
+            break
+    if "büyüt" in l or "buyut" in l or "büyük" in l or "buyuk" in l or "artır" in l or "artir" in l:
+        props.append("font-size: 2.2rem")
+    if "küçült" in l or "kucult" in l or "küçük" in l or "kucuk" in l or "azalt" in l:
+        props.append("font-size: 0.9rem")
+    if "ortala" in l or "center" in l:
+        props.append("text-align: center")
+    if "kalın" in l or "kalin" in l or "bold" in l:
+        props.append("font-weight: 700")
+    if "gölge" in l or "golge" in l or "shadow" in l:
+        props.append("box-shadow: 0 8px 24px rgba(0,0,0,0.15)")
+    if "yuvarla" in l or "köşe" in l or "kose" in l or "radius" in l:
+        props.append("border-radius: 12px")
+    if "arkaplan" in l or "arka plan" in l or "background" in l or "zemin" in l:
+        props.append("background-color: #f3e8ff")
+    if not props:
+        props.append("color: #7c3aed")
+    return f"{selector} {{ {'; '.join(props)}; }}"
 
 
 @app.get("/api/memory/search")

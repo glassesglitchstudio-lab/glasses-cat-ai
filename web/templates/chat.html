@@ -150,6 +150,14 @@
         .art-insp .ai-edit{flex-basis:100%;display:flex;gap:6px}
         .art-insp .ai-edit input{flex:1;border:1px solid #e0ddd5;border-radius:5px;padding:5px 8px;font-size:.7rem;font-family:inherit;min-width:0}
         .art-insp .ai-edit button{background:#7c3aed;border:none;color:#fff;border-radius:5px;font-size:.7rem;padding:5px 12px;cursor:pointer;font-family:inherit}
+        .mode-badge{font-size:.62rem;padding:3px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+        .mode-badge.demo{background:#f5f3ee;color:#999}
+        .mode-badge.live{background:#e6f7e9;color:#1a7f37}
+        .mode-badge.live::before{content:"● ";color:#22c55e}
+        .mode-badge{font-size:.6rem;padding:3px 10px;border-radius:999px;font-weight:600;white-space:nowrap;flex:none}
+        .mode-badge.demo{background:#f5f3ee;color:#999;border:1px solid #e0ddd5}
+        .mode-badge.live{background:#e8f5e9;color:#1a7f37;border:1px solid #c8e6c9}
+        .mode-badge.error{background:#fdecea;color:#c0392b;border:1px solid #f5c6c6}
 
         .upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center}
         .upload-overlay.show{display:flex}
@@ -247,6 +255,7 @@
     <div class="topbar">
         <div class="topbar-left">
             <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+            <span id="modeBadge" class="mode-badge demo" title="Backend durumu">◌ demo</span>
             <div class="model-selector" onclick="toggleDropdown('modelDropdown')">
                 <span class="dot"></span>
                 <span id="modelName">X_OPUS</span>
@@ -259,6 +268,7 @@
                     <div class="model-opt disabled">ShadowCat R:1<span class="sub">yakında</span></div>
                 </div>
             </div>
+            <span id="modeBadge" class="mode-badge demo" title="Backend durumu">◌ demo</span>
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
@@ -739,8 +749,9 @@
         scrollBottom();
     }
 
-    function skillResponse(sk, q) {
+    async function skillResponse(sk, q) {
         if (sk.id === 'site-builder' || sk.id === 'tailwind-css') {
+            if (!demoMode) return await realSiteBuild(q);
             const html = demoSite();
             addArtifact('site.html', html, 'html');
             return '**' + sk.icon + ' ' + sk.name + '** — demo site oluşturuldu!\n\n'
@@ -760,7 +771,8 @@
         }
         if (sk.inst) {
             const inst = sk.inst.length > 600 ? sk.inst.slice(0, 600) + '\n\n_... devamı 🛠️ Skill panelinde_ (_' + sk.id + '_)' : sk.inst;
-            return '**' + sk.icon + ' ' + sk.name + '** skill\'i uygulandı.\n\n**Yönergeler:** ' + inst + '\n\n"' + q + '" talebi bu yönergeler doğrultusunda işlendi (demo mod — tam motor localhost admin sürümünde aktif).';
+            const modeNote = demoMode ? ' (demo mod — tam motor localhost admin sürümünde aktif)' : '';
+            return '**' + sk.icon + ' ' + sk.name + '** skill\'i uygulandı.\n\n**Yönergeler:** ' + inst + '\n\n"' + q + '" talebi bu yönergeler doğrultusunda işlendi' + modeNote + '.';
         }
         return reply(q);
     }
@@ -931,7 +943,8 @@
             }
             addMsg('ai', '**✨ AI düzenlemesi:** `' + info.selector + '` ← "' + inst + '"\n\n```css\n' + d.css + '\n```', true);
         } catch(e) {
-            addMsg('ai', '❌ Düzenleme hatası: ' + e.message, true);
+            addMsg('ai', '❌ AI düzenleme hatası: ' + e.message + '\n\n_Demo kurallara düşülüyor._', true);
+            demoAiEdit(i, info, inst);
         }
     }
 
@@ -1198,22 +1211,43 @@
         const wantSearch = webSearchEnabled || t.toLowerCase().startsWith('/search ');
         const sk = (!wantSearch && !isSlash) ? matchSkill(t) : null;
         if (wantSearch) {
-            const query = t.toLowerCase().startsWith('/search ') ? t.slice(8) : t;
-            thinkEl.style.display = 'flex';
-            thinkText.textContent = 'web araması başlatılıyor...';
-            await new Promise(r => setTimeout(r, 300));
-            const sources = await showWebSearchAnim(query);
-            thinkEl.style.display = 'none';
-            const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
-            addMsg('ai', appendSources(base, sources), true);
+            if (!demoMode) {
+                thinkEl.style.display = 'flex';
+                thinkText.textContent = 'web araması + AI derliyor...';
+                await new Promise(r => setTimeout(r, 300));
+                try {
+                    const real = await callChat(t);
+                    addMsg('ai', real, true);
+                } catch(e) {
+                    addMsg('ai', '⚠️ Backend hatası: ' + e.message, true);
+                }
+            } else {
+                const query = t.toLowerCase().startsWith('/search ') ? t.slice(8) : t;
+                thinkEl.style.display = 'flex';
+                thinkText.textContent = 'web araması başlatılıyor...';
+                await new Promise(r => setTimeout(r, 300));
+                const sources = await showWebSearchAnim(query);
+                thinkEl.style.display = 'none';
+                const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
+                addMsg('ai', appendSources(base, sources), true);
+            }
         } else if (sk) {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : sk.icon + ' ' + sk.name + ' skill\'i uygulanıyor...';
             thinkEl.style.display = 'flex';
             await new Promise(r => setTimeout(r, 450));
             showSkillBadge(sk);
             await new Promise(r => setTimeout(r, 400));
-            const r = skillResponse(sk, t);
+            const r = await skillResponse(sk, t);
             addMsg('ai', r, true);
+        } else if (!demoMode) {
+            thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'GlassesCatCore yanıt hazırlıyor...';
+            thinkEl.style.display = 'flex';
+            try {
+                const r = await callChat(t);
+                addMsg('ai', r, true);
+            } catch(e) {
+                addMsg('ai', '⚠️ Backend hatası: ' + e.message + '\n\nDemo modda devam etmek için sayfayı yenile.', true);
+            }
         } else {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'yanıt hazırlanıyor...';
             thinkEl.style.display = 'flex';
@@ -1387,6 +1421,61 @@
         e._t = setTimeout(() => e.classList.remove('show'), 1800);
     }
 
+    async function checkBackend() {
+        try {
+            const r = await fetch('/api/core/status', {method:'GET'});
+            const d = await r.json();
+            if (d && d.available) {
+                demoMode = false;
+                const b = document.getElementById('modeBadge');
+                if (b) { b.textContent = 'canlı'; b.className = 'mode-badge live'; }
+                toast('✅ Backend bağlandı — canlı mod aktif');
+            } else {
+                const b = document.getElementById('modeBadge');
+                if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
+            }
+        } catch(e) {
+            const b = document.getElementById('modeBadge');
+            if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
+        }
+    }
+
+    async function callChat(msg) {
+        const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg})});
+        const d = await res.json();
+        if (!d.success) throw new Error(d.error || 'Backend hata döndürdü');
+        return d.response || '';
+    }
+
+    async function checkBackend() {
+        const b = document.getElementById('modeBadge');
+        try {
+            const r = await fetch('/api/core/status', {method:'GET'});
+            const d = await r.json();
+            if (d && d.available) {
+                demoMode = false;
+                if (b) { b.textContent = '● canlı'; b.className = 'mode-badge live'; }
+            } else {
+                if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
+            }
+        } catch(e) {
+            if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
+        }
+    }
+
+    async function realSiteBuild(q) {
+        try {
+            const r = await callChat('Bir HTML/CSS web sitesi üret. Tek bir HTML dosyası olsun (inline CSS). Elementlere anlamlı class adları ver (navbar, hero, card, cta-btn vb.) — kullanıcı bu elementleri tıklayıp düzenleyecek. Kullanıcı talebi: "' + q + '"');
+            const m = r.match(/```html\s*([\s\S]*?)```/);
+            const html = (m ? m[1] : r).trim();
+            if (!/<html|<!doctype/i.test(html)) throw new Error('AI HTML üretmedi');
+            addArtifact('site.html', html, 'html');
+            return '**🛠️ Site Builder** — site gerçek AI ile üretildi!\n\n📦 **site.html** canlı önizlemede açıldı. 🖱️ **Seç** ile element tıkla, kaydırıcılarla ya da "✨ AI\'a sor" kutusuyla düzenle.';
+        } catch(e) {
+            return '⚠️ Site üretilemedi: ' + e.message;
+        }
+    }
+
     document.addEventListener('click', function(e) {
         ['modelDropdown','slashMenu'].forEach(id => {
             const el = document.getElementById(id);
@@ -1396,6 +1485,7 @@
     });
 
     newChat();
+    checkBackend();
 </script>
 </body>
 </html>
