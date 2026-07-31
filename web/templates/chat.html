@@ -721,7 +721,7 @@
             await new Promise(r => setTimeout(r, 300));
             const sources = await showWebSearchAnim(query);
             thinkEl.style.display = 'none';
-            const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + reply(query);
+            const base = '"**' + query + '**" sorgusu için web\'den sonuçlar derlendi:\n\n' + searchReply(query);
             addMsg('ai', appendSources(base, sources), true);
         } else {
             thinkText.textContent = extendedThinking ? 'derinlemesine düşünülüyor...' : 'yanıt hazırlanıyor...';
@@ -783,6 +783,20 @@
                 }
             })();
         });
+    }
+
+    function searchReply(q) {
+        const l = q.toLowerCase();
+        const KNOW = {
+            'python': 'Python, 1991 yılında Guido van Rossum tarafından geliştirilen, okunabilirliği ön planda tutan yüksek seviyeli bir programlama dilidir. Web geliştirme (Django, Flask), veri bilimi (pandas, NumPy), yapay zeka (PyTorch, TensorFlow) ve otomasyon alanlarında yaygın olarak kullanılır. Basit sözdizimi sayesinde öğrenmesi kolaydır.',
+            'yapay zeka': 'Yapay zeka (AI), makinelerin öğrenme, akıl yürütme ve algılama gibi insan benzeri bilişsel işlevleri gerçekleştirmesini sağlayan bilgisayar bilimi alanıdır. Makine öğrenmesi, derin öğrenme ve doğal dil işleme (NLP) gibi alt dalları içerir. Günümüzde ChatGPT, Gemini ve GlassesCat gibi asistanlar bu teknolojiyle çalışır.',
+            'javascript': 'JavaScript, web tarayıcılarında çalışan, dinamik web sayfaları oluşturmak için kullanılan bir programlama dilidir. Node.js ile sunucu tarafında da çalışabilir. Modern web geliştirmenin temel taşıdır (HTML ve CSS ile birlikte).',
+            'web': 'Web (World Wide Web), internet üzerinde HTTP protokolü ile erişilen, birbirine bağlı dokümanlar ve kaynaklar sistemidir. Tarayıcılar (Chrome, Firefox, Edge) kullanıcıların bu içeriklere erişmesini sağlar.',
+            'chatgpt': 'ChatGPT, OpenAI tarafından geliştirilen, GPT (Generative Pre-trained Transformer) mimarisine dayalı bir sohbet yapay zekasıdır. Doğal dilde soruları yanıtlar, kod yazar, metin üretir ve birçok görevde yardımcı olur.',
+            'glassescat': 'GlassesCat (Elythra-AI), 37 araç, sınırsız Obsidian tabanlı hafıza, otonom web ajanı ve çoklu model yönlendirme özelliklerine sahip yerel bir yapay zeka asistanıdır. V3.1.0 sürümünde stil seçimi, proje yönetimi ve web araması sunar.'
+        };
+        for (const [k, v] of Object.entries(KNOW)) if (l.includes(k)) return v;
+        return '**' + q + '** konusu için web kaynaklarından derlenen özet:\n\nBu sorgu hakkında tarayıcı sonuçları incelendi. Detaylı bilgi için yukarıdaki kaynakları ziyaret edebilir veya daha spesifik bir soru sorabilirsiniz.';
     }
 
     function appendSources(text, sources) {
