@@ -11,7 +11,11 @@ from routes.scheduler import router as scheduler_router
 from routes.rag import router as rag_router
 from routes.vision import router as vision_router
 from routes.tts import router as tts_router
-from routes.code_agent import router as code_agent_router
+try:
+    from routes.code_agent import router as code_agent_router
+    CODE_AGENT_OK = True
+except Exception:
+    CODE_AGENT_OK = False
 from routes.qwen import router as qwen_router
 from routes.sandbox import router as sandbox_router
 from routes.venv import router as venv_router
@@ -35,7 +39,8 @@ router.include_router(scheduler_router, prefix="/api/scheduler", tags=["schedule
 router.include_router(rag_router, prefix="/api/rag", tags=["rag"])
 router.include_router(vision_router, prefix="/api/vision", tags=["vision"])
 router.include_router(tts_router, prefix="/api/tts", tags=["tts"])
-router.include_router(code_agent_router, prefix="/api/agent", tags=["code_agent"])
+if CODE_AGENT_OK:
+    router.include_router(code_agent_router, prefix="/api/agent", tags=["code_agent"])
 router.include_router(qwen_router, prefix="/api/qwen", tags=["qwen"])
 router.include_router(sandbox_router, prefix="/api/sandbox", tags=["sandbox"])
 router.include_router(venv_router, prefix="/api/venv", tags=["venv"])

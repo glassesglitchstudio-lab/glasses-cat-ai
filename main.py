@@ -103,7 +103,7 @@ try:
     app.include_router(api_router)
     logger.info("Modüler route'lar yüklendi")
 except Exception as e:
-    logger.warning(f"Route yükleme hatası: {e}")
+    logger.debug(f"Route yükleme hatası: {e}")
 
 # Hibrit Zeka Yapılandırması
 AI_CONFIG = {
