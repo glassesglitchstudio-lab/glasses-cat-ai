@@ -189,6 +189,8 @@
         .skill-card .sk-acts button:hover{border-color:#7c3aed;color:#7c3aed}
         .skill-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);color:#7c3aed;font-size:.72rem;font-weight:600;margin:4px 0;animation:pillIn .3s ease}
         .skill-form-row{display:flex;gap:6px;margin-bottom:6px}
+        .sk-tab{flex:1;padding:6px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;cursor:pointer;font-size:.74rem;color:#555;font-family:inherit;transition:all .1s}
+        .sk-tab.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
 
         @media(max-width:900px){.artifacts{position:fixed;right:0;top:0;z-index:60;height:100vh;box-shadow:-4px 0 24px rgba(0,0,0,0.06)}.artifacts.open{width:90vw!important}}
         @media(max-width:768px){.welcome .chips{flex-direction:column;align-items:stretch}.msg .ct{margin-left:0}.think{margin-left:0}.topbar{padding:8px 12px}.tb-group{gap:2px}.tb-btn{font-size:.68rem;padding:4px 8px}}
@@ -291,6 +293,7 @@
             <div class="slash-opt" onclick="runSlash('/clear')"><span class="key">/clear</span><span class="desc">Geçmişi temizle</span></div>
             <div class="slash-opt" onclick="runSlash('/help')"><span class="key">/help</span><span class="desc">Komut listesi</span></div>
             <div class="slash-opt" onclick="runSlash('/skills')"><span class="key">/skills</span><span class="desc">Skill listesi</span></div>
+            <div class="slash-opt" onclick="runSlash('/pull')"><span class="key">/pull</span><span class="desc">GitHub'dan skill indir</span></div>
             <div class="slash-opt" onclick="runSlash('/search')"><span class="key">/search</span><span class="desc">Web'de ara</span></div>
             <div class="slash-opt" onclick="runSlash('/export')"><span class="key">/export</span><span class="desc">Sohbeti dışa aktar</span></div>
             <div class="slash-opt" onclick="runSlash('/share')"><span class="key">/share</span><span class="desc">Paylaşım linki</span></div>
@@ -336,7 +339,16 @@
         <button class="close-overlay" onclick="hideSkillModal()">✕</button>
         <h2 style="text-align:center">🛠️ Skill'ler</h2>
         <div class="sub" style="text-align:center">Hazır + kişisel skill'ler — GlassesCat'e yetenek verir</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+            <button id="skTabLocal" class="sk-tab active" onclick="switchSkillTab('local')">📚 Yüklü</button>
+            <button id="skTabStore" class="sk-tab" onclick="switchSkillTab('store')">🌐 GitHub Store</button>
+        </div>
         <div id="skillGrid" class="skill-grid"></div>
+        <div id="ghStore" class="skill-grid" style="display:none"></div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+            <input id="ghUrl" placeholder="GitHub SKILL.md URL veya repo path'i yapıştır..." style="flex:1;padding:8px 10px;border:1px solid #e0ddd5;border-radius:6px;font-size:.75rem;font-family:inherit;outline:none">
+            <button onclick="pullSkillFromInput()" style="padding:8px 14px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.75rem;font-family:inherit">⬇️ İndir</button>
+        </div>
         <button onclick="toggleSkillForm()" style="margin-top:12px;width:100%;padding:8px;border-radius:8px;border:1px dashed #7c3aed;background:transparent;color:#7c3aed;cursor:pointer;font-size:.78rem;font-family:inherit">+ Yeni Skill Ekle</button>
         <div id="skillForm" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e0ddd5">
             <div class="skill-form-row">
@@ -420,8 +432,18 @@
         const c = cmd.toLowerCase();
         if (c === '/new') { newChat(); return 'Yeni sohbet başlatıldı.'; }
         if (c === '/clear') { chats = {}; chatId = null; newChat(); return 'Geçmiş temizlendi.'; }
-        if (c === '/help') return '**Komutlar:**\n- `/new` — Yeni sohbet\n- `/clear` — Geçmişi temizle\n- `/help` — Bu menü\n- `/skills` — Skill listesi\n- `/search <sorgu>` — Web\'de ara\n- `/export` — Sohbeti dışa aktar\n- `/share` — Paylaşım linki oluştur';
+        if (c === '/help') return '**Komutlar:**\n- `/new` — Yeni sohbet\n- `/clear` — Geçmişi temizle\n- `/help` — Bu menü\n- `/skills` — Skill listesi\n- `/pull <url>` — GitHub\'dan skill indir\n- `/search <sorgu>` — Web\'de ara\n- `/export` — Sohbeti dışa aktar\n- `/share` — Paylaşım linki oluştur';
         if (c === '/skills') { toggleSkillModal(); return '🛠️ Skill paneli açıldı. Aktifleştir veya yenisi oluştur.'; }
+        if (c.startsWith('/pull ')) {
+            const url = cmd.slice(6).trim();
+            pullSkill(url).then(sk => {
+                addMsg('ai', '**✅ ' + sk.icon + ' ' + sk.name + '** skill\'i GitHub\'dan yüklendi!\n\n**Açıklama:** ' + (sk.desc || '-') + '\n\nPanelden aktifleştirebilir veya ilgili görevi direkt yazabilirsin.', true);
+            }).catch(e => {
+                addMsg('ai', '❌ Skill indirilemedi: ' + e.message + '\n\nFormat: `/pull <SKILL.md URL>`\nÖrnek: `/pull https://raw.githubusercontent.com/user/repo/main/skills/myskill/SKILL.md`', true);
+            });
+            return '📦 GitHub\'dan skill indiriliyor: ' + url;
+        }
+        if (c === '/pull') return 'Kullanım: `/pull <SKILL.md URL>` — GitHub\'dan skill indirir. Örnek: `/pull https://raw.githubusercontent.com/anthropics/skills/main/skills/pdf/SKILL.md`';
         if (c.startsWith('/search ')) return `**Web arama:** "${cmd.slice(8)}" için sonuçlar hazırlanıyor... (demo)`;
         if (c === '/export') { const t = JSON.stringify(chats[chatId], null, 2); navigator.clipboard.writeText(t); return 'Sohbet panoya kopyalandı.'; }
         if (c === '/share') return '**Paylaşım linki:** `https://demo.glassescat.ai/share/demo123` (demo)';
@@ -569,6 +591,102 @@
         localStorage.setItem('glassescat_skills', JSON.stringify(userSkills));
         renderSkills();
         toast('Skill silindi');
+    }
+
+    function switchSkillTab(tab) {
+        document.getElementById('skillGrid').style.display = tab === 'local' ? '' : 'none';
+        document.getElementById('ghStore').style.display = tab === 'store' ? '' : 'none';
+        document.getElementById('skTabLocal').classList.toggle('active', tab === 'local');
+        document.getElementById('skTabStore').classList.toggle('active', tab === 'store');
+        if (tab === 'store') loadGitHubStore();
+    }
+
+    async function loadGitHubStore() {
+        const el = document.getElementById('ghStore');
+        if (el.dataset.loaded) return;
+        el.innerHTML = '<div style="padding:14px;text-align:center;color:#888;font-size:.75rem">GitHub Store yükleniyor...</div>';
+        try {
+            const res = await fetch('https://api.github.com/repos/anthropics/skills/contents/skills');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const dirs = await res.json();
+            el.innerHTML = '';
+            const skills = dirs.filter(d => d.type === 'dir');
+            if (!skills.length) throw new Error('skill bulunamadı');
+            skills.forEach(d => {
+                const card = document.createElement('div');
+                card.className = 'skill-card';
+                card.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span class="sk-ico">📦</span><span class="sk-tag">anthropics/skills</span></div>'
+                    + '<div class="sk-name">' + esc(d.name) + '</div>'
+                    + '<div class="sk-desc">GitHub — anthropics/skills deposu</div>'
+                    + '<div class="sk-acts"><button onclick="installSkillFromRepo(\'' + d.path + '\')">⬇️ Yükle</button><a href="https://github.com/anthropics/skills/tree/main/' + d.path + '" target="_blank" style="padding:3px 8px;border-radius:5px;border:1px solid #e0ddd5;font-size:.65rem;text-decoration:none;color:#555">GitHub</a></div>';
+                el.appendChild(card);
+            });
+            el.dataset.loaded = '1';
+        } catch(e) {
+            el.innerHTML = '<div style="padding:14px;text-align:center;color:#d33;font-size:.75rem">Store yüklenemedi: ' + esc(e.message) + '<br><br>Yine de alt kutuya URL yapıştırarak indirebilirsin.</div>';
+        }
+    }
+
+    function parseSkillMd(text, fallbackName) {
+        const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/);
+        let name = fallbackName || 'github-skill', desc = '', body = text;
+        if (m) {
+            const n = m[1].match(/name:\s*["']?([^"'\n]+)["']?/);
+            const d = m[1].match(/description:\s*["']?([^"'\n]+)["']?/);
+            if (n) name = n[1].trim();
+            if (d) desc = d[1].trim();
+            body = m[2].trim();
+        }
+        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        return {id: id || 'github-skill', name: name, icon: '📦', desc: desc, inst: body.slice(0, 3000)};
+    }
+
+    async function installSkillFromRepo(path) {
+        const url = 'https://raw.githubusercontent.com/anthropics/skills/main/' + path + '/SKILL.md';
+        toast('⬇️ ' + path + ' indiriliyor...');
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const text = await res.text();
+            const sk = parseSkillMd(text, path.split('/').pop());
+            const ix = userSkills.findIndex(s => s.id === sk.id);
+            if (ix >= 0) userSkills[ix] = sk; else userSkills.push(sk);
+            localStorage.setItem('glassescat_skills', JSON.stringify(userSkills));
+            switchSkillTab('local');
+            renderSkills();
+            toast('✅ ' + sk.name + ' yüklendi');
+        } catch(e) {
+            toast('❌ Yükleme hatası: ' + e.message);
+        }
+    }
+
+    async function pullSkill(url) {
+        let raw = url.trim().replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+        if (!/^https?:\/\//.test(raw)) raw = 'https://raw.githubusercontent.com/' + raw.replace(/^\//, '');
+        try {
+            const res = await fetch(raw);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const text = await res.text();
+            if (!text || !text.trim()) throw new Error('boş dosya');
+            const sk = parseSkillMd(text, raw.split('/').pop());
+            const ix = userSkills.findIndex(s => s.id === sk.id);
+            if (ix >= 0) userSkills[ix] = sk; else userSkills.push(sk);
+            localStorage.setItem('glassescat_skills', JSON.stringify(userSkills));
+            return sk;
+        } catch(e) {
+            throw new Error(e.message);
+        }
+    }
+
+    function pullSkillFromInput() {
+        const url = document.getElementById('ghUrl').value.trim();
+        if (!url) { toast('URL gerekli'); return; }
+        pullSkill(url).then(sk => {
+            toast('✅ ' + sk.name + ' yüklendi');
+            document.getElementById('ghUrl').value = '';
+            switchSkillTab('local');
+            renderSkills();
+        }).catch(e => toast('❌ İndirilemedi: ' + e.message));
     }
 
     function matchSkill(t) {
