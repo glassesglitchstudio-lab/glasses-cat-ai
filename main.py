@@ -192,18 +192,19 @@ async def call_ai_engine(message: str, config: Dict[str, Any]) -> Optional[str]:
                     json=payload
                 )
             else:
-                # Ollama API - messages formatı
+                # Ollama API - /api/chat formatı
                 payload = {
-                    "model": config.get("model", "qwen2.5-coder:7b"),
+                    "model": config.get("model", "qwen3.5:9b"),
                     "messages": [
                         {"role": "system", "content": "Sen GlassesCat'sın. Yardımcı ve nazik bir Türkçe yapay zeka asistanısın. Kısa ve faydalı yanıtlar verirsin. Oyunları bilirsin. Saygılı davranırsın."},
                         {"role": "user", "content": message}
                     ],
                     "stream": False,
-                    "options": {"temperature": 0.7, "num_predict": 500}
+                    "think": False,
+                    "options": {"temperature": 0.7, "num_predict": 2000}
                 }
                 response = await client.post(
-                    f"{config['url']}/v1/chat/completions",
+                    f"{config['url']}/api/chat",
                     json=payload
                 )
             
@@ -212,7 +213,11 @@ async def call_ai_engine(message: str, config: Dict[str, Any]) -> Optional[str]:
                 if config["url"].endswith("/v1"):
                     return data["choices"][0]["message"]["content"]
                 else:
-                    return data.get("response", "")
+                    msg = data.get("message", {})
+                    content = msg.get("content", "").strip()
+                    if not content:
+                        content = msg.get("thinking", "").strip()
+                    return content
             return None
             
     except Exception as e:
