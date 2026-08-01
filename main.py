@@ -1429,6 +1429,8 @@ async def agent_loop_status():
 class SiteBuilderRequest(BaseModel):
     message: str
     current_html: str = ""
+    template: Optional[str] = None
+    theme: Optional[str] = None
 
 class SiteBuilderEditRequest(BaseModel):
     selector: str
@@ -1461,8 +1463,254 @@ img{max-width:100%;height:auto}
 </body>
 </html>"""
 
-def _site_builder_agent_logic(message: str, current_html: str = "") -> dict:
+SITE_TEMPLATES = {
+    "restoran": {
+        "name": "Restoran",
+        "icon": "🍽️",
+        "html": """<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Restoran</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#faf8f4;color:#1f2937;line-height:1.6}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+.logo{font-size:1.3rem;font-weight:800;color:#b45309}
+.nav-links a{margin-left:20px;text-decoration:none;color:#555;font-weight:600;font-size:.9rem}
+.hero{text-align:center;padding:90px 24px;background:linear-gradient(180deg,#fffbeb,#faf8f4)}
+.hero h1{font-size:3rem;font-weight:800;margin-bottom:12px;color:#92400e}
+.hero p{color:#78716c;max-width:520px;margin:0 auto 28px}
+.cta-btn{background:#d97706;color:#fff;border:none;border-radius:999px;padding:14px 34px;font-size:1rem;font-weight:700;cursor:pointer;transition:.3s}
+.cta-btn:hover{background:#b45309;transform:scale(1.05)}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;padding:60px 6%;max-width:1100px;margin:auto}
+.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.05);transition:.3s}
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.1)}
+.card h3{margin-bottom:8px;color:#92400e}
+.card p{color:#78716c;font-size:.9rem}
+.price{font-weight:800;color:#d97706;margin-top:10px}
+footer{text-align:center;padding:32px;background:#fff;border-top:1px solid #eee;color:#a8a29e;font-size:.85rem}
+@media(max-width:600px){.navbar{padding:14px 18px}.nav-links a{margin-left:12px;font-size:.8rem}.hero h1{font-size:2.2rem}.menu{padding:40px 5%}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">🍽️ Lezzet Durağı</div>
+    <div class="nav-links"><a href="#menu">Menü</a><a href="#iletisim">İletişim</a></div>
+</nav>
+<section class="hero">
+    <h1>Eşsiz Lezzetler</h1>
+    <p>Yöresel malzemelerle hazırlanan özenli yemeklerimizle sizi bekliyoruz.</p>
+    <button class="cta-btn">Rezervasyon Yap</button>
+</section>
+<section class="menu" id="menu">
+    <div class="card"><h3>Izgara Köfte</h3><p>Özel baharatlarla marine edilmiş.</p><div class="price">145 TL</div></div>
+    <div class="card"><h3>Ev Yapımı Mantı</h3><p>Sarımsaklı yoğurt ve sos ile.</p><div class="price">120 TL</div></div>
+    <div class="card"><h3>Fıstıklı Baklava</h3><p>Günde sınırlı üretim.</p><div class="price">90 TL</div></div>
+</section>
+<footer id="iletisim">© 2026 Lezzet Durağı · 0212 000 00 00</footer>
+</body>
+</html>"""
+    },
+    "portfolyo": {
+        "name": "Portfolyo",
+        "icon": "🎨",
+        "html": """<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolyo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#111827;line-height:1.6}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 36px;border-bottom:1px solid #f3f4f6}
+.logo{font-size:1.2rem;font-weight:800}
+.nav-links a{margin-left:22px;text-decoration:none;color:#555;font-weight:500;font-size:.9rem}
+.hero{text-align:center;padding:100px 24px 60px}
+.hero .name{font-size:3rem;font-weight:800;letter-spacing:-1px}
+.hero .role{color:#9ca3af;font-size:1.2rem;margin-top:8px}
+.hero .bio{color:#6b7280;max-width:480px;margin:20px auto 0}
+.work{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding:40px 6%;max-width:1100px;margin:auto}
+.proj{background:#f9fafb;border-radius:16px;padding:28px;transition:.3s}
+.proj:hover{box-shadow:0 8px 30px rgba(0,0,0,.08);transform:translateY(-3px)}
+.proj h3{margin-bottom:6px}
+.proj p{color:#6b7280;font-size:.9rem}
+.tag{display:inline-block;background:#eef2ff;color:#4f46e5;border-radius:99px;padding:3px 12px;font-size:.75rem;margin-top:12px}
+footer{text-align:center;padding:40px;color:#9ca3af;font-size:.85rem}
+@media(max-width:600px){.hero .name{font-size:2.2rem}.navbar{padding:14px 18px}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">Ayşe Yılmaz</div>
+    <div class="nav-links"><a href="#isler">İşler</a><a href="#iletisim">İletişim</a></div>
+</nav>
+<section class="hero">
+    <div class="name">Ayşe Yılmaz</div>
+    <div class="role">UI/UX Tasarımcı & Geliştirici</div>
+    <p class="bio">Kullanıcı odaklı, estetik ve işlevsel dijital deneyimler tasarlıyorum.</p>
+</section>
+<section class="work" id="isler">
+    <div class="proj"><h3>E-Ticaret Uygulaması</h3><p>Mobil öncelikli alışveriş deneyimi tasarımı.</p><span class="tag">UI/UX</span></div>
+    <div class="proj"><h3>Kurumsal Web Sitesi</h3><p>Yenilikçi marka kimliği ve site tasarımı.</p><span class="tag">Web</span></div>
+    <div class="proj"><h3>Mobil Uygulama</h3><p>Sağlık takip uygulaması tasarım sistemi.</p><span class="tag">Mobile</span></div>
+</section>
+<footer id="iletisim">hello@ayseyilmaz.com · İstanbul</footer>
+</body>
+</html>"""
+    },
+    "eticaret": {
+        "name": "E-Ticaret",
+        "icon": "🛍️",
+        "html": """<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mağaza</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fafafa;color:#111827;line-height:1.6}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:#fff;border-bottom:1px solid #f3f4f6;position:sticky;top:0;z-index:10}
+.logo{font-size:1.3rem;font-weight:800}
+.nav-links a{margin-left:20px;text-decoration:none;color:#555;font-weight:600;font-size:.9rem}
+.hero{text-align:center;padding:70px 24px;background:linear-gradient(135deg,#eef2ff,#fff)}
+.hero h1{font-size:2.5rem;font-weight:800;margin-bottom:10px}
+.hero p{color:#6b7280;margin-bottom:24px}
+.cta-btn{background:#111827;color:#fff;border:none;border-radius:8px;padding:12px 30px;font-weight:700;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:50px 6%;max-width:1100px;margin:auto}
+.product{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05);text-align:center;transition:.3s}
+.product:hover{transform:translateY(-3px);box-shadow:0 8px 26px rgba(0,0,0,.09)}
+.product .thumb{height:150px;background:#f3f4f6;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin-bottom:14px}
+.product h3{font-size:.95rem;margin-bottom:4px}
+.product .price{font-weight:800;color:#111827;margin-top:8px}
+.buy-btn{background:#4f46e5;color:#fff;border:none;border-radius:8px;padding:8px 22px;cursor:pointer;font-size:.85rem;margin-top:10px;transition:.2s}
+.buy-btn:hover{background:#4338ca}
+footer{text-align:center;padding:32px;color:#9ca3af;font-size:.85rem}
+@media(max-width:600px){.navbar{padding:14px 18px}.hero h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">🛍️ Trendy</div>
+    <div class="nav-links"><a href="#urunler">Ürünler</a><a href="#iletisim">İletişim</a></div>
+</nav>
+<section class="hero">
+    <h1>Yeni Sezon Kampanyası</h1>
+    <p>Seçili ürünlerde %50'ye varan indirim!</p>
+    <button class="cta-btn">Alışverişe Başla</button>
+</section>
+<section class="products" id="urunler">
+    <div class="product"><div class="thumb">👟</div><h3>Koşu Ayakkabısı</h3><div class="price">1.299 TL</div><button class="buy-btn">Sepete Ekle</button></div>
+    <div class="product"><div class="thumb">🧥</div><h3>Klasik Mont</h3><div class="price">899 TL</div><button class="buy-btn">Sepete Ekle</button></div>
+    <div class="product"><div class="thumb">🎧</div><h3>Kablosuz Kulaklık</h3><div class="price">649 TL</div><button class="buy-btn">Sepete Ekle</button></div>
+</section>
+<footer id="iletisim">© 2026 Trendy · Kargo ücretsiz</footer>
+</body>
+</html>"""
+    },
+    "blog": {
+        "name": "Blog",
+        "icon": "📝",
+        "html": """<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blog</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#111827;line-height:1.7}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 36px;border-bottom:1px solid #f3f4f6;max-width:900px;margin:auto}
+.logo{font-size:1.2rem;font-weight:800}
+.nav-links a{margin-left:20px;text-decoration:none;color:#555;font-size:.9rem}
+.posts{max-width:700px;margin:40px auto;padding:0 24px}
+.post{border-bottom:1px solid #f3f4f6;padding:28px 0}
+.post .date{color:#9ca3af;font-size:.8rem}
+.post h2{font-size:1.4rem;margin:8px 0;cursor:pointer}
+.post h2:hover{color:#4f46e5}
+.post p{color:#6b7280;font-size:.95rem}
+.post .read{color:#4f46e5;font-size:.85rem;font-weight:600;margin-top:10px;display:inline-block}
+footer{text-align:center;padding:40px;color:#9ca3af;font-size:.85rem}
+@media(max-width:600px){.navbar{padding:14px 18px}}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">📝 Günlük Düşünceler</div>
+    <div class="nav-links"><a href="#">Yazılar</a><a href="#">Hakkında</a></div>
+</nav>
+<section class="posts">
+    <div class="post"><div class="date">1 Ağustos 2026</div><h2>Yapay Zeka ile Üretkenlik</h2><p>AI araçlarının günlük iş akışını nasıl dönüştürdüğüne dair kişisel deneyimlerim...</p><span class="read">Devamını Oku →</span></div>
+    <div class="post"><div class="date">25 Temmuz 2026</div><h2>Kod Yazmanın Geleceği</h2><p>Düşük kod ve no-code araçların yükselişi üzerine notlar ve tahminler...</p><span class="read">Devamını Oku →</span></div>
+    <div class="post"><div class="date">10 Temmuz 2026</div><h2>Minimalizm ve Odak</h2><p>Daha az araç, daha derin çalışma: dijital minimalizm rehberi...</p><span class="read">Devamını Oku →</span></div>
+</section>
+<footer>© 2026 Günlük Düşünceler</footer>
+</body>
+</html>"""
+    },
+    "kisisel": {
+        "name": "Kişisel",
+        "icon": "👤",
+        "html": """<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kişisel Sayfa</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8fafc;color:#0f172a;line-height:1.6}
+.page{max-width:720px;margin:0 auto;padding:40px 24px;text-align:center}
+.avatar{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;color:#fff}
+.name{font-size:2.2rem;font-weight:800}
+.title{color:#64748b;margin-top:6px}
+.bio{color:#475569;max-width:480px;margin:18px auto 30px}
+.social{display:flex;gap:12px;justify-content:center;margin-bottom:40px}
+.social a{background:#fff;border:1px solid #e2e8f0;border-radius:99px;padding:9px 22px;text-decoration:none;color:#334155;font-size:.85rem;font-weight:600;transition:.2s}
+.social a:hover{border-color:#6366f1;color:#6366f1}
+.skills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 50px}
+.skill{background:#eef2ff;color:#4f46e5;border-radius:99px;padding:6px 16px;font-size:.8rem;font-weight:600}
+footer{color:#94a3b8;font-size:.8rem;padding:20px}
+@media(max-width:600px){.name{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="avatar">🐱</div>
+    <div class="name">Merhaba, Ben Ali</div>
+    <div class="title">Yazılım Geliştirici</div>
+    <p class="bio">Türkiye'den bir yazılım tutkunu. Web, yapay zeka ve açık kaynak projeleriyle ilgileniyorum.</p>
+    <div class="social"><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Twitter</a></div>
+    <div class="skills"><span class="skill">Python</span><span class="skill">JavaScript</span><span class="skill">AI/ML</span><span class="skill">Web</span></div>
+</div>
+<footer>© 2026 Ali · İletişim: ali@example.com</footer>
+</body>
+</html>"""
+    },
+}
+
+SITE_THEMES = {
+    "mor": {"name": "Mor", "hint": "Ana renk #7c3aed (mor), vurgu mor tonlari, arka plan acik kremsi"},
+    "mavi": {"name": "Mavi", "hint": "Ana renk #2563eb (mavi), vurgu mavi tonlari, arka plan acik mavi-beyaz"},
+    "koyu": {"name": "Koyu", "hint": "Koyu tema: arka plan #0f172a, metin #e2e8f0, vurgu #38bdf8 (acik mavi)"},
+    "neon": {"name": "Neon", "hint": "Neon tema: koyu arka plan #0a0a0f, neon yesil #22c55e ve neon pembe #ec4899 vurgular, parlak efektler"},
+    "yesil": {"name": "Yeşil", "hint": "Ana renk #16a34a (yesil), dogal yesil tonlar, acik yaprak yesili arka plan"},
+    "kirmizi": {"name": "Kırmızı", "hint": "Ana renk #dc2626 (kirmizi), sicak tonlar, acik krem arka plan"},
+}
+
+SITE_FONTS = "Google Fonts kullanabilirsin: <link href='https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap' rel='stylesheet'> ile 'Playfair Display' basliklarda, 'Poppins' metinlerde kullanabilirsin. Alternatif fontlar: 'Inter', 'Space Grotesk', 'DM Serif Display'."
+
+def _site_builder_agent_logic(message: str, current_html: str = "", template: Optional[str] = None, theme: Optional[str] = None) -> dict:
     """Site Builder mantigi: mesaji analiz et, HTML guncelle, AI yaniti hazirla"""
+    theme_hint = ""
+    if theme and theme in SITE_THEMES:
+        theme_hint = f"\nTEMA: '{theme}' temasini kullan: {SITE_THEMES[theme]['hint']}. Tum renkleri bu temaya uygun sec.\n"
+    template_hint = ""
+    if template and template in SITE_TEMPLATES:
+        template_hint = f"\nSABLON: '{template}' sablonu secildi. Bu sablonun yapisini ve bolumlerini koru, talebi ona uygula.\n"
     prompt = (
         f"Kullanici site hakkinda su talepte bulundu: \"{message}\"\n\n"
         f"Su anki HTML:\n```html\n{current_html or DEFAULT_SITE_HTML}\n```\n\n"
@@ -1474,7 +1722,10 @@ def _site_builder_agent_logic(message: str, current_html: str = "") -> dict:
         "5. Elementlere anlamli class adlari ver (navbar, hero, card, footer vb)\n"
         "6. Eksiksiz ve gecerli bir HTML dokumani olmali - <!doctype html> ile baslamali\n"
         "7. MOBIL UYUM ZORUNLU: <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"> head icinde olmali, @media(max-width:600px) ile mobil stiller ekle, flexbox/grid kullan\n"
-        "8. RESIM: Kullanici resim isterse <img> ekle. Gorsel URL'si belirtilmediyse placeholder olarak https://picsum.photos/seed/site{n}/800/500 kullan. Tum img'lere max-width:100%;height:auto ver\n\n"
+        "8. RESIM: Kullanici resim isterse <img> ekle. Gorsel URL'si belirtilmediyse placeholder olarak https://picsum.photos/seed/site{n}/800/500 kullan. Tum img'lere max-width:100%;height:auto ver\n"
+        "9. COKLU SAYFA: Kullanici 'sayfa ekle', 'hakkimizda sayfasi' gibi bir sey isterse, tek HTML dosyasinda birden fazla bolum (<section id=\"...\">) olustur ve navbar'daki linklerle (href=\"#id\") bagla. Kullanici istemedikce yeni dosya acma.\n"
+        f"10. {SITE_FONTS}\n"
+        f"{template_hint}{theme_hint}\n"
         "Yanit format (KESINLIKLE uygula):\n"
         "---HTML---\n<!doctype html> ile baslayan TUM HTML kodu\n"
         "---MESAJ---\n[kullaniciya kisa aciklama, 1-2 cumle]\n"
@@ -1545,11 +1796,23 @@ def _html_needs_recovery(html: str) -> bool:
     return False
 
 
+@app.get("/api/site-builder/templates")
+async def site_builder_templates():
+    """Site Builder sablon ve tema listesi"""
+    return {
+        "success": True,
+        "templates": {k: {"name": v["name"], "icon": v["icon"]} for k, v in SITE_TEMPLATES.items()},
+        "themes": {k: {"name": v["name"]} for k, v in SITE_THEMES.items()}
+    }
+
 @app.post("/api/site-builder/chat")
 async def site_builder_chat(req: SiteBuilderRequest):
     """Site Builder sohbet — mesaj alir, HTML gunceller, AI yaniti doner"""
     try:
-        logic = _site_builder_agent_logic(req.message, req.current_html)
+        start_html = req.current_html
+        if not start_html and req.template and req.template in SITE_TEMPLATES:
+            start_html = SITE_TEMPLATES[req.template]["html"]
+        logic = _site_builder_agent_logic(req.message, start_html, template=req.template, theme=req.theme)
         ai_resp = await get_ai_response(logic["prompt"], num_predict=8000)
         msg_part = "Site guncellendi!"
 
@@ -1577,7 +1840,7 @@ async def site_builder_chat(req: SiteBuilderRequest):
                     cleaned = await _recover_html_with_ai(cleaned)
                 return {"success": True, "html": cleaned[:20000], "message": msg_part}
 
-        return {"success": True, "html": logic["current_html"], "message": "Anlamadim. Lutfen net bir istek yazin."}
+        return {"success": True, "html": start_html or logic["current_html"], "message": "Anlamadim. Lutfen net bir istek yazin."}
     except Exception as e:
         logger.error(f"Site Builder hatasi: {e}")
         return {"success": False, "error": str(e), "html": req.current_html or DEFAULT_SITE_HTML}

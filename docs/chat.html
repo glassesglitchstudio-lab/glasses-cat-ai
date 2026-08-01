@@ -524,7 +524,16 @@
                 <div style="display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid #e0ddd5;background:#f8f8f8;flex-wrap:wrap">
                     <button class="tb-btn active" id="sbPreviewTab" onclick="sbSwitchView('preview')">👁️ Önizleme</button>
                     <button class="tb-btn" id="sbCodeTab" onclick="sbSwitchView('code')">📄 Kod</button>
+                    <select id="sbTemplateSel" onchange="sbPickTemplate(this.value)" title="Sablon sec" style="padding:4px 8px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;font-size:.72rem;font-family:inherit;cursor:pointer;color:#444">
+                        <option value="">📋 Şablon</option>
+                    </select>
+                    <select id="sbThemeSel" onchange="sbPickTheme(this.value)" title="Tema sec" style="padding:4px 8px;border-radius:6px;border:1px solid #e0ddd5;background:#fff;font-size:.72rem;font-family:inherit;cursor:pointer;color:#444">
+                        <option value="">🎨 Tema</option>
+                    </select>
                     <span style="flex:1"></span>
+                    <button class="tb-btn" id="sbUndoBtn" onclick="sbUndo()" title="Geri al">↩️</button>
+                    <button class="tb-btn" id="sbRedoBtn" onclick="sbRedo()" title="Ileri al">↪️</button>
+                    <button class="tb-btn" onclick="sbDownload()" title="HTML indir">⬇️</button>
                     <button class="tb-btn" id="sbSelBtn" onclick="sbToggleSelect()">🖱️ Seç</button>
                     <span class="sel-info" id="sbSelInfo" style="font-size:.66rem;color:#7c3aed;font-family:Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
                 </div>
@@ -1278,12 +1287,108 @@ function renderSettingsStyles() {
     /* ─── SITE BUILDER ─── */
     let sbHtml = '';
     let sbSelEl = null;
+    let sbHistory = [];
+    let sbHistoryIdx = -1;
+    let sbTheme = '';
+
+    function sbPushHistory(html) {
+        if (sbHtml === html) return;
+        sbHistory = sbHistory.slice(0, sbHistoryIdx + 1);
+        sbHistory.push(html);
+        if (sbHistory.length > 30) sbHistory.shift();
+        sbHistoryIdx = sbHistory.length - 1;
+        sbUpdateNavBtns();
+    }
+
+    function sbUpdateNavBtns() {
+        const u = document.getElementById('sbUndoBtn');
+        const r = document.getElementById('sbRedoBtn');
+        if (u) u.style.opacity = sbHistoryIdx > 0 ? 1 : .35;
+        if (r) r.style.opacity = sbHistoryIdx < sbHistory.length - 1 ? 1 : .35;
+    }
+
+    function sbUndo() {
+        if (sbHistoryIdx <= 0) return;
+        sbHistoryIdx--;
+        sbHtml = sbHistory[sbHistoryIdx];
+        sbLoadPreview();
+        document.getElementById('sbCodePre').textContent = sbHtml;
+        sbUpdateNavBtns();
+        addSbMsg('ai', '↩️ Geri alindi');
+    }
+
+    function sbRedo() {
+        if (sbHistoryIdx >= sbHistory.length - 1) return;
+        sbHistoryIdx++;
+        sbHtml = sbHistory[sbHistoryIdx];
+        sbLoadPreview();
+        document.getElementById('sbCodePre').textContent = sbHtml;
+        sbUpdateNavBtns();
+        addSbMsg('ai', '↪️ Ileri alindi');
+    }
+
+    function sbDownload() {
+        if (!sbHtml) { toast('Once site olustur'); return; }
+        const blob = new Blob([sbHtml], {type: 'text/html;charset=utf-8'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'site.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    async function sbLoadTemplates() {
+        try {
+            const res = await fetch('/api/site-builder/templates');
+            const d = await res.json();
+            if (d.success) {
+                const ts = document.getElementById('sbTemplateSel');
+                for (const [k, v] of Object.entries(d.templates)) {
+                    const opt = document.createElement('option');
+                    opt.value = k;
+                    opt.textContent = v.icon + ' ' + v.name;
+                    ts.appendChild(opt);
+                }
+                const th = document.getElementById('sbThemeSel');
+                for (const [k, v] of Object.entries(d.themes)) {
+                    const opt = document.createElement('option');
+                    opt.value = k;
+                    opt.textContent = v.name;
+                    th.appendChild(opt);
+                }
+            }
+        } catch(e) {}
+    }
+
+    function sbPickTemplate(t) {
+        const sel = document.getElementById('sbTemplateSel');
+        if (!t) { sel.value = ''; return; }
+        const msg = 'Bu sablonu kullan: ' + t + ' sablonu ile site olustur';
+        sel.value = '';
+        document.getElementById('sbInput').value = msg;
+        sbSend();
+    }
+
+    function sbPickTheme(t) {
+        const sel = document.getElementById('sbThemeSel');
+        if (!t) { sel.value = ''; return; }
+        sbTheme = t;
+        const msg = 'Temayi "' + t + '" olarak degistir, tum renkleri bu temaya uyarla';
+        sel.value = '';
+        document.getElementById('sbInput').value = msg;
+        sbSend();
+    }
 
     function toggleBuilder() {
         const o = document.getElementById('builderOverlay');
         o.classList.toggle('show');
         if (o.classList.contains('show')) {
             sbHtml = '';
+            sbHistory = [];
+            sbHistoryIdx = -1;
+            sbTheme = '';
+            sbUpdateNavBtns();
+            sbLoadTemplates();
             document.getElementById('sbMsgs').innerHTML = '';
             document.getElementById('sbPreviewWrap').style.display = 'flex';
             document.getElementById('sbCodeWrap').style.display = 'none';
@@ -1340,6 +1445,7 @@ function renderSettingsStyles() {
                 }
                 sbLoadPreview();
                 document.getElementById('sbCodePre').textContent = sbHtml;
+                sbPushHistory(sbHtml);
                 addSbMsg('ai', '✅ Gorsel eklendi! Simdi soyle: "gorselin altina metin ekle" veya "gorseli saga yerlestir".\n\n📌 Adres: `' + d.url + '`');
             } else {
                 addSbMsg('ai', '⚠️ ' + (d.error || 'Yukleme basarisiz'));
@@ -1384,7 +1490,7 @@ function renderSettingsStyles() {
             const res = await fetch('/api/site-builder/chat', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: msg, current_html: sbHtml})
+                body: JSON.stringify({message: msg, current_html: sbHtml, theme: sbTheme || null})
             });
             const d = await res.json();
             clearInterval(sbStageTimer);
@@ -1395,6 +1501,7 @@ function renderSettingsStyles() {
                 last.remove();
             }
             if (d.success && d.html) {
+                sbPushHistory(d.html);
                 sbHtml = d.html;
                 sbLoadPreview();
                 document.getElementById('sbCodePre').textContent = sbHtml;
