@@ -713,6 +713,37 @@ async def get_uploaded_file(file_id: str):
         return {"success": False, "error": str(e)}
 
 
+@app.post("/api/site-builder/upload-image")
+async def site_builder_upload_image(file: UploadFile = File(...)):
+    """Site Builder gorsel yukleme — web/static/uploads'a kaydeder, /static/... URL'si doner"""
+    try:
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext not in (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"):
+            return {"success": False, "error": f"Gorsel desteklenmiyor: {ext}. PNG/JPG/GIF/WEBP/SVG kullan."}
+
+        sb_upload_dir = os.path.join(os.path.dirname(__file__), "web", "static", "uploads")
+        os.makedirs(sb_upload_dir, exist_ok=True)
+
+        file_id = uuid.uuid4().hex[:8]
+        safe_name = f"{file_id}{ext}"
+        file_path = os.path.join(sb_upload_dir, safe_name)
+
+        content_bytes = await file.read()
+        if len(content_bytes) > 8 * 1024 * 1024:
+            return {"success": False, "error": "Gorsel 8MB'dan buyuk olamaz"}
+        with open(file_path, "wb") as f:
+            f.write(content_bytes)
+
+        url = f"/static/uploads/{safe_name}"
+        return {
+            "success": True,
+            "url": url,
+            "message": f"{file.filename} yuklendi. HTML'e <img src='{url}'> olarak ekleyebilirsin."
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 # ─────────────────────────────────────────────────────────────
 # KONUŞMA PAYLAŞMA LİNKİ
 # ─────────────────────────────────────────────────────────────
@@ -1417,6 +1448,8 @@ body{font-family:system-ui,sans-serif;background:#faf8f4;color:#1f2937;line-heig
 .hero h1{font-size:2.5rem;font-weight:800;margin-bottom:12px}
 .hero p{color:#6b7280;max-width:480px;margin:0 auto 24px}
 .cta-btn{background:#7c3aed;color:#fff;border:none;border-radius:999px;padding:12px 32px;font-size:1rem;cursor:pointer}
+img{max-width:100%;height:auto}
+@media(max-width:600px){.hero{padding:48px 16px 36px}.hero h1{font-size:1.8rem}}
 </style>
 </head>
 <body>
@@ -1439,13 +1472,78 @@ def _site_builder_agent_logic(message: str, current_html: str = "") -> dict:
         "3. Sadece degisen kismi degil, TUM HTML'i dondur\n"
         "4. Tum CSS <style> icinde olsun\n"
         "5. Elementlere anlamli class adlari ver (navbar, hero, card, footer vb)\n"
-        "6. Eksiksiz ve gecerli bir HTML dokumani olmali - <!doctype html> ile baslamali\n\n"
+        "6. Eksiksiz ve gecerli bir HTML dokumani olmali - <!doctype html> ile baslamali\n"
+        "7. MOBIL UYUM ZORUNLU: <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"> head icinde olmali, @media(max-width:600px) ile mobil stiller ekle, flexbox/grid kullan\n"
+        "8. RESIM: Kullanici resim isterse <img> ekle. Gorsel URL'si belirtilmediyse placeholder olarak https://picsum.photos/seed/site{n}/800/500 kullan. Tum img'lere max-width:100%;height:auto ver\n\n"
         "Yanit format (KESINLIKLE uygula):\n"
         "---HTML---\n<!doctype html> ile baslayan TUM HTML kodu\n"
         "---MESAJ---\n[kullaniciya kisa aciklama, 1-2 cumle]\n"
         "SADECE bu formatta yanit ver, baska hicbir sey yazma."
     )
     return {"prompt": prompt, "current_html": current_html or DEFAULT_SITE_HTML}
+
+def _sanitize_html(html: str) -> str:
+    """Regex son kontrol - AI hata yapsa bile temiz HTML garanti eder"""
+    import re as _re
+    # 1. Negatif padding/margin degerlerini sifirla (gecersiz CSS)
+    html = _re.sub(r'(padding|margin)(?:-top|-bottom|-left|-right)?\s*:\s*-\d+(?:\.\d+)?(?:px|rem|em|vh|vw)?\s*;?', lambda m: m.group(0).split(':')[0] + ':0;', html)
+    # 2. Eksik text-shadow (renk degeri olmayan) satirlarini sil
+    html = _re.sub(r'text-shadow\s*:\s*rgba\([^)]*\)\s*;?', '', html)
+    # 3. Tanimsiz var() kullanimini kaldir (--x tanimli degilse)
+    html = _re.sub(r'calc\(-1\s*\*\s*var\(--content-padding\)\)', '0', html)
+    # 3b. Bos kalmis CSS kurallarini sil (.hero{})
+    html = _re.sub(r'[^{}]{1,80}\{\s*\}', '', html)
+    # 4. Viewport yoksa ekle
+    if 'name="viewport"' not in html and '<head>' in html:
+        html = html.replace('<head>', '<head>\n<meta name="viewport" content="width=device-width,initial-scale=1">', 1)
+    # 5. </html> yoksa ekle
+    if '</html>' not in html.lower():
+        html += '\n</html>'
+    # 6. Ard arda bos satirlari tek bos satira indir
+    html = _re.sub(r'\n{3,}', '\n\n', html)
+    return html.strip()
+
+
+async def _recover_html_with_ai(html: str) -> str:
+    """Recovery subagent - X_FABLE_CODER (kod modeli) HTML'i temizler"""
+    if not html or len(html) < 100:
+        return _sanitize_html(html)
+    prompt = (
+        "Sen bir HTML temizlik uzmanisin. Asagidaki kullanici tarafindan AI ile uretilmis HTML'i duzelt:\n"
+        "- Negatif padding/margin degerlerini 0 yap\n"
+        "- Eksik veya bozuk text-shadow ozelliklerini sil\n"
+        "- Tanimsiz CSS degiskeni kullanimlarini kaldir\n"
+        "- Gecersiz CSS kurallarini sil (tarayicida sorun cikaranlar)\n"
+        "- <meta name=\"viewport\"> head icinde yoksa ekle\n"
+        "- </html> kapanis etiketi yoksa ekle\n"
+        "- Icerik, yapi ve sinif adlarina DOKUNMA\n"
+        "- SADECE duzeltilmis TUM HTML kodunu dondur, baska hicbir sey yazma (aciklama yok, kod blogu isareti yok)\n\n"
+        f"HTML:\n{html}"
+    )
+    recovery_config = dict(AI_CONFIG["primary"])
+    recovery_config["model"] = "glassesglitchstudio/x_fable_coder:V1"
+    try:
+        cleaned = await call_ai_engine(prompt, recovery_config, num_predict=6000)
+        if cleaned and "<html" in cleaned.lower() or (cleaned and "<body" in cleaned.lower()):
+            return _sanitize_html(cleaned)
+    except Exception as e:
+        logger.warning(f"Recovery subagent hatasi: {e}")
+    return _sanitize_html(html)
+
+
+def _html_needs_recovery(html: str) -> bool:
+    """Sanitizer sonrasi hala kusur var mi? (subagent sadece gerekirse calisir)"""
+    import re as _re
+    if _re.search(r'(padding|margin)(?:-top|-bottom|-left|-right)?\s*:\s*-\d', html):
+        return True
+    if 'text-shadow:rgba' in html or 'var(--' in html:
+        return True
+    if 'name="viewport"' not in html or '</html>' not in html.lower():
+        return True
+    if _re.search(r'[^{}]{1,80}\{\s*\}', html):
+        return True
+    return False
+
 
 @app.post("/api/site-builder/chat")
 async def site_builder_chat(req: SiteBuilderRequest):
@@ -1474,7 +1572,10 @@ async def site_builder_chat(req: SiteBuilderRequest):
                 new_html = ai_resp.strip()
             # 4. AI tamamlanmamış HTML döndürdüyse default şablonu kullan
             if new_html:
-                return {"success": True, "html": new_html[:20000], "message": msg_part}
+                cleaned = _sanitize_html(new_html)
+                if _html_needs_recovery(cleaned):
+                    cleaned = await _recover_html_with_ai(cleaned)
+                return {"success": True, "html": cleaned[:20000], "message": msg_part}
 
         return {"success": True, "html": logic["current_html"], "message": "Anlamadim. Lutfen net bir istek yazin."}
     except Exception as e:
