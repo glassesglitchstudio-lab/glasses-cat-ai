@@ -108,19 +108,14 @@ except Exception as e:
 # Hibrit Zeka Yapılandırması
 AI_CONFIG = {
     "primary": {
-        "url": "http://localhost:1234/v1",
-        "name": "LM Studio",
+        "url": "http://localhost:11434",
+        "name": "Ollama",
         "enabled": True
     },
     "fallback": {
         "url": "http://localhost:11434",
         "name": "Ollama",
-        "enabled": True  # Failover için aç
-    },
-    "pearai": {
-        "url": "https://api.pearai.com/v1",
-        "name": "PearAI",
-        "enabled": True  # PearAI ortak çalışma
+        "enabled": True
     }
 }
 
