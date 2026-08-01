@@ -1359,8 +1359,26 @@ function renderSettingsStyles() {
         if (!msg) return;
         inp.value = '';
         addSbMsg('user', msg);
-        const loadingHtml = '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse">Model yükleniyor, lütfen bekleyin<span class="sb-load-dots"></span></span><small>AI siteni oluşturuyor...</small></div></div>';
+        const loadingHtml = '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse" id="sbStageMain">Model yükleniyor, lütfen bekleyin<span class="sb-load-dots"></span></span><small id="sbStageSub">AI siteni oluşturuyor...</small></div></div>';
         addSbMsg('ai', loadingHtml, true);
+
+        const stages = [
+            [0,    'Model yükleniyor, lütfen bekleyin', 'AI siteni oluşturuyor...'],
+            [8,    'Site tasarımı çiziliyor', 'navbar, hero ve bölümler planlanıyor...'],
+            [35,   'HTML kodları yazılıyor', 'içerik ve stiller ekleniyor...'],
+            [75,   'Kod temizleniyor', 'kusurlar gideriliyor, düzeltmeler yapılıyor...'],
+            [120,  'Son rötuşlar yapılıyor', 'mobil uyum kontrol ediliyor...']
+        ];
+        const sbStageT0 = Date.now();
+        const sbStageTimer = setInterval(() => {
+            const sec = (Date.now() - sbStageT0) / 1000;
+            let cur = stages[0];
+            for (const s of stages) { if (sec >= s[0]) cur = s; }
+            const main = document.getElementById('sbStageMain');
+            const sub = document.getElementById('sbStageSub');
+            if (main) main.innerHTML = cur[1] + '<span class="sb-load-dots"></span>';
+            if (sub) sub.textContent = cur[2];
+        }, 3000);
 
         try {
             const res = await fetch('/api/site-builder/chat', {
@@ -1369,6 +1387,7 @@ function renderSettingsStyles() {
                 body: JSON.stringify({message: msg, current_html: sbHtml})
             });
             const d = await res.json();
+            clearInterval(sbStageTimer);
             // Remove thinking msg
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
@@ -1384,6 +1403,7 @@ function renderSettingsStyles() {
                 addSbMsg('ai', '⚠️ ' + (d.error || 'Bir hata oldu'));
             }
         } catch(e) {
+            clearInterval(sbStageTimer);
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
             if (last && last.querySelector('.sb-loading')) {
