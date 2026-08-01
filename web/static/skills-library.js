@@ -1,7 +1,7 @@
 /* GlassesCat Global Skill Library - executable skills (fonksiyon tabanlı) */
 window.SKILL_LIBRARY = [
 {
-    id:'hesapla', name:'Hesaplama', icon:'🧮',
+    id:'hesapla', name:'Hesaplama', icon:'calc',
     desc:'Matematiksel ifadeleri ve yüzdeleri çözer',
     example:'150 ile 30 topla',
     keywords:['hesapla','kaç eder','topla','çıkar','çarp','böl','yüzde'],
@@ -29,7 +29,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'birim-cevir', name:'Birim Çevirme', icon:'📏',
+    id:'birim-cevir', name:'Birim Çevirme', icon:'ruler',
     desc:'km/mil, kg/lb, m/ft, litre/galon, C/F dönüşümü',
     example:'5 km kaç mil',
     keywords:['çevir','kaç mil','kaç km','kaç pound','kaç libre','kaç feet','kaç galon','fahrenheit','celsius'],
@@ -53,7 +53,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'sifre-uretici', name:'Şifre Üretici', icon:'🔑',
+    id:'sifre-uretici', name:'Şifre Üretici', icon:'key',
     desc:'Güçlü rastgele şifre üretir',
     example:'şifre üret 16',
     keywords:['şifre üret','şifre oluştur','password üret'],
@@ -67,7 +67,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'kelime-sayaci', name:'Kelime Sayacı', icon:'🔢',
+    id:'kelime-sayaci', name:'Kelime Sayacı', icon:'digits',
     desc:'Metnin kelime, harf ve cümle sayısını hesaplar',
     example:'kelime say: merhaba dünya',
     keywords:['kelime say','harf say','kelime sayacı'],
@@ -81,7 +81,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'json-duzenleyici', name:'JSON Düzenleyici', icon:'📦',
+    id:'json-duzenleyici', name:'JSON Düzenleyici', icon:'box',
     desc:'Tek satır veya bozuk JSON u sıralar ve doğrular',
     example:'json düzenle: {"a":1,"b":[2,3]}',
     keywords:['json düzenle','json biçimle','json formatla'],
@@ -97,7 +97,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'yas-hesapla', name:'Yaş Hesaplama', icon:'🎂',
+    id:'yas-hesapla', name:'Yaş Hesaplama', icon:'cake',
     desc:'Doğum yılından yaş hesaplar',
     example:'1990 doğumluyum kaç yaşındayım',
     keywords:['doğum','doğdum','yaşım','kaç yaşında','yaş hesapla'],
@@ -112,7 +112,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'tarih-farki', name:'Tarih Farkı', icon:'📅',
+    id:'tarih-farki', name:'Tarih Farkı', icon:'calendar',
     desc:'İki tarih arasındaki gün sayısını hesaplar',
     example:'01.01.2026 ile 01.06.2026 arası kaç gün',
     keywords:['kaç gün','gün kaldı','tarih farkı','arası kaç gün'],
@@ -132,7 +132,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'asal-kontrol', name:'Asal Sayı', icon:'🔢',
+    id:'asal-kontrol', name:'Asal Sayı', icon:'digits',
     desc:'Sayının asal olup olmadığını kontrol eder',
     example:'17 asal mı',
     keywords:['asal mı','asal kontrol'],
@@ -143,11 +143,11 @@ window.SKILL_LIBRARY = [
         if(n<2) return {ok:true,text:n+' asal değil.'};
         var prime=true;
         for(var i=2;i*i<=n;i++) if(n%i===0){prime=false;break;}
-        return {ok:true,text:'**'+n+'** '+(prime?'asal bir sayıdır ✅':'asal değildir ❌')};
+        return {ok:true,text:'**'+n+'** '+(prime?'asal bir sayıdır (evet)':'asal değildir (hayır)')};
     }
 },
 {
-    id:'fibonacci', name:'Fibonacci', icon:'🌀',
+    id:'fibonacci', name:'Fibonacci', icon:'spiral',
     desc:'Fibonacci dizisini üretir',
     example:'fibonacci 12',
     keywords:['fibonacci'],
@@ -160,7 +160,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'faktoriyel', name:'Faktoriyel', icon:'❗',
+    id:'faktoriyel', name:'Faktoriyel', icon:'exclaim',
     desc:'n! hesaplar',
     example:'faktoriyel 6',
     keywords:['faktoriyel','faktöriyel'],
@@ -175,7 +175,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'rastgele-sayi', name:'Rastgele Sayı', icon:'🎲',
+    id:'rastgele-sayi', name:'Rastgele Sayı', icon:'dice',
     desc:'Belirtilen aralıkta rastgele sayı üretir',
     example:'1 ile 100 arası rastgele',
     keywords:['rastgele','random sayı','zar at'],
@@ -184,11 +184,11 @@ window.SKILL_LIBRARY = [
         var lo=nums.length?Math.min(nums[0],nums[nums.length-1]):1;
         var hi=nums.length>1?Math.max(nums[0],nums[nums.length-1]):100;
         var v=Math.floor(Math.random()*(hi-lo+1))+lo;
-        return {ok:true,text:'🎲 **'+lo+' - '+hi+'** aralığında: **'+v+'**'};
+        return {ok:true,text:'(zar) **'+lo+' - '+hi+'** aralığında: **'+v+'**'};
     }
 },
 {
-    id:'ters-metin', name:'Ters Çevirici', icon:'🔃',
+    id:'ters-metin', name:'Ters Çevirici', icon:'refresh',
     desc:'Metni tersine çevirir',
     example:'ters çevir: merhaba',
     keywords:['ters çevir','tersine çevir','reverse'],
@@ -199,7 +199,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'buyuk-harf', name:'Büyük/Küçük Harf', icon:'🔠',
+    id:'buyuk-harf', name:'Büyük/Küçük Harf', icon:'letters',
     desc:'Metni büyük veya küçük harfe çevirir',
     example:'büyük harf yap: merhaba',
     keywords:['büyük harf','küçük harf','uppercase','lowercase'],
@@ -211,7 +211,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'kisaltma', name:'Metin Kısaltma', icon:'✂️',
+    id:'kisaltma', name:'Metin Kısaltma', icon:'scissors',
     desc:'Uzun metni istenen karakter sayısına kısaltır',
     example:'kısalt 50: çok uzun bir metin...',
     keywords:['kısalt','özetle','shorten'],
@@ -225,7 +225,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'kdv-hesapla', name:'KDV Hesaplama', icon:'🧾',
+    id:'kdv-hesapla', name:'KDV Hesaplama', icon:'receipt',
     desc:'KDV tutarı ve genel toplamı hesaplar',
     example:'200 tl %20 kdv',
     keywords:['kdv','vergi'],
@@ -238,7 +238,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'quiz', name:'Mini Quiz', icon:'❓',
+    id:'quiz', name:'Mini Quiz', icon:'question',
     desc:'Rastgele bilgi sorusu sorar ve cevabını verir',
     example:'quiz yap',
     keywords:['quiz','soru sor','bilgi yarışması'],
@@ -256,21 +256,21 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'zar-at', name:'Zar Atma', icon:'🎲',
+    id:'zar-at', name:'Zar Atma', icon:'dice',
     desc:'Sanal zar atar (1-6)',
     example:'zar at',
     keywords:['zar at','zarları at'],
-    run:function(){ return {ok:true,text:'🎲 **'+(Math.floor(Math.random()*6)+1)+'** geldi!'}; }
+    run:function(){ return {ok:true,text:'(zar) **'+(Math.floor(Math.random()*6)+1)+'** geldi!'}; }
 },
 {
-    id:'yazi-tura', name:'Yazı Tura', icon:'🪙',
+    id:'yazi-tura', name:'Yazı Tura', icon:'coin',
     desc:'Sanal para atar',
     example:'yazı tura at',
     keywords:['yazı tura','para at'],
-    run:function(){ return {ok:true,text:'🪙 **'+(Math.random()<0.5?'YAZI':'TURA')+'**'}; }
+    run:function(){ return {ok:true,text:'(yazı tura) **'+(Math.random()<0.5?'YAZI':'TURA')+'**'}; }
 },
 {
-    id:'ussu-al', name:'Üs Alma', icon:'🧮',
+    id:'ussu-al', name:'Üs Alma', icon:'calc',
     desc:'Üslü sayı, kare ve küp hesaplar',
     example:'2 üssü 10',
     keywords:['üssü','üzeri','üstü','kare al','küp al','karesi'],
@@ -285,7 +285,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'karekok', name:'Karekök', icon:'🌱',
+    id:'karekok', name:'Karekök', icon:'sprout',
     desc:'Karekök hesaplar',
     example:'karekök 144',
     keywords:['karekök','kök al'],
@@ -298,7 +298,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'ortalama', name:'Ortalama', icon:'📊',
+    id:'ortalama', name:'Ortalama', icon:'chart',
     desc:'Sayıların ortalamasını hesaplar',
     example:'ortalama: 5,7,9',
     keywords:['ortalama','ortalaması'],
@@ -310,7 +310,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'min-max', name:'Min / Maks', icon:'📈',
+    id:'min-max', name:'Min / Maks', icon:'trend',
     desc:'Sayıların en büyüğünü veya en küçüğünü bulur',
     example:'en büyük: 5,12,7',
     keywords:['en büyük','en küçük','en yüksek','en düşük'],
@@ -323,7 +323,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'indirim', name:'İndirim Hesaplama', icon:'🏷️',
+    id:'indirim', name:'İndirim Hesaplama', icon:'tag',
     desc:'İndirimli fiyatı hesaplar',
     example:'100 tl %20 indirim',
     keywords:['indirim'],
@@ -335,7 +335,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'bahsis', name:'Bahşiş Hesaplama', icon:'💸',
+    id:'bahsis', name:'Bahşiş Hesaplama', icon:'money',
     desc:'Bahşiş ve toplam ödemeyi hesaplar',
     example:'500 tl %10 bahşiş',
     keywords:['bahşiş','bahsis'],
@@ -347,7 +347,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'faiz', name:'Faiz Hesaplama', icon:'🏦',
+    id:'faiz', name:'Faiz Hesaplama', icon:'bank',
     desc:'Yıllık basit faizi hesaplar',
     example:'10000 tl %10 faiz',
     keywords:['faiz'],
@@ -359,7 +359,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'doviz', name:'Döviz Çevirme', icon:'💱',
+    id:'doviz', name:'Döviz Çevirme', icon:'exchange',
     desc:'USD/EUR/GBP ↔ TL çevirir (demo kur)',
     example:'100 usd kaç tl',
     keywords:['usd','eur','gbp','dolar','euro','sterlin'],
@@ -373,7 +373,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'bmi', name:'BMI Hesaplama', icon:'⚖️',
+    id:'bmi', name:'BMI Hesaplama', icon:'scale',
     desc:'Vücut kitle indeksi hesaplar',
     example:'175 cm 70 kg',
     keywords:['bmi','vücut kitle','kitle indeksi'],
@@ -383,12 +383,12 @@ window.SKILL_LIBRARY = [
         if(!mc||!mk) return {ok:false};
         var h=+mc[1].replace(',','.'),w=+mk[1].replace(',','.');
         var bmi=w/Math.pow(h/100,2);
-        var cat=bmi<18.5?'zayıf 🟡':bmi<25?'normal 🟢':bmi<30?'fazla kilolu 🟠':'obez 🔴';
+        var cat=bmi<18.5?'zayıf':bmi<25?'normal':bmi<30?'fazla kilolu':'obez';
         return {ok:true,text:'Boy: '+h+' cm, Kilo: '+w+' kg\n\nBMI: **'+Math.round(bmi*10)/10+'** → **'+cat+'**'};
     }
 },
 {
-    id:'su-ihtiyaci', name:'Su İhtiyacı', icon:'💧',
+    id:'su-ihtiyaci', name:'Su İhtiyacı', icon:'drop',
     desc:'Günlük su ihtiyacını hesaplar',
     example:'70 kg su ihtiyacı',
     keywords:['su ihtiyacı','su ihtiyacım','kaç litre su'],
@@ -400,7 +400,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'baskent', name:'Başkent Bilgisi', icon:'🏛️',
+    id:'baskent', name:'Başkent Bilgisi', icon:'columns',
     desc:'Ülkelerin başkentlerini söyler',
     example:'fransa nın başkenti',
     keywords:['başkent','başkenti'],
@@ -411,7 +411,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'telefon-kodu', name:'Ülke Kodu', icon:'📞',
+    id:'telefon-kodu', name:'Ülke Kodu', icon:'phone',
     desc:'Telefon ülke kodlarını söyler',
     example:'+33 hangi ülke',
     keywords:['ülke kodu','telefon kodu'],
@@ -436,7 +436,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'hex-cevir', name:'Hex Çevirme', icon:'🅰️',
+    id:'hex-cevir', name:'Hex Çevirme', icon:'letter-a',
     desc:'Sayıyı onaltılık (hex) sisteme çevirir',
     example:'255 hex',
     keywords:['hex','16 taban'],
@@ -447,7 +447,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'base64', name:'Base64 Kodlama', icon:'🔐',
+    id:'base64', name:'Base64 Kodlama', icon:'lock',
     desc:'Metni Base64 e çevirir',
     example:'base64: merhaba',
     keywords:['base64'],
@@ -458,7 +458,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'url-encode', name:'URL Kodlama', icon:'🔗',
+    id:'url-encode', name:'URL Kodlama', icon:'link',
     desc:'Metni URL güvenli biçime çevirir',
     example:'url: merhaba dünya',
     keywords:['url kodla','url encode'],
@@ -469,7 +469,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'renk-donustur', name:'Renk Çevirici', icon:'🎨',
+    id:'renk-donustur', name:'Renk Çevirici', icon:'palette',
     desc:'HEX ↔ RGB renk dönüşümü',
     example:'#ff0000 rgb',
     keywords:['rgb','hex renk','renk çevir'],
@@ -488,7 +488,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'palindrom', name:'Palindrom Kontrol', icon:'🔄',
+    id:'palindrom', name:'Palindrom Kontrol', icon:'sync',
     desc:'Metnin palindrom olup olmadığını söyler',
     example:'palindrom: kasım',
     keywords:['palindrom'],
@@ -496,11 +496,11 @@ window.SKILL_LIBRARY = [
         var orig=t.replace(/^[^:(]*[:(]\s*/,'').trim();
         var txt=orig.toLowerCase().replace(/[^a-zçğıöşü0-9]/g,'');
         if(txt.length<2) return {ok:false};
-        return {ok:true,text:'"'+orig+'" '+(txt===txt.split('').reverse().join('')?'**palindrom** ✅':'palindrom **değil** ❌')};
+        return {ok:true,text:'"'+orig+'" '+(txt===txt.split('').reverse().join('')?'**palindrom** (evet)':'palindrom **değil** (hayır)')};
     }
 },
 {
-    id:'sesli-harf', name:'Sesli Harf Sayacı', icon:'🔊',
+    id:'sesli-harf', name:'Sesli Harf Sayacı', icon:'volume',
     desc:'Metindeki sesli ve sessiz harf sayısını bulur',
     example:'sesli harf: merhaba',
     keywords:['sesli harf','ünlü harf'],
@@ -513,7 +513,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'ilk-harf', name:'Baş Harfler', icon:'🔤',
+    id:'ilk-harf', name:'Baş Harfler', icon:'abc',
     desc:'Kelimelerin baş harflerini alır',
     example:'baş harfler: mustafa kemal',
     keywords:['baş harf','baş harfler','ilk harfleri'],
@@ -525,7 +525,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'alfabe-sirala', name:'Alfabetik Sıralama', icon:'🔡',
+    id:'alfabe-sirala', name:'Alfabetik Sıralama', icon:'lowercase',
     desc:'Kelimeleri alfabetik sıralar',
     example:'sırala: muz elma kiraz',
     keywords:['sırala','alfabetik sırala'],
@@ -537,7 +537,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'hangi-gun', name:'Hangi Gün', icon:'📆',
+    id:'hangi-gun', name:'Hangi Gün', icon:'calendar2',
     desc:'Bir tarihin hangi güne denk geldiğini söyler',
     example:'01.01.2026 hangi gün',
     keywords:['hangi gün','güne denk','günlerden'],
@@ -554,7 +554,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'tarih-ekle', name:'Tarih Ekle/Çıkar', icon:'➕',
+    id:'tarih-ekle', name:'Tarih Ekle/Çıkar', icon:'plus',
     desc:'Bir tarihe gün ekler veya çıkarır',
     example:'01.01.2026 + 15 gün',
     keywords:['gün ekle','gün çıkar','gün sonra','gün önce'],
@@ -574,7 +574,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'uuid', name:'UUID Üretici', icon:'🆔',
+    id:'uuid', name:'UUID Üretici', icon:'id',
     desc:'Rastgele UUID v4 üretir',
     example:'uuid üret',
     keywords:['uuid'],
@@ -584,7 +584,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'rastgele-isim', name:'Rastgele İsim', icon:'👤',
+    id:'rastgele-isim', name:'Rastgele İsim', icon:'user',
     desc:'Rastgele Türkçe isim + soyisim üretir',
     example:'rastgele isim',
     keywords:['rastgele isim','isim üret','takma ad'],
@@ -595,7 +595,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'element', name:'Element Bilgisi', icon:'⚗️',
+    id:'element', name:'Element Bilgisi', icon:'alembic',
     desc:'Periyodik tablo mini — element özellikleri',
     example:'element: demir',
     keywords:['element','periyodik'],
@@ -606,7 +606,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'gezegen', name:'Gezegen Bilgisi', icon:'🪐',
+    id:'gezegen', name:'Gezegen Bilgisi', icon:'planet',
     desc:'Gezegenler hakkında bilgi verir',
     example:'mars bilgisi',
     keywords:['gezegen','bilgisi'],
@@ -641,7 +641,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'sayi-okunusu', name:'Sayı Okunuşu', icon:'🔢',
+    id:'sayi-okunusu', name:'Sayı Okunuşu', icon:'digits',
     desc:'Sayıyı Türkçe yazıyla yazar',
     example:'12345 okunuşu',
     keywords:['okunuşu','yazıyla','kelimeyle'],
@@ -673,7 +673,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'mod-hesapla', name:'Mod Alma', icon:'➗',
+    id:'mod-hesapla', name:'Mod Alma', icon:'divide',
     desc:'Bölme kalanını hesaplar',
     example:'17 mod 5',
     keywords:['mod','kalanı'],
@@ -684,7 +684,7 @@ window.SKILL_LIBRARY = [
     }
 },
 {
-    id:'dna', name:'DNA Tamamlayıcı', icon:'🧬',
+    id:'dna', name:'DNA Tamamlayıcı', icon:'dna',
     desc:'DNA dizisinin tamamlayıcısını bulur',
     example:'dna: ATCG',
     keywords:['dna','gen dizisi'],

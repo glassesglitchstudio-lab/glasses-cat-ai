@@ -133,7 +133,11 @@ USE_X_OPUS = True  # X_OPUS hibrit modu aktif mi?
 
 USE_AGI_MODE = True
 
-# LM Studio desteği
+# Ollama Only Mode - tüm AI istekleri yalnızca Ollama'ya gider
+OLLAMA_URL = "http://localhost:11434/api/chat"
+USE_OLLAMA_ONLY = True  # True: diğer backend'ler (LM Studio vb.) devre dışı, yalnızca Ollama
+
+# LM Studio desteği (USE_OLLAMA_ONLY=True iken kapalıdır)
 LM_STUDIO_URL = "http://localhost:1234/v1/chat/completions"
 USE_LM_STUDIO = False
 
@@ -201,7 +205,7 @@ class ModelRouter:
         del base_urls
         del config_file
 
-        self.ollama_url = ollama_url or "http://localhost:11434/api/chat"
+        self.ollama_url = ollama_url or OLLAMA_URL  # USE_OLLAMA_ONLY=True: yalnızca Ollama
 
         # Encrypted model desteği
         self._encrypted_provider = None
