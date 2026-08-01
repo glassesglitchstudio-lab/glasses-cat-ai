@@ -169,10 +169,10 @@ class LoginRequest(BaseModel):
     password: str
 
 
-async def call_ai_engine(message: str, config: Dict[str, Any]) -> Optional[str]:
+async def call_ai_engine(message: str, config: Dict[str, Any], num_predict: int = 2000) -> Optional[str]:
     """AI motoruna asenkron çağrı - Ollama entegrasyonu"""
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             if config["url"].endswith("/v1"):
                 # OpenAI uyumlu API (LM Studio)
                 system_prompt = "Sen GlassesCat'sın - yardımcı ve nazik bir yapay zeka asistanısın. Türkçe konuşur, kısa ve faydalı yanıtlar verirsin. Oyunları iyi bilirsin: Minecraft, Valorant, CS2, League of Legends, Fortnite, GTA, PUBG, FIFA, Call of Duty, vb. Yazılım ve donanım konusunda yardımcı olursun. Nazik ve sabırlı davranırsın."
@@ -201,7 +201,7 @@ async def call_ai_engine(message: str, config: Dict[str, Any]) -> Optional[str]:
                     ],
                     "stream": False,
                     "think": False,
-                    "options": {"temperature": 0.7, "num_predict": 2000}
+                    "options": {"temperature": 0.7, "num_predict": num_predict}
                 }
                 response = await client.post(
                     f"{config['url']}/api/chat",
@@ -225,13 +225,13 @@ async def call_ai_engine(message: str, config: Dict[str, Any]) -> Optional[str]:
         return None
 
 
-async def get_ai_response(message: str, model: Optional[str] = None) -> str:
+async def get_ai_response(message: str, model: Optional[str] = None, num_predict: int = 2000) -> str:
     """Hibrit AI sistemi - Ana motor başarısız olursa yedeğe geçer"""
     
     # Önce ana motoru dene
     if AI_CONFIG["primary"]["enabled"]:
         logger.info(f"Ana motor deneniyor: {AI_CONFIG['primary']['name']}")
-        response = await call_ai_engine(message, AI_CONFIG["primary"])
+        response = await call_ai_engine(message, AI_CONFIG["primary"], num_predict=num_predict)
         if response:
             logger.info(f"Ana motor yanıt verdi")
             return response
@@ -241,7 +241,7 @@ async def get_ai_response(message: str, model: Optional[str] = None) -> str:
     # Yedek motoru dene
     if AI_CONFIG["fallback"]["enabled"]:
         logger.info(f"Yedek motor deneniyor: {AI_CONFIG['fallback']['name']}")
-        response = await call_ai_engine(message, AI_CONFIG["fallback"])
+        response = await call_ai_engine(message, AI_CONFIG["fallback"], num_predict=num_predict)
         if response:
             logger.info(f"Yedek motor yanıt verdi")
             return response
@@ -1435,12 +1435,15 @@ def _site_builder_agent_logic(message: str, current_html: str = "") -> dict:
         f"Su anki HTML:\n```html\n{current_html or DEFAULT_SITE_HTML}\n```\n\n"
         "Gorevlerin:\n"
         "1. Talebi anla (ekleme, degisiklik, silme, stil vs)\n"
-        "2. HTML'i guncelle\n"
+        "2. HTML'i guncelle - talebi gercekten uygula\n"
         "3. Sadece degisen kismi degil, TUM HTML'i dondur\n"
-        "4. Tum CSS inline veya <style> icinde olsun\n"
-        "5. Elementlere anlamli class adlari ver (navbar, hero, card, footer vb)\n\n"
-        "Yanit format:\n"
-        "---HTML---\n[guncellenmis HTML kodu]\n---MESAJ---\n[kullaniciya kisa aciklama, 1-2 cumle]\n"
+        "4. Tum CSS <style> icinde olsun\n"
+        "5. Elementlere anlamli class adlari ver (navbar, hero, card, footer vb)\n"
+        "6. Eksiksiz ve gecerli bir HTML dokumani olmali - <!doctype html> ile baslamali\n\n"
+        "Yanit format (KESINLIKLE uygula):\n"
+        "---HTML---\n<!doctype html> ile baslayan TUM HTML kodu\n"
+        "---MESAJ---\n[kullaniciya kisa aciklama, 1-2 cumle]\n"
+        "SADECE bu formatta yanit ver, baska hicbir sey yazma."
     )
     return {"prompt": prompt, "current_html": current_html or DEFAULT_SITE_HTML}
 
@@ -1449,20 +1452,30 @@ async def site_builder_chat(req: SiteBuilderRequest):
     """Site Builder sohbet — mesaj alir, HTML gunceller, AI yaniti doner"""
     try:
         logic = _site_builder_agent_logic(req.message, req.current_html)
-        ai_resp = await get_ai_response(logic["prompt"])
+        ai_resp = await get_ai_response(logic["prompt"], num_predict=8000)
+        msg_part = "Site guncellendi!"
 
-        if ai_resp and "❌" not in ai_resp and "---HTML---" in ai_resp:
+        if ai_resp and "❌" not in ai_resp:
             import re
-            m = re.search(r'---HTML---\s*\n(.*?)\n---MESAJ---', ai_resp, re.DOTALL)
-            if m:
+            new_html = None
+            # 1. ---HTML--- / ---MESAJ--- formatı
+            m = re.search(r'---HTML---\s*\n(.*?)(?:\n---MESAJ---|$)', ai_resp, re.DOTALL)
+            if m and ("<html" in m.group(1) or "<body" in m.group(1) or "<!doctype" in m.group(1).lower()):
                 new_html = m.group(1).strip()
-                msg_part = ai_resp.split("---MESAJ---")[-1].strip()[:300] if "---MESAJ---" in ai_resp else "Site guncellendi!"
-                return {"success": True, "html": new_html, "message": msg_part}
-        
-        # Fallback: AI yaniti direkt HTML olarak dene
-        if ai_resp and "❌" not in ai_resp and ("<html" in ai_resp or "<body" in ai_resp or "<!doctype" in ai_resp.lower()):
-            return {"success": True, "html": ai_resp.strip()[:10000], "message": "Site guncellendi!"}
-        
+                if "---MESAJ---" in ai_resp:
+                    msg_part = ai_resp.split("---MESAJ---")[-1].strip()[:300]
+            # 2. Fenced code block
+            if not new_html:
+                m = re.search(r'```(?:html)?\s*\n(.*?)```', ai_resp, re.DOTALL)
+                if m and ("<html" in m.group(1) or "<body" in m.group(1) or "<!doctype" in m.group(1).lower()):
+                    new_html = m.group(1).strip()
+            # 3. Direkt HTML
+            if not new_html and ("<html" in ai_resp or "<body" in ai_resp or "<!doctype" in ai_resp.lower()):
+                new_html = ai_resp.strip()
+            # 4. AI tamamlanmamış HTML döndürdüyse default şablonu kullan
+            if new_html:
+                return {"success": True, "html": new_html[:20000], "message": msg_part}
+
         return {"success": True, "html": logic["current_html"], "message": "Anlamadim. Lutfen net bir istek yazin."}
     except Exception as e:
         logger.error(f"Site Builder hatasi: {e}")
@@ -1480,7 +1493,7 @@ async def site_builder_edit(req: SiteBuilderEditRequest):
             "Sadece bir CSS kural blogu dondur: `{ selector { property: value; } }` seklinde.\n"
             "Aciklama yazma, markdown kullanma."
         )
-        result = await get_ai_response(edit_prompt)
+        result = await get_ai_response(edit_prompt, num_predict=4000)
         if result and "❌" not in result:
             m = re.search(r'\{[\s\S]*\}', result)
             if m:
