@@ -395,7 +395,7 @@ Her yanitinda kullan:
         
         return base
     
-def _build_user_prompt(self, user_input: str, memory_context: str,
+    def _build_user_prompt(self, user_input: str, memory_context: str,
                            conversation_history: List = None) -> str:
         """Kullanıcı prompt'unu oluştur (bagimla zenginlestirilmis)"""
         parts = []
@@ -432,7 +432,7 @@ def _build_user_prompt(self, user_input: str, memory_context: str,
         # ReAct formatı
         parts.append("## Şimdi Düşün ve Yanıtla\n🧠 DÜŞÜN: ...\n⚡ KARAR VER: ...\n🛠️ UYGULA: ...\n✅ YANITLA: ...")
         
-return "\n".join(parts)
+        return "\n".join(parts)
 
     def _memory_agent_deep_search(self, query: str) -> str:
         """Hafiza Ajan icin derin hafiza arama ve baglanti tespiti."""
@@ -588,29 +588,6 @@ return "\n".join(parts)
                     except Exception:
                         pass
                 
-                # LM Studio
-                try:
-                    resp = session.post(
-                        "http://localhost:1234/v1/chat/completions",
-                        json={
-                            "model": "turkcell-llm-7b-v1",
-                            "messages": [
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": user_prompt}
-                            ],
-                            "stream": False,
-                            "temperature": 0.0
-                        },
-                        timeout=(1, 2)
-                    )
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        result_container.append(data["choices"][0]["message"]["content"])
-                        done_event.set()
-                        return
-                except Exception:
-                    pass
-                
                 # Ollama - X_OPUS ile dene
                 try:
                     resp = session.post(
@@ -669,7 +646,7 @@ return "\n".join(parts)
         fallbacks = [
             f"Anlıyorum, '{user_msg[:30]}...' konusunda size yardımcı olabilirim. "
             f"Ancak şu anda AI modeline bağlanamıyorum. "
-            f"Lütfen LM Studio veya Ollama'nın çalıştığından emin olun.",
+            f"Lütfen Ollama'nın çalıştığından emin olun.",
             
             f"Mesajınızı aldım: '{user_msg[:30]}...'. "
             f"Ne yazık ki AI motoru şu anda yanıt vermiyor. "
