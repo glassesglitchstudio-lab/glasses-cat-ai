@@ -135,11 +135,7 @@ USE_AGI_MODE = True
 
 # Ollama Only Mode - tüm AI istekleri yalnızca Ollama'ya gider
 OLLAMA_URL = "http://localhost:11434/api/chat"
-USE_OLLAMA_ONLY = True  # True: diğer backend'ler (LM Studio vb.) devre dışı, yalnızca Ollama
-
-# LM Studio desteği (USE_OLLAMA_ONLY=True iken kapalıdır)
-LM_STUDIO_URL = "http://localhost:1234/v1/chat/completions"
-USE_LM_STUDIO = False
+USE_OLLAMA_ONLY = True  # True: diğer backend'ler devre dışı, yalnızca Ollama
 
 
 class ModelType(Enum):
@@ -340,6 +336,9 @@ class ModelRouter:
 
     def try_secure_fallback(self, model_name: str) -> str:
         """Model Ollama'da yoksa şifreli versiyonunu dene."""
+        # Ollama Only Mode: şifreli/alternatif backend fallback'i devre dışı - yalnızca Ollama
+        if USE_OLLAMA_ONLY:
+            return model_name
         if not self._check_model(model_name):
             provider = self._get_encrypted_provider()
             if provider and model_name in provider.list_encrypted():

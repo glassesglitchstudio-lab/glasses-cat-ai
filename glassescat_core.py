@@ -847,6 +847,7 @@ class GlassescatCore:
             "response": response,
             "tool_calls": tool_calls,
             "thoughts": thoughts,
+            "thinking": loop_result.get("thinking", ""),
             "memory_context": memory_context,
             "duration": f"{time.time() - start_time:.2f}s",
             "state": asdict(self.state),

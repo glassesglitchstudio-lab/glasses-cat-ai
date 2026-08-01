@@ -90,25 +90,21 @@ araçları (tools) kullanır ve en iyi yanıtı üretirsin.
 ## Düşünme Sürecin (ReAct)
 Her adımda şu formatı kullan:
 
-### 🧠 DÜŞÜN (Think)
+### DÜŞÜN (Think)
 Mevcut durumu analiz et. Ne yapman gerektiğini düşün.
-"Kullanıcı Chrome'u açıp YouTube'da video aramak istiyor. Önce Chrome'u açmalıyım."
 
-### ⚡ KARAR VER (Decide)
+### KARAR VER (Decide)
 Hangi aracı kullanacağına karar ver.
-"open_app aracını kullanacağım."
 
-### 🛠️ UYGULA (Act)
+### UYGULA (Act)
 Aracı çağır:
 FUNCCALL: open_app(name='chrome')
 
-### 👁️ GÖZLEMLE (Observe)
+### GÖZLEMLE (Observe)
 Aracın sonucunu değerlendir.
-"Chrome başarıyla açıldı. Şimdi YouTube'u açıp arama yapmalıyım."
 
-### ✅ YANITLA (Answer)
-Kullanıcıya nihai yanıtı ver.
-"Chrome'u açtım. Şimdi YouTube'da arama yapıyorum..."
+### YANITLA (Answer)
+Kullanıcıya kısa ve öz nihai yanıtı ver. Gereksiz tekrar, uzun giriş ve onay cümleleri yazma.
 
 ## Araçların
 Kullanabileceğin araçlar şunlardır:
@@ -123,8 +119,31 @@ Kullanabileceğin araçlar şunlardır:
 6. Türkçe yanıt ver
 7. Arkadaş canlısı ve yardımsever ol
 8. Maksimum {max_iterations} adımda sonuca ulaş
-9. DÜŞÜN, KARAR VER, UYGULA, GÖZLEMLE blokları iç düşüncedir, kullanıcıya asla gösterilmez. Sadece ✅ YANITLA bölümünde kullanıcıya cevabını yaz.
+9. DÜŞÜN, KARAR VER, UYGULA, GÖZLEMLE bloklarını yaz; bunlar arayüzde "Düşünme" bölümünde gösterilir. YANITLA bölümü kullanıcıya final cevap olarak gösterilir.
+10. Yanıtını kısa ve öz tut; gereksiz tekrar, uzun giriş ve onay cümlelerinden kaçın.
 """
+
+
+ANSWER_HEADER_RE = re.compile(
+    r"^\s*(?:#{1,4}\s*)?(?:✅|✔|✓)?\s*(?:YANITLA|ANSWER)(?:\s*\([^)]*\))?(?=\s*[:：\n]|\s*$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+REACT_HEADER_RE = re.compile(
+    r"^\s*(?:#{1,4}\s*)?(?:🧠|⚡|🛠️|👁️|✅|✔|✓)?\s*(?:DÜŞÜN|DUSUN|THINK|KARAR VER|DECIDE|UYGULA|ACT|GÖZLEMLE|OBSERVE|YANITLA|ANSWER)\s*[:：]?",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def split_response(text: str) -> Dict[str, str]:
+    """ReAct yanıtını düşünme + cevap olarak ayırır."""
+    if not text:
+        return {"thinking": "", "answer": text}
+    m = ANSWER_HEADER_RE.search(text)
+    if m:
+        thinking = text[:m.start()].strip()
+        answer = re.sub(r"^[:：\s]+", "", text[m.end():].strip())
+        return {"thinking": thinking, "answer": answer}
+    return {"thinking": "", "answer": text.strip()}
 
 
 def extract_answer(text: str) -> str:
@@ -132,25 +151,15 @@ def extract_answer(text: str) -> str:
     sadece kullanıcıya gösterilecek final yanıtı döndürür."""
     if not text:
         return text
-    react_header_re = re.compile(
-        r"^\s*#{2,4}\s*[^\n]{0,40}?(?:DÜŞÜN|DUSUN|THINK|KARAR VER|DECIDE|UYGULA|ACT|GÖZLEMLE|OBSERVE|YANITLA|ANSWER)",
-        re.IGNORECASE | re.MULTILINE,
-    )
-    answer_header_re = re.compile(
-        r"^\s*#{2,4}\s*[^\n]{0,40}?(?:YANITLA|ANSWER)",
-        re.IGNORECASE | re.MULTILINE,
-    )
-    m = answer_header_re.search(text)
-    if m:
-        tail = text[m.end():].strip()
-        if tail:
-            return tail
+    parts = split_response(text)
+    if parts["answer"]:
+        return parts["answer"]
     lines = text.split("\n")
     out = []
     skip = False
     for ln in lines:
-        if react_header_re.match(ln):
-            skip = not answer_header_re.match(ln)
+        if REACT_HEADER_RE.match(ln):
+            skip = True
             continue
         if not skip:
             out.append(ln)
@@ -230,6 +239,7 @@ class AgentLoop:
         self.thoughts = []
         self.iteration = 0
         tool_calls = []
+        thinking_text = ""
         
         logger.info(f"🤔 Agent Loop başladı: '{user_input[:50]}...'")
         
@@ -310,6 +320,8 @@ class AgentLoop:
                     continue
             
             # --- YANITLA (Answer) - Araç çağrısı yoksa yanıtla ---
+            react_parts = split_response(llm_response)
+            thinking_text = react_parts["thinking"]
             final_response = extract_answer(llm_response)
             self.thoughts.append(Thought(
                 step=self.iteration,
@@ -322,6 +334,7 @@ class AgentLoop:
             
             return {
                 "response": final_response,
+                "thinking": thinking_text,
                 "thoughts": [asdict(t) for t in self.thoughts],
                 "tool_calls": tool_calls,
                 "iterations": self.iteration,
@@ -341,6 +354,7 @@ class AgentLoop:
         
         return {
             "response": final_response,
+            "thinking": thinking_text,
             "thoughts": [asdict(t) for t in self.thoughts],
             "tool_calls": tool_calls,
             "iterations": self.iteration,
@@ -430,7 +444,7 @@ Her yanitinda kullan:
         parts.append(f"## 📝 Kullanıcının Yeni Mesajı\n{user_input}\n")
         
         # ReAct formatı
-        parts.append("## Şimdi Düşün ve Yanıtla\n🧠 DÜŞÜN: ...\n⚡ KARAR VER: ...\n🛠️ UYGULA: ...\n✅ YANITLA: ...")
+        parts.append("## Şimdi Düşün ve Yanıtla\nDÜŞÜN: ...\nKARAR VER: ...\nUYGULA: ...\nYANITLA: ...")
         
         return "\n".join(parts)
 
@@ -489,10 +503,10 @@ Her yanitinda kullan:
 {tool_summary}
 
 ## Şimdi devam et
-🧠 DÜŞÜN (araç sonucunu değerlendir):
-⚡ KARAR VER (yeni araç gerekli mi?):
-🛠️ UYGULA (gerekirse):
-✅ YANITLA (işlem bittiyse):"""
+DÜŞÜN (araç sonucunu değerlendir):
+KARAR VER (yeni araç gerekli mi?):
+UYGULA (gerekirse):
+YANITLA (işlem bittiyse):"""
     
     def _build_tool_summary(self, processed: Dict) -> str:
         """Araç çalıştırma sonuçlarını özetle"""

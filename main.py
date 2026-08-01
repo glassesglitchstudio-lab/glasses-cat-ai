@@ -173,51 +173,29 @@ async def call_ai_engine(message: str, config: Dict[str, Any], num_predict: int 
     """AI motoruna asenkron çağrı - Ollama entegrasyonu"""
     try:
         async with httpx.AsyncClient(timeout=300.0) as client:
-            if config["url"].endswith("/v1"):
-                # OpenAI uyumlu API (LM Studio)
-                system_prompt = "Sen GlassesCat'sın - yardımcı ve nazik bir yapay zeka asistanısın. Türkçe konuşur, kısa ve faydalı yanıtlar verirsin. Oyunları iyi bilirsin: Minecraft, Valorant, CS2, League of Legends, Fortnite, GTA, PUBG, FIFA, Call of Duty, vb. Yazılım ve donanım konusunda yardımcı olursun. Nazik ve sabırlı davranırsın."
-                # Root mod veya teknik bilgiler için deepseek-coder-6.7b-kexer, normal modda turkcell-llm-7b-v1 kullan (Türkçe için)
-                model_name = config.get("model", "turkcell-llm-7b-v1")
-                payload = {
-                    "model": model_name,
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": message}
-                    ],
-                    "stream": False,
-                    "temperature": 0.0  # Tamamen deterministik
-                }
-                response = await client.post(
-                    f"{config['url']}/chat/completions",
-                    json=payload
-                )
-            else:
-                # Ollama API - /api/chat formatı
-                payload = {
-                    "model": config.get("model", "glassesglitchstudio/x_opus:V1_X_OPUS"),
-                    "messages": [
-                        {"role": "system", "content": "Sen GlassesCat'sın. Yardımcı ve nazik bir Türkçe yapay zeka asistanısın. Kısa ve faydalı yanıtlar verirsin. Oyunları bilirsin. Saygılı davranırsın."},
-                        {"role": "user", "content": message}
-                    ],
-                    "stream": False,
-                    "think": False,
-                    "options": {"temperature": 0.7, "num_predict": num_predict}
-                }
-                response = await client.post(
-                    f"{config['url']}/api/chat",
-                    json=payload
-                )
+            # Ollama API - /api/chat formatı
+            payload = {
+                "model": config.get("model", "glassesglitchstudio/x_opus:V1_X_OPUS"),
+                "messages": [
+                    {"role": "system", "content": "Sen GlassesCat'sın. Yardımcı ve nazik bir Türkçe yapay zeka asistanısın. Kısa ve faydalı yanıtlar verirsin. Oyunları bilirsin. Saygılı davranırsın."},
+                    {"role": "user", "content": message}
+                ],
+                "stream": False,
+                "think": False,
+                "options": {"temperature": 0.7, "num_predict": num_predict}
+            }
+            response = await client.post(
+                f"{config['url']}/api/chat",
+                json=payload
+            )
             
             if response.status_code == 200:
                 data = response.json()
-                if config["url"].endswith("/v1"):
-                    return data["choices"][0]["message"]["content"]
-                else:
-                    msg = data.get("message", {})
-                    content = msg.get("content", "").strip()
-                    if not content:
-                        content = msg.get("thinking", "").strip()
-                    return content
+                msg = data.get("message", {})
+                content = msg.get("content", "").strip()
+                if not content:
+                    content = msg.get("thinking", "").strip()
+                return content
             return None
             
     except Exception as e:
@@ -334,6 +312,7 @@ async def chat(request: ChatRequest):
                                 core = get_core()
                                 res = core.process_message(request.message)
                                 holder["text"] = res.get("response", "")
+                                holder["thinking"] = res.get("thinking", "")
                             except Exception as e:
                                 holder["error"] = str(e)
                         th = threading.Thread(target=run_core, daemon=True)
@@ -352,6 +331,9 @@ async def chat(request: ChatRequest):
                                     text = inner.get("response") or inner.get("text") or inner.get("error") or str(inner)
                             except Exception:
                                 pass
+                        thinking_txt = holder.get("thinking", "")
+                        if thinking_txt:
+                            yield sse({"thinking": thinking_txt, "done": False})
                         text = extract_answer(text or "")
                         yield sse({"token": text, "done": False})
                         yield sse({"done": True})
@@ -376,6 +358,7 @@ async def chat(request: ChatRequest):
         response_text = ""
         tool_calls = []
         thoughts = []
+        thinking_text = ""
         
         # Model seçimi: frontend'den gelen modele göre yönlendir
         model_choice = (request.model or "X_OPUS").upper()
@@ -391,6 +374,7 @@ async def chat(request: ChatRequest):
                     model=override
                 )
                 response_text = result.get("response", "")
+                thinking_text = result.get("thinking", "")
                 if result.get("routing"):
                     thoughts = [result["routing"]]
                 if not response_text:
@@ -420,6 +404,7 @@ async def chat(request: ChatRequest):
                 
                 tool_calls = result.get("tool_calls", [])
                 thoughts = result.get("thoughts", [])
+                thinking_text = result.get("thinking", "")
                 
                 if not response_text:
                     response_text = "Üzgünüm, yanıt üretemedim."
@@ -440,7 +425,8 @@ async def chat(request: ChatRequest):
             "engine_used": model_choice,
             "username": username,
             "tool_calls": tool_calls[:5] if tool_calls else [],
-            "thoughts": thoughts[-3:] if thoughts else []
+            "thoughts": thoughts[-3:] if thoughts else [],
+            "thinking": thinking_text
         }
     except Exception as e:
         logger.error(f"Sunucu iç hatası: {str(e)}")

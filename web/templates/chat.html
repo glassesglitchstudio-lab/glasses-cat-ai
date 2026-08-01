@@ -104,6 +104,14 @@
 
         .think{display:flex;align-items:center;gap:10px;padding:10px 0;margin-left:34px;max-width:720px;color:#999;font-size:.82rem}
         .think .pulse{animation:pulse 1.4s ease-in-out infinite}
+        .think-box{margin-left:34px;margin-bottom:10px;border:1px solid #e9e0ff;background:#faf7ff;border-radius:10px;overflow:hidden}
+        .think-box .think-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;cursor:pointer;color:#7c3aed;font-size:.72rem;font-weight:600;user-select:none;gap:6px}
+        .think-box .think-hdr:hover{background:#f3edff}
+        .think-box .think-toggle{font-size:.6rem;opacity:.7;transition:transform .2s}
+        .think-box .think-body{display:none;padding:8px 12px 12px;color:#6b7280;font-size:.75rem;line-height:1.6;white-space:pre-wrap;max-height:220px;overflow-y:auto}
+        .think-box.open .think-body{display:block}
+        .think-box.open .think-toggle{transform:rotate(180deg)}
+        @media(max-width:768px){.think-box{margin-left:0}}
         @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 
         .sb-loading{display:flex;align-items:center;gap:12px;padding:6px 0}
@@ -1932,7 +1940,7 @@ function renderSettingsStyles() {
         }
         document.getElementById('welcome').classList.add('hidden');
         i.classList.remove('hidden');
-        c.msgs.forEach(m => addMsg(m.role, m.text, false));
+        c.msgs.forEach(m => addMsg(m.role, m.text, false, m.thinking ? {thinking: m.thinking} : null));
         scrollBottom();
     }
 
@@ -1942,7 +1950,7 @@ function renderSettingsStyles() {
         document.getElementById('msgsInner').innerHTML = '';
     }
 
-    function addMsg(role, text, save = true) {
+    function addMsg(role, text, save = true, opts = null) {
         const inner = document.getElementById('msgsInner');
         document.getElementById('welcome').classList.add('hidden');
         inner.classList.remove('hidden');
@@ -1966,6 +1974,13 @@ function renderSettingsStyles() {
             hdr.appendChild(acts);
         }
         el.appendChild(hdr);
+        if (role === 'ai' && opts && opts.thinking) {
+            const tb = document.createElement('div');
+            tb.className = 'think-box';
+            tb.innerHTML = '<div class="think-hdr" onclick="this.parentElement.classList.toggle(\'open\')"><span>Düşünme</span><span class="think-toggle">▾</span></div><div class="think-body"></div>';
+            tb.querySelector('.think-body').textContent = cleanThink(opts.thinking);
+            el.appendChild(tb);
+        }
         const ct = document.createElement('div');
         ct.className = 'ct';
         if (role === 'ai') ct.innerHTML = format(text);
@@ -2024,6 +2039,11 @@ function renderSettingsStyles() {
         editArea.remove();
         const actBtn = msg.querySelector('.actions button');
         if (actBtn) actBtn.style.display = '';
+    }
+
+    function cleanThink(t) {
+        // Düşünme kutusunda emoji + markdown başlık işareti gösterme
+        return (t || '').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}]/gu, '').replace(/^#{1,6}\s*/gm, '').trim();
     }
 
     function format(t) {
@@ -2383,7 +2403,7 @@ function renderSettingsStyles() {
         return d.response || '';
     }
 
-    async function streamChat(msg, onToken) {
+    async function streamChat(msg, onToken, onThinking) {
         const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel, stream: true})});
         if (!res.ok) throw new Error('HTTP ' + res.status);
         if (!res.body) {
@@ -2408,6 +2428,8 @@ function renderSettingsStyles() {
                 let d;
                 try { d = JSON.parse(line.slice(5).trim()); } catch(e) { continue; }
                 if (d.error) throw new Error(d.error);
+                if (d.thinking && onThinking) onThinking(d.thinking);
+                if (d.thinking_reset && onThinking) onThinking(null);
                 if (d.token) { full += d.token; onToken(d.token); }
                 if (d.done) { streamDone = true; break; }
             }
@@ -2450,14 +2472,26 @@ function renderSettingsStyles() {
 
     async function streamReply(t) {
         addMsg('ai', '', true);
-        const ct = document.getElementById('msgsInner').lastElementChild.querySelector('.ct');
+        const el = document.getElementById('msgsInner').lastElementChild;
+        const ct = el.querySelector('.ct');
+        const thinkBox = document.createElement('div');
+        thinkBox.className = 'think-box';
+        thinkBox.style.display = 'none';
+        thinkBox.innerHTML = '<div class="think-hdr" onclick="this.parentElement.classList.toggle(\'open\')"><span>Düşünme</span><span class="think-toggle">▾</span></div><div class="think-body"></div>';
+        el.insertBefore(thinkBox, ct);
         const typer = createTyper(ct);
-        const full = await streamChat(t, tok => typer.push(tok));
+        let thinkingText = '';
+        const full = await streamChat(t, tok => typer.push(tok), tk => {
+            if (tk === null) { thinkingText = ''; thinkBox.style.display = 'none'; return; }
+            thinkingText += tk;
+            thinkBox.style.display = '';
+            thinkBox.querySelector('.think-body').textContent = cleanThink(thinkingText);
+        });
         typer.flush();
         ct.innerHTML = format(full);
         if (chatId && chats[chatId]) {
             const ms = chats[chatId].msgs;
-            if (ms.length) ms[ms.length - 1].text = full;
+            if (ms.length) { ms[ms.length - 1].text = full; if (thinkingText) ms[ms.length - 1].thinking = thinkingText; }
         }
         setTimeout(() => hljs.highlightAll(), 50);
         return full;

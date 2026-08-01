@@ -24,37 +24,29 @@ logger = logging.getLogger("XOpusRouter")
 
 X_OPUS_VERSION = "1.0.0"
 
-REACT_BLOCK_RE = re.compile(
-    r"^\s*#{2,4}\s*[^\n]{0,40}?(?:DÜŞÜN|DUSUN|THINK|KARAR VER|DECIDE|UYGULA|ACT|GÖZLEMLE|OBSERVE|YANITLA|ANSWER)",
-    re.IGNORECASE | re.MULTILINE,
-)
 ANSWER_HEADER_RE = re.compile(
-    r"^\s*#{2,4}\s*[^\n]{0,40}?(?:YANITLA|ANSWER)",
+    r"^\s*(?:#{1,4}\s*)?(?:✅|✔|✓)?\s*(?:YANITLA|ANSWER)(?:\s*\([^)]*\))?(?=\s*[:：\n]|\s*$)",
     re.IGNORECASE | re.MULTILINE,
 )
+
+
+def split_response(text: str) -> Dict[str, str]:
+    """ReAct yanıtını düşünme + cevap olarak ayırır."""
+    if not text:
+        return {"thinking": "", "answer": text}
+    m = ANSWER_HEADER_RE.search(text)
+    if m:
+        thinking = text[:m.start()].strip()
+        answer = re.sub(r"^[:：\s]+", "", text[m.end():].strip())
+        return {"thinking": thinking, "answer": answer}
+    return {"thinking": "", "answer": text.strip()}
 
 
 def strip_thinking(text: str) -> str:
-    """ReAct düşünce bloklarını (DÜŞÜN/KARAR/UYGULA/GÖZLEMLE) çıkarır,
-    sadece kullanıcıya gösterilecek final yanıtı döndürür."""
+    """ReAct düşünce bloklarını çıkarır, sadece final yanıtı döndürür."""
     if not text:
         return text
-    m = ANSWER_HEADER_RE.search(text)
-    if m:
-        tail = text[m.end():].strip()
-        if tail:
-            return tail
-    lines = text.split("\n")
-    out = []
-    skip = False
-    for ln in lines:
-        if REACT_BLOCK_RE.match(ln):
-            skip = not ANSWER_HEADER_RE.match(ln)
-            continue
-        if not skip:
-            out.append(ln)
-    joined = "\n".join(out).strip()
-    return joined if joined else text
+    return split_response(text)["answer"] or text
 
 CYBER_MODEL = "glassesglitchstudio/x_opus:V1_X_OPUS"
 CODE_MODEL = "glassesglitchstudio/x_fable_coder:V1"
@@ -137,7 +129,7 @@ KURALLAR:
 4. Siber guvenlik konularinda etik ve yasal sinirlar icinde kal
 5. Kullaniciya Berkay veya komutan diye hitap et
 6. X_OPUS kimligini her zaman koru, gereksiz yere alt modellerden bahsetme
-7. DUSUN, KARAR VER, UYGULA, GOZLEMLE basliklari SENIN ICINDE kalsin - ASLA yazma. Sadece kullaniciya cevabi dogrudan yaz
+7. DUSUN, KARAR VER, UYGULA, GOZLEMLE basliklarini ### seklinde yaz (arayuzde "Dusunme" bolumunde gosterilir). Final cevabi ### YANITLA basligiyla ver. Cevaplarini kisa ve oz tut, gereksiz tekrar yapma
 
 KISILIGIN:
 Karizmatik, hizli dusunen, kusursuz kod yazan, siber dunyanin korkulu ruyasi.
@@ -210,10 +202,20 @@ class XOpusRouter:
             response = self.session.post(self.ollama_url, json=payload, timeout=120)
             if response.status_code == 200:
                 result = response.json()
-                ai_response = strip_thinking(result["message"]["content"])
+                msg = result.get("message", {}) or {}
+                content = msg.get("content") or ""
+                native_thinking = msg.get("thinking") or ""
+                parts = split_response(content)
+                ai_response = parts["answer"] or content
+                if not ai_response and native_thinking:
+                    # Native reasoning modeli: content bos, cevap olarak
+                    # dusunmeyi kullan (X_GLITCH_OPUS gibi).
+                    ai_response = native_thinking
+                    native_thinking = ""
                 return {
                     "success": True,
                     "response": ai_response,
+                    "thinking": parts["thinking"] or native_thinking,
                     "model": model,
                     "model_type": request_type,
                     "routing": routing_info,
@@ -274,6 +276,11 @@ class XOpusRouter:
                                      stream=True, timeout=120)
         if response.status_code != 200:
             raise RuntimeError(f"Ollama hatasi: HTTP {response.status_code}")
+        buf = ""
+        answer_started = False
+        full_text = ""
+        native_mode = False
+        final_content = ""
         for line in response.iter_lines(decode_unicode=True):
             if not line:
                 continue
@@ -281,11 +288,70 @@ class XOpusRouter:
                 chunk = json.loads(line)
             except json.JSONDecodeError:
                 continue
-            piece = chunk.get("message", {}).get("content", "")
-            if piece:
-                yield {"token": piece, "done": False}
+            msg = chunk.get("message", {}) or {}
+            piece = msg.get("content") or ""
+            think = msg.get("thinking") or ""
             if chunk.get("done"):
+                # done chunk'i (stream sonunda) tam content'i tasiyabilir
+                final_content = msg.get("content") or ""
                 break
+            if think and not piece:
+                # Ollama native reasoning alani (X_GLITCH_OPUS gibi):
+                # dusunme kutusuna dogrudan akit — kullanici ilerlemeyi gorur.
+                native_mode = True
+                yield {"thinking": think, "done": False}
+                continue
+            if not piece:
+                continue
+            if native_mode:
+                # Native model: content = temiz cevap (baslik ayristirmaya gerek yok).
+                # Olası YANITLA baslik on ekini yine de temizle.
+                piece = re.sub(
+                    r"^\s*#{1,4}\s*(?:✅|✔|✓)?\s*(?:YANITLA|ANSWER)[^\n]*[:：]?\s*",
+                    "", piece, count=1, flags=re.IGNORECASE)
+                answer_started = True
+                if piece:
+                    yield {"token": piece, "done": False}
+                continue
+            full_text += piece
+            if not answer_started:
+                probe = buf + piece
+                m = ANSWER_HEADER_RE.search(probe)
+                if m:
+                    answer_started = True
+                    thinking = probe[:m.start()].strip()
+                    tail = re.sub(r"^[:：\s]+", "", probe[m.end():])
+                    if thinking:
+                        yield {"thinking": thinking, "done": False}
+                    if tail:
+                        yield {"token": tail, "done": False}
+                else:
+                    # Başlık parçaya bölünebilir: satırın tamamlanmamış kuyruğunu bekle,
+                    # tamamlanan satırları düşünme olarak akıt (akıcı görünüm).
+                    # Böylece başlık her zaman satır başında yakalanır.
+                    nl = probe.rfind("\n")
+                    if nl != -1:
+                        emit = probe[:nl + 1]
+                        buf = probe[nl + 1:]
+                        if emit:
+                            yield {"thinking": emit, "done": False}
+                    else:
+                        buf = probe
+                continue
+            yield {"token": piece, "done": False}
+        if not answer_started:
+            # Model YANITLA başlığı yazmadı (örn. kısa selamlama):
+            # akıtılan tüm metin aslında cevaptır — düşünme kutusunu sıfırla,
+            # tamamını cevap olarak gönder (yarım cevap bug fix).
+            if native_mode and final_content:
+                # Native model: content yalnizca done chunk'inda geldi.
+                # Dusunme kutusu zaten dolu — cevabi oldugu gibi ver.
+                yield {"token": final_content, "done": False}
+            elif full_text:
+                yield {"thinking_reset": True, "done": False}
+                yield {"token": full_text, "done": False}
+            # native_mode + hic content yok: dusunme kutusu zaten akitildi,
+            # bos cevap uretilmedi — ekstra olay gerekmez.
 
     def chat_with_history(self, message: str, session_id: str = None,
                           system_prompt: str = None) -> Dict[str, Any]:
