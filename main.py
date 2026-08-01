@@ -194,7 +194,7 @@ async def call_ai_engine(message: str, config: Dict[str, Any]) -> Optional[str]:
             else:
                 # Ollama API - /api/chat formatı
                 payload = {
-                    "model": config.get("model", "qwen3.5:9b"),
+                    "model": config.get("model", "glassesglitchstudio/x_opus:V1_X_OPUS"),
                     "messages": [
                         {"role": "system", "content": "Sen GlassesCat'sın. Yardımcı ve nazik bir Türkçe yapay zeka asistanısın. Kısa ve faydalı yanıtlar verirsin. Oyunları bilirsin. Saygılı davranırsın."},
                         {"role": "user", "content": message}
