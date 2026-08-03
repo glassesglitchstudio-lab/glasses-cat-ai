@@ -221,7 +221,7 @@ window.SKILL_LIBRARY = [
         var n=Math.min(500,m?parseInt(m[0]):100);
         if(txt.length<2) return {ok:false};
         if(txt.length<=n) return {ok:true,text:txt};
-        return {ok:true,text:txt.slice(0,n)+'…\n\n_(**'+txt.length+'** karakter → **'+n+'** karakter)_'};
+        return {ok:true,text:txt.slice(0,n)+'…\n\n_(**'+txt.length+'** karakter -> **'+n+'** karakter)_'};
     }
 },
 {
@@ -360,7 +360,7 @@ window.SKILL_LIBRARY = [
 },
 {
     id:'doviz', name:'Döviz Çevirme', icon:'exchange',
-    desc:'USD/EUR/GBP ↔ TL çevirir (demo kur)',
+    desc:'USD/EUR/GBP <-> TL çevirir (demo kur)',
     example:'100 usd kaç tl',
     keywords:['usd','eur','gbp','dolar','euro','sterlin'],
     run:function(t){
@@ -384,7 +384,7 @@ window.SKILL_LIBRARY = [
         var h=+mc[1].replace(',','.'),w=+mk[1].replace(',','.');
         var bmi=w/Math.pow(h/100,2);
         var cat=bmi<18.5?'zayıf':bmi<25?'normal':bmi<30?'fazla kilolu':'obez';
-        return {ok:true,text:'Boy: '+h+' cm, Kilo: '+w+' kg\n\nBMI: **'+Math.round(bmi*10)/10+'** → **'+cat+'**'};
+        return {ok:true,text:'Boy: '+h+' cm, Kilo: '+w+' kg\n\nBMI: **'+Math.round(bmi*10)/10+'** -> **'+cat+'**'};
     }
 },
 {
@@ -420,12 +420,12 @@ window.SKILL_LIBRARY = [
         var m=t.match(/\+?(\d{1,3})/);
         if(!m) return {ok:false};
         var code=m[1];
-        if(map[code]) return {ok:true,text:'+'+code+' → **'+map[code]+'**'};
+        if(map[code]) return {ok:true,text:'+'+code+' -> **'+map[code]+'**'};
         return {ok:true,text:'+'+code+' kodu veritabanında yok (demo — 10 ülke yüklü)'};
     }
 },
 {
-    id:'binary', name:'Binary Çevirme', icon:'0️⃣',
+    id:'binary', name:'Binary Çevirme', icon:'0',
     desc:'Sayıyı ikilik (binary) sisteme çevirir',
     example:'5 binary',
     keywords:['binary','ikili sistem','2 taban'],
@@ -470,7 +470,7 @@ window.SKILL_LIBRARY = [
 },
 {
     id:'renk-donustur', name:'Renk Çevirici', icon:'palette',
-    desc:'HEX ↔ RGB renk dönüşümü',
+    desc:'HEX <-> RGB renk dönüşümü',
     example:'#ff0000 rgb',
     keywords:['rgb','hex renk','renk çevir'],
     run:function(t){
@@ -521,7 +521,7 @@ window.SKILL_LIBRARY = [
         var txt=t.replace(/^[^:(]*[:(]\s*/,'').trim();
         if(txt.length<2) return {ok:false};
         var init=txt.split(/\s+/).filter(Boolean).map(function(w){return w.charAt(0)}).join('');
-        return {ok:true,text:'"'+txt+'" → **'+init.toUpperCase()+'**'};
+        return {ok:true,text:'"'+txt+'" -> **'+init.toUpperCase()+'**'};
     }
 },
 {
@@ -546,11 +546,11 @@ window.SKILL_LIBRARY = [
         var m=t.match(/\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/);
         if(!m){
             var now=new Date();
-            return {ok:true,text:'Bugün → **'+names[now.getDay()]+'**'};
+            return {ok:true,text:'Bugün -> **'+names[now.getDay()]+'**'};
         }
         var p=m[0].split(/[./-]/),d=+p[0],mo=+p[1],y=+p[2];
         if(y<100) y+=2000;
-        return {ok:true,text:m[0]+' → **'+names[new Date(y,mo-1,d).getDay()]+'**'};
+        return {ok:true,text:m[0]+' -> **'+names[new Date(y,mo-1,d).getDay()]+'**'};
     }
 },
 {
@@ -669,7 +669,7 @@ window.SKILL_LIBRARY = [
         if(th) words+=(th===1?' bin':' '+say(th)+' bin');
         if(rest) words+=' '+say(rest);
         words=words.replace(/\s+/g,' ').trim();
-        return {ok:true,text:m[0]+' → **'+words+'**'};
+        return {ok:true,text:m[0]+' -> **'+words+'**'};
     }
 },
 {
