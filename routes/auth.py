@@ -6,10 +6,14 @@ from datetime import datetime
 
 router = APIRouter()
 
+# Davet kodu sistemi - BETA kapali test. Gecerli kodlar burada.
+INVITE_CODES = {"GLASSCAT-BETA-2026", "GLASSES-GLITCH"}
+
 class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
+    invite_code: Optional[str] = None
 
 class LoginRequest(BaseModel):
     email: str
@@ -24,7 +28,22 @@ class DevLoginRequest(BaseModel):
 
 @router.post("/register")
 async def register(req: RegisterRequest, response: Response):
-    from middleware.auth import users, hash_password, create_session
+    from middleware.auth import users, hash_password, create_session, _save_users
+    code = (req.invite_code or "").strip().upper()
+    valid = code in INVITE_CODES
+    if not valid:
+        try:
+            from routes.admin import valid_keys, _save_keys
+            key_info = valid_keys.get(code)
+            valid = bool(key_info) and key_info.get("is_active", True)
+            if valid:
+                key_info["used_by"] = req.email
+                key_info["last_used"] = datetime.now().isoformat()
+                _save_keys()
+        except Exception:
+            valid = False
+    if not valid:
+        raise HTTPException(status_code=403, detail="Gecersiz veya eksik davet kodu. GlassesCat su anda davetli kullanicilara aciktir.")
     if req.email in users:
         raise HTTPException(status_code=400, detail="E-posta zaten kayıtlı")
     users[req.email] = {
@@ -34,6 +53,7 @@ async def register(req: RegisterRequest, response: Response):
         "is_admin": False,
         "is_dev": False
     }
+    _save_users(users)
     token = create_session(req.email)
     response.set_cookie("session_token", token, httponly=True, max_age=7*24*3600)
     return {"message": "Kayıt başarılı", "token": token}
@@ -48,7 +68,7 @@ async def login(req: LoginRequest, response: Response):
     if req.email not in users:
         if dev_mode:
             # DEV_MODE'da otomatik kayıt
-            from middleware.auth import hash_password
+            from middleware.auth import hash_password, _save_users
             users[req.email] = {
                 "name": req.email.split("@")[0],
                 "email": req.email,
@@ -56,6 +76,7 @@ async def login(req: LoginRequest, response: Response):
                 "is_admin": True,
                 "is_dev": True
             }
+            _save_users(users)
         else:
             raise HTTPException(status_code=401, detail="Geçersiz e-posta veya şifre")
 
@@ -86,7 +107,7 @@ DEV_SIMPLE_PASSWORD = os.getenv("DEV_SIMPLE_PASSWORD", "adminglassescat")
 @router.post("/simple-login")
 async def simple_login(req: SimpleLoginRequest, response: Response):
     """Basit İsim + Beta Key ile giriş"""
-    from middleware.auth import users, create_session
+    from middleware.auth import users, create_session, _save_users
     name = req.name.strip()
     beta_key = req.beta_key.strip().upper()
 
@@ -95,9 +116,21 @@ async def simple_login(req: SimpleLoginRequest, response: Response):
     if not beta_key:
         raise HTTPException(status_code=400, detail="Beta Key gereklidir!")
 
-    # Basit validasyon - gerçek uygulamada valid_keys kontrolü gerekir
-    if len(beta_key) < 4:
-        raise HTTPException(status_code=401, detail="Geçersiz Beta Key!")
+    # Gerçek davet kodu kontrolü (sabit kodlar + admin'in ürettiği beta key'ler)
+    valid = beta_key in INVITE_CODES
+    if not valid:
+        try:
+            from routes.admin import valid_keys, _save_keys
+            key_info = valid_keys.get(beta_key)
+            valid = bool(key_info) and key_info.get("is_active", True)
+            if valid:
+                key_info["used_by"] = name
+                key_info["last_used"] = datetime.now().isoformat()
+                _save_keys()
+        except Exception:
+            valid = False
+    if not valid:
+        raise HTTPException(status_code=401, detail="Gecersiz veya pasif davet kodu! GlassesCat su anda davetli kullanicilara aciktir.")
 
     users[name] = {
         "name": name,
@@ -105,6 +138,7 @@ async def simple_login(req: SimpleLoginRequest, response: Response):
         "created_at": datetime.now().isoformat(),
         "last_login": datetime.now().isoformat()
     }
+    _save_users(users)
 
     token = create_session(name)
     response.set_cookie("session_token", token, httponly=True, max_age=7*24*3600)
@@ -129,6 +163,8 @@ async def dev_login_simple(req: DevLoginRequest, response: Response):
         "created_at": datetime.now().isoformat(),
         "last_login": datetime.now().isoformat()
     }
+    from middleware.auth import _save_users
+    _save_users(users)
 
     token = create_session(name)
     response.set_cookie("session_token", token, httponly=True, max_age=7*24*3600)

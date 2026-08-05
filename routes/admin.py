@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, List
 import os
+import json
 import time
 import threading
 from collections import Counter
@@ -12,17 +13,38 @@ from middleware.auth import require_admin, sessions
 
 router = APIRouter()
 
-# ==================== Storage (replicated from web/app.py globals) ====================
+# ==================== Storage ====================
 
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "glasses_admin_2024")
 MAX_LOGS = 100
 MAX_USER_MESSAGES = 500
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+KEYS_DB = os.path.join(BASE_DIR, "api_keys.json")
+
 # API request logs
 request_logs: list = []
 
-# Beta access keys
-valid_keys: dict = {}  # {key_code: {created_at, created_by, is_active, description, used_by}}
+# Beta access keys — kalici (api_keys.json)
+def _load_keys() -> dict:
+    if os.path.exists(KEYS_DB):
+        try:
+            with open(KEYS_DB, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    return data
+        except Exception:
+            pass
+    return {}
+
+def _save_keys():
+    try:
+        with open(KEYS_DB, "w", encoding="utf-8") as f:
+            json.dump(valid_keys, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+valid_keys: dict = _load_keys()  # {key_code: {created_at, created_by, is_active, description, used_by}}
 
 # User messages
 user_messages: list = []
@@ -86,6 +108,7 @@ async def create_key(body: CreateKeyRequest, user=Depends(require_admin)):
         "is_active": True,
         "description": body.description.strip() or "Genel Kullanici",
     }
+    _save_keys()
 
     return {
         "success": True,
@@ -100,6 +123,7 @@ async def delete_key(body: DeleteKeyRequest, user=Depends(require_admin)):
     if key not in valid_keys:
         raise HTTPException(status_code=404, detail="Kod bulunamadi")
     del valid_keys[key]
+    _save_keys()
     return {
         "success": True,
         "message": f"Beta Key silindi: {key}",
@@ -113,6 +137,7 @@ async def toggle_key(body: ToggleKeyRequest, user=Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Kod bulunamadi")
 
     valid_keys[key]["is_active"] = not valid_keys[key]["is_active"]
+    _save_keys()
     status = "aktif" if valid_keys[key]["is_active"] else "pasif"
 
     return {

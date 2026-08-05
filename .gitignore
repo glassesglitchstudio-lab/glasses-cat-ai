@@ -77,6 +77,8 @@ web/app.py
 
 # Users database
 users.json
+auth_users.json
+api_keys.json
 
 # External tools / embedded repos
 .glitchcode/

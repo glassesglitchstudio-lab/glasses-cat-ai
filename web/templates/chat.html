@@ -1970,7 +1970,7 @@ function renderSettingsStyles() {
         if (role === 'ai') {
             const acts = document.createElement('div');
             acts.className = 'actions';
-            acts.innerHTML = '<button onclick="copyMsg(this)" title="Kopyala"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
+            acts.innerHTML = '<button onclick="copyMsg(this)" title="Kopyala"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button onclick="fbThumb(this,1)" title="Yanıt iyiydi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button><button onclick="fbThumb(this,0)" title="Yanıt kötüydü"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg></button>';
             hdr.appendChild(acts);
         }
         el.appendChild(hdr);
@@ -2005,6 +2005,23 @@ function renderSettingsStyles() {
         const ct = btn.closest('.msg').querySelector('.ct');
         navigator.clipboard.writeText(ct.textContent);
         toast('Kopyalandı');
+    }
+
+    async function fbThumb(btn, vote) {
+        const msg = btn.closest('.msg');
+        const text = msg.querySelector('.ct').textContent;
+        if (btn.dataset.sent) return;
+        btn.dataset.sent = '1';
+        btn.style.color = '#16a34a';
+        const other = msg.querySelectorAll('.actions button[data-sent]');
+        try {
+            await fetch('/api/feedback', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({vote: vote === 1 ? 'good' : 'bad', text: text.slice(0, 500)})
+            });
+            toast(vote === 1 ? 'Teşekkürler, geri bildirim alındı 👍' : 'Geri bildirim alındı, bunu düzeltmeye çalışacağım');
+        } catch(e) { toast('Geri bildirim gönderilemedi'); }
     }
 
     function editMsg(btn) {

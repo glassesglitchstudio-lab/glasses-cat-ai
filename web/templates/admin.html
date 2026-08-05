@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin — GlassesCat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(124,58,237,0.15)}
+body{font-family:'Inter',-apple-system,sans-serif;background:#f5f5f5;color:#1a1a1a;height:100vh;display:flex;overflow:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:3px}
+
+.sidebar{width:280px;min-width:280px;background:#f0efe8;display:flex;flex-direction:column;height:100vh;border-right:1px solid #e0ddd5}
+.sidebar-header{padding:16px 16px 12px;border-bottom:1px solid #e0ddd5}
+.sidebar-brand{display:flex;align-items:center;gap:10px;text-decoration:none;padding:2px}
+.sidebar-brand img{width:28px;height:28px;border-radius:50%;object-fit:contain}
+.sidebar-brand-text{font-weight:700;font-size:.9rem;color:#1a1a1a;letter-spacing:-.01em}
+.sidebar-brand-sub{font-size:.6rem;color:#999}
+.online-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px 12px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;font-size:.82rem;color:#555;cursor:pointer;margin-bottom:2px;transition:all .12s}
+.nav-item:hover{background:rgba(124,58,237,0.04);color:#1a1a1a}
+.nav-item.active{background:rgba(124,58,237,0.08);color:#7c3aed;font-weight:500}
+.nav-item .n-ico{width:16px;height:16px;flex:none;color:#999}
+.nav-item.active .n-ico{color:#7c3aed}
+.sidebar-footer{padding:14px 16px;border-top:1px solid #e0ddd5}
+.sidebar-footer .who{font-size:.78rem;color:#555;font-weight:500;margin-bottom:8px}
+.sidebar-footer button{background:none;border:none;color:#7c3aed;cursor:pointer;font-size:.74rem;font-family:inherit}
+
+.main{flex:1;display:flex;flex-direction:column;height:100vh;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #e0ddd5;background:#fff}
+.topbar h1{font-size:.95rem;font-weight:600;color:#1a1a1a}
+.topbar .crumb{font-size:.72rem;color:#999;margin-top:2px}
+.topbar .right{display:flex;align-items:center;gap:10px}
+.mode-badge{font-size:.62rem;padding:3px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+.mode-badge.live{background:#e6f7e9;color:#1a7f37;border:1px solid #c8e6c9}
+.mode-badge.live::before{content:"● ";color:#22c55e}
+.content{flex:1;overflow-y:auto;padding:24px}
+.inner{width:100%;max-width:880px;margin:0 auto}
+
+.card{background:#fff;border:1px solid #e0ddd5;border-radius:12px;padding:20px;margin-bottom:16px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-hdr h2{font-size:.8rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px}
+.card-hdr .hint{font-size:.72rem;color:#999}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:#f8f8f8;border:1px solid #e0ddd5;border-radius:10px;padding:16px}
+.stat .num{font-size:1.5rem;font-weight:700;color:#1a1a1a}
+.stat .num small{font-size:.75rem;color:#999;font-weight:500}
+.stat .lbl{font-size:.7rem;color:#888;margin-top:4px}
+
+.input-row{display:flex;gap:8px;margin-bottom:16px}
+.input-row input{flex:1;padding:10px 12px;border:1px solid #e0ddd5;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;font-size:.85rem}
+.input-row input:focus{outline:none;border-color:#7c3aed;box-shadow:0 2px 16px rgba(124,58,237,0.04)}
+
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;color:#888;font-weight:500;padding:8px 10px;border-bottom:1px solid #e0ddd5;font-size:.68rem;text-transform:uppercase;letter-spacing:.3px}
+td{padding:10px;border-bottom:1px solid #e8e6de;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#faf9f7}
+.key-code{font-family:Consolas,monospace;font-size:.76rem;background:rgba(124,58,237,0.06);color:#7c3aed;padding:4px 8px;border-radius:6px}
+.badge{display:inline-block;padding:2px 10px;border-radius:100px;font-size:.66rem;font-weight:600}
+.badge.active{background:#e6f7e9;color:#1a7f37}
+.badge.passive{background:#fdecea;color:#c0392b}
+.muted{color:#999;font-size:.75rem}
+
+button{background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
+button:hover{background:#6d28d9}
+button.ghost{background:#fff;border:1px solid #e0ddd5;color:#555}
+button.ghost:hover{background:#f5f5f5;border-color:#ccc;color:#1a1a1a}
+button.danger{background:#fff;border:1px solid #f5c6c6;color:#c0392b}
+button.danger:hover{background:#fdecea}
+button.small{padding:4px 10px;font-size:.72rem;border-radius:6px}
+.row-actions{display:flex;gap:4px;flex-wrap:wrap}
+
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center;min-width:0}
+.login-box{width:100%;max-width:360px;background:#fff;border:1px solid #e0ddd5;border-radius:14px;padding:34px;box-shadow:0 2px 24px rgba(26,26,26,0.05)}
+.login-box .logo{width:52px;height:52px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+.login-box .logo img{width:52px;height:52px;object-fit:contain}
+.login-box h1{font-size:1.2rem;font-weight:600;text-align:center;letter-spacing:-.02em}
+.login-box .sub{font-size:.8rem;color:#888;text-align:center;margin:4px 0 24px}
+.login-box label{display:block;font-size:.75rem;color:#555;margin-bottom:6px}
+.login-box input{width:100%;padding:10px 12px;border:1px solid #e0ddd5;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;font-size:.85rem;margin-bottom:16px}
+.login-box input:focus{outline:none;border-color:#7c3aed}
+.login-box button{width:100%}
+
+.empty{color:#999;font-size:.8rem;text-align:center;padding:18px 0}
+.secret{font-size:.72rem;color:#999;text-align:center;margin-top:18px}
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(26,26,26,0.92);color:#fff;padding:10px 18px;border-radius:8px;font-size:.8rem;opacity:0;pointer-events:none;transition:all .2s;z-index:100}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+.hamburger{display:none;width:32px;height:32px;align-items:center;justify-content:center;border-radius:6px;border:1px solid #e0ddd5;background:#fff;color:#555;cursor:pointer;font-size:1rem;margin-right:10px}
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .2s}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+}
+</style>
+</head>
+<body>
+
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <a class="sidebar-brand" href="/">
+      <img src="/static/glassescat-logo.png" alt="GlassesCat">
+      <div>
+        <div class="sidebar-brand-text">GlassesCat</div>
+        <div class="sidebar-brand-sub">Admin Panel</div>
+      </div>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-item active" data-view="dash" onclick="switchView('dash')">
+      <svg class="n-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-view="keys" onclick="switchView('keys')">
+      <svg class="n-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.6 7.6a5.5 5.5 0 1 1-7.8 7.8 5.5 5.5 0 0 1 7.8-7.8zm0 0L15 7m0 0l3 3L22 5l-3-3-4 4z"/></svg>
+      API Keys
+    </div>
+    <div class="nav-item" data-view="inside" onclick="switchView('inside')">
+      <svg class="n-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      İstatistikler
+    </div>
+  </div>
+  <div class="sidebar-footer" id="footerActions"></div>
+</aside>
+
+<div class="main">
+  <div id="loginView" style="display:none" class="login-wrap">
+    <div class="login-box">
+      <div class="logo"><img src="/static/glassescat-logo.png" alt="GlassesCat"></div>
+      <h1>Admin Girişi</h1>
+      <p class="sub">GlassesCat yönetim paneline erişmek için şifreni gir</p>
+      <label for="adminPass">Admin Şifresi</label>
+      <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+      <button onclick="adminLogin()">Giriş Yap</button>
+      <div class="secret">Erişimi olmayan yetkililer sistem tarafından kaydedilir</div>
+    </div>
+  </div>
+
+  <div id="mainView" style="display:none">
+    <div class="topbar">
+      <div style="display:flex;align-items:center">
+        <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="crumb" id="pageCrumb">GlassesCat yönetim merkezi</div>
+        </div>
+      </div>
+      <div class="right">
+        <span class="mode-badge live" id="liveBadge">canlı</span>
+        <span class="muted" id="adminName"></span>
+      </div>
+    </div>
+
+    <div class="content"><div class="inner">
+
+      <div class="view" id="view-dash">
+        <div class="card">
+          <div class="card-hdr"><h2>İstatistikler</h2></div>
+          <div class="stats-grid" id="statsGrid"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hdr"><h2>Son Mesajlar</h2><span class="hint" id="msgsHint"></span></div>
+          <p class="empty" id="msgsEmpty" style="display:none">Mesaj kaydı bulunamadı</p>
+          <div id="messagesBox"></div>
+        </div>
+      </div>
+
+      <div class="view" id="view-keys" style="display:none">
+        <div class="card">
+          <div class="card-hdr"><h2>API Keys / Davet Kodları</h2><span class="hint">Kişiye özel erişim anahtarları</span></div>
+          <div class="key-row">
+            <label for="keyDesc">Yeni key açıklaması (örn. "Arkadaşım Ali")</label>
+            <div class="key-row-inner">
+              <input type="text" id="keyDesc" placeholder="Açıklama (opsiyonel)" onkeydown="if(event.key==='Enter')createKey()">
+              <button onclick="createKey()">+ Key Oluştur</button>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Key</th><th>Açıklama</th><th>Durum</th><th>Kullanan</th><th>Oluşturulma</th><th>İşlem</th></tr></thead>
+            <tbody id="keysBody"></tbody>
+          </table>
+          <p class="empty" id="keysEmpty" style="display:none">Henüz key yok. Yukarıdan oluştur.</p>
+        </div>
+      </div>
+
+      <div class="view" id="view-inside" style="display:none">
+        <div class="card"><div class="card-hdr"><h2>Sistem Hakkında</h2></div>
+          <p style="font-size:.82rem;color:#555;line-height:1.7">
+            GlassesCat yönetim paneli, tek tek kişilere özel API anahtarları dağıtarak sohbet arayüzüne giriş izni verir.
+            Her anahtar aktif/pasif olarak anlık yönetilebilir ve silinebilir. Anahtar sahibi <b>/api/auth/simple-login</b> ile
+            giriş yapar; kullanımı "Kullanan" sütununda izlenir.
+          </p>
+        </div>
+      </div>
+
+    </div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let authed = false;
+const api = (path, opts) => fetch(path, opts).then(r => {
+  if (r.status === 401) { authed = false; render(); throw new Error('Oturum yok'); }
+  if (r.status === 403) { authed = false; render(); throw new Error('Yetkisiz'); }
+  return r.json();
+});
+let toastTimer;
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+function copyKey(k) { if (navigator.clipboard) navigator.clipboard.writeText(k); toast('Key kopyalandı: ' + k); }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+async function adminLogin() {
+  const pass = document.getElementById('adminPass').value.trim();
+  if (!pass) return toast('Şifre gir');
+  try {
+    const r = await fetch('/api/auth/dev-login-simple', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pass})});
+    const d = await r.json();
+    if (d.success) { authed = true; toast('Hoş geldin Admin!'); render(); }
+    else toast(d.message || 'Giriş başarısız');
+  } catch(e) { toast('Giriş hatası: ' + e.message); }
+}
+
+async function logout() {
+  await fetch('/api/auth/logout', {method:'POST'});
+  authed = false; render(); toast('Çıkış yapıldı');
+  document.getElementById('adminPass').value = '';
+}
+
+function switchView(v) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === v));
+  document.querySelectorAll('.view').forEach(vw => vw.style.display = vw.id === 'view-' + v ? '' : 'none');
+  const titles = {dash:'Dashboard', keys:'API Keys', inside:'İstatistikler'};
+  const crumb = {dash:'Yönetim merkezi', keys:'Erişim anahtarları', inside:'Sistem bilgisi'};
+  document.getElementById('pageTitle').textContent = titles[v];
+  document.getElementById('pageCrumb').textContent = crumb[v];
+}
+
+async function render() {
+  document.getElementById('loginView').style.display = authed ? 'none' : 'flex';
+  document.getElementById('mainView').style.display = authed ? '' : 'none';
+  document.getElementById('footerActions').innerHTML = authed
+    ? '<div><div class="who"><span class="online-badge"></span>Admin</div><button onclick="logout()">Çıkış Yap</button></div>'
+    : '';
+  document.getElementById('adminName').textContent = authed ? 'Admin' : '';
+  if (authed) { loadStats(); loadKeys(); loadMessages(); }
+}
+
+async function loadStats() {
+  try {
+    const d = await api('/api/admin/stats');
+    const s = document.getElementById('statsGrid');
+    if (d.message) { s.innerHTML = ''; setEmpty(s, d.message); return; }
+    s.innerHTML = [
+      ['İstek Sayısı', d.total_requests || 0],
+      ['Son 24 Saat', d.requests_24h || 0],
+      ['Tekil IP', d.unique_ips || 0],
+      ['Aktif Mesaj', d.total_messages || 0],
+    ].map(([l, n]) => '<div class="stat"><div class="num">' + n + '</div><div class="lbl">' + l + '</div></div>').join('');
+  } catch(e) {}
+}
+
+async function loadKeys() {
+  try {
+    const d = await api('/api/admin/keys');
+    const body = document.getElementById('keysBody');
+    body.innerHTML = '';
+    document.getElementById('keysEmpty').style.display = d.keys.length ? 'none' : '';
+    d.keys.forEach(k => {
+      const tr = document.createElement('tr');
+      const status = k.is_active ? '<span class="badge active">aktif</span>' : '<span class="badge passive">pasif</span>';
+      const used = k.used_by ? '<span class="muted">' + esc(k.used_by) + '</span>' : '<span class="muted">—</span>';
+      tr.innerHTML = '<td><span class="key-code">' + k.key + '</span> <button class="ghost small" onclick="copyKey(\'' + k.key + '\')">kopyala</button></td>'
+        + '<td>' + esc(k.description || '') + '</td>'
+        + '<td>' + status + '</td>'
+        + '<td>' + used + '</td>'
+        + '<td class="muted">' + esc(k.created_at || '') + '</td>'
+        + '<td><div class="row-actions">'
+        + '<button class="ghost small" onclick="toggleKey(\'' + k.key + '\')">' + (k.is_active ? 'Pasifleştir' : 'Aktifleştir') + '</button>'
+        + '<button class="danger small" onclick="deleteKey(\'' + k.key + '\')">Sil</button>'
+        + '</div></td>';
+      body.appendChild(tr);
+    });
+  } catch(e) {}
+}
+
+async function createKey() {
+  const desc = document.getElementById('keyDesc').value.trim();
+  try {
+    const d = await api('/api/admin/keys/create', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({description: desc})});
+    if (d.success) { document.getElementById('keyDesc').value = ''; toast('Key: ' + d.key); loadKeys(); }
+    else toast(d.message || 'Oluşturulamadı');
+  } catch(e) { toast('Hata: ' + e.message); }
+}
+
+async function toggleKey(key) {
+  try { await api('/api/admin/keys/toggle', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key})}); loadKeys(); }
+  catch(e) { toast('Hata: ' + e.message); }
+}
+
+async function deleteKey(key) {
+  if (!confirm('Bu key silinsin mi?')) return;
+  try { await api('/api/admin/keys/delete', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({key})}); loadKeys(); toast('Silindi'); }
+  catch(e) { toast('Hata: ' + e.message); }
+}
+
+async function loadMessages() {
+  try {
+    const d = await api('/api/admin/messages/stats');
+    const box = document.getElementById('messagesBox');
+    document.getElementById('msgsEmpty').style.display = d.message || !d.total_messages ? '' : 'none';
+    document.getElementById('msgsHint').textContent = 'Toplam: ' + (d.total_messages||0) + ' · Son 24 saat: ' + (d.messages_24h||0) + ' · Kullanıcı: ' + (d.unique_users||0);
+    box.innerHTML = '';
+  } catch(e) {}
+}
+
+render();
+</script>
+</body>
+</html>

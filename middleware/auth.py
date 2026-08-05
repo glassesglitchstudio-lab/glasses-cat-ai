@@ -1,13 +1,30 @@
 import os
 import hashlib
 import secrets
+import json
 from functools import wraps
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 
+USERS_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "auth_users.json")
+
 # Session depolama (production'da Redis/DB kullanın)
 sessions: dict = {}
-users: dict = {}
+
+def _load_users() -> dict:
+    if os.path.exists(USERS_DB):
+        try:
+            with open(USERS_DB, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def _save_users(data: dict):
+    with open(USERS_DB, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+users: dict = _load_users()
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
