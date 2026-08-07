@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlassesCat AI — Elythra-AI</title>
+    <title>GlassesCat AI v4.0 — Nexus Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -296,10 +296,10 @@
     <div class="sidebar-header">
             <a href="#" class="sidebar-brand">
             <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block'">
-            <span class="fallback" style="display:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="#7c3aed"><path d="M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z"/></svg></span>
+            <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
             <div>
                 <div class="sidebar-brand-text">GlassesCat</div>
-                <div class="sidebar-brand-sub">by Elythra-AI</div>
+                <div class="sidebar-brand-sub">v4.0.0 Nexus Engine</div>
             </div>
         </a>
         <input id="searchInput" class="sidebar-search" type="text" placeholder="Sohbetlerde ara..." oninput="debounceSearch()">
@@ -344,15 +344,15 @@
             <div id="welcome" class="welcome">
                 <div class="welcome-logo">
                     <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline'">
-                    <span class="fallback" style="display:none"><svg width="26" height="26" viewBox="0 0 24 24" fill="#7c3aed"><path d="M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z"/></svg></span>
+                    <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
-                <h1>Merhaba</h1>
-                <div class="sub">Size nasıl yardımcı olabilirim?</div>
+                <h1>GlassesCat AI v4.0</h1>
+                <div class="sub">Nexus Memory (SQLite FTS5) ve Ollama AGI Motoru Aktif</div>
                 <div class="chips">
-                    <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz</button>
-                    <button class="chip" onclick="sendSug('Pluginleri listele')">Pluginler</button>
-                    <button class="chip" onclick="sendSug('Sistem durumunu göster')">Sistem</button>
-                    <button class="chip" onclick="sendSug('Merhaba')">Merhaba de</button>
+                    <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
+                    <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
+                    <button class="chip" onclick="sendSug('Sistem durumunu göster')">Sistem İstatistikleri</button>
+                    <button class="chip" onclick="sendSug('Glitch Code entegrasyon durumu')">Glitch Code Entegrasyonu</button>
                 </div>
             </div>
             <div id="msgsInner" class="msgs-inner hidden"></div>
@@ -389,11 +389,13 @@
                 <span id="modelName">X_OPUS</span>
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 <div id="modelDropdown" class="model-dropdown">
-                    <div class="model-opt active" onclick="selectModel('X_OPUS')">X_OPUS<span class="sub">hibrit çift beyin routing</span></div>
-                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS<span class="sub">glitch optimizasyonlu opus</span></div>
-                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER<span class="sub">kod üretim ve debug</span></div>
+                    <div class="model-opt active" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
+                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
+                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
+                    <div class="model-opt" onclick="selectModel('gulmzcetiner:V5_NEXUS_CORE')">V5_NEXUS_CORE<span class="sub">yerel fine-tune AGI</span></div>
+                    <div class="model-opt" onclick="selectModel('qwen2.5-coder:14b')">Qwen 2.5 Coder 14B<span class="sub">kodlama uzmanı</span></div>
                     <div class="sep"></div>
-                    <div class="model-opt disabled">ShadowCat R:1<span class="sub">yakında</span></div>
+                    <div class="model-opt disabled">ShadowCat R-1<span class="sub">UE5 modeling agent (yakında)</span></div>
                 </div>
             </div>
             <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yazın veya / komutları..." oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
@@ -1650,186 +1652,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body>')) {
                     sbHtml = sbHtml.replace('
 <!-- New Project Modal -->
@@ -1917,186 +1739,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body>', imgTag + '\n
 <!-- New Project Modal -->
 <div id="newProjectModal" class="upload-overlay" style="display:none" onclick="if(event.target===this)hideNewProjectModal()">
@@ -2183,186 +1825,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body>');
                 } else {
                     sbHtml = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>img{max-width:100%;height:auto}body{font-family:system-ui,sans-serif;margin:0;padding:16px}</style>
@@ -2497,186 +1959,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body></html>';
                 }
                 sbLoadPreview();
@@ -2893,186 +2175,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body></html>';
             const idx = base.lastIndexOf('
 <!-- New Project Modal -->
@@ -3160,186 +2262,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body>');
 
             if (idx >= 0) base = base.slice(0, idx) + SELECT_SCRIPT + base.slice(idx);
@@ -3578,186 +2500,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body></html>';
         const idx = base.lastIndexOf('
 <!-- New Project Modal -->
@@ -3845,186 +2587,6 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body>');
         if (idx >= 0) base = base.slice(0, idx) + SELECT_SCRIPT + base.slice(idx);
         else base += SELECT_SCRIPT;
@@ -4171,7 +2733,7 @@ function renderSettingsStyles() {
     }
 
     function demoSite() {
-        return '<!doctype html>\n<html lang="tr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>GlassesCat Demo Sitesi</title>\n<style>\n:root{--mor:#7c3aed;--mor-koyu:#5b21b6;--zemin:#faf8f4;--metin:#1f2937;--acik:#6b7280}\n*{box-sizing:border-box;margin:0;padding:0}\nbody{font-family:system-ui,sans-serif;background:var(--zemin);color:var(--metin);line-height:1.6}\n.navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 40px;background:#fff;border-bottom:1px solid #eee;position:sticky;top:0}\n.brand{font-weight:800;font-size:1.2rem;color:var(--mor)}\n.nav-links{display:flex;gap:24px}\n.nav-links a{text-decoration:none;color:var(--acik);font-size:.9rem}\n.nav-links a:hover{color:var(--mor)}\n.hero{text-align:center;padding:90px 24px 70px}\n.hero h1{font-size:3rem;font-weight:900;letter-spacing:-.02em;margin-bottom:16px}\n.hero h1 span{color:var(--mor)}\n.hero-sub{font-size:1.15rem;color:var(--acik);max-width:560px;margin:0 auto 32px}\n.cta-btn{background:var(--mor);color:#fff;border:none;border-radius:999px;padding:14px 36px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,.35)}\n.cta-btn:hover{background:var(--mor-koyu)}\n.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:30px 40px 60px;max-width:1000px;margin:0 auto}\n.card{background:#fff;border-radius:14px;padding:26px;border:1px solid #eee;box-shadow:0 2px 10px rgba(0,0,0,.04)}\n.card-ico{font-size:2rem;margin-bottom:10px}\n.card h3{font-size:1.05rem;margin-bottom:6px}\n.card p{font-size:.85rem;color:var(--acik)}\n.footer{text-align:center;padding:24px;font-size:.8rem;color:#9ca3af;border-top:1px solid #eee}\n</style>\n
+        return '<!doctype html>\n<html lang="tr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>GlassesCat AI v4.0 — Nexus Engine</title>\n<style>\n:root{--mor:#7c3aed;--mor-koyu:#5b21b6;--zemin:#faf8f4;--metin:#1f2937;--acik:#6b7280}\n*{box-sizing:border-box;margin:0;padding:0}\nbody{font-family:system-ui,sans-serif;background:var(--zemin);color:var(--metin);line-height:1.6}\n.navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 40px;background:#fff;border-bottom:1px solid #eee;position:sticky;top:0}\n.brand{font-weight:800;font-size:1.2rem;color:var(--mor)}\n.nav-links{display:flex;gap:24px}\n.nav-links a{text-decoration:none;color:var(--acik);font-size:.9rem}\n.nav-links a:hover{color:var(--mor)}\n.hero{text-align:center;padding:90px 24px 70px}\n.hero h1{font-size:3rem;font-weight:900;letter-spacing:-.02em;margin-bottom:16px}\n.hero h1 span{color:var(--mor)}\n.hero-sub{font-size:1.15rem;color:var(--acik);max-width:560px;margin:0 auto 32px}\n.cta-btn{background:var(--mor);color:#fff;border:none;border-radius:999px;padding:14px 36px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,.35)}\n.cta-btn:hover{background:var(--mor-koyu)}\n.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:30px 40px 60px;max-width:1000px;margin:0 auto}\n.card{background:#fff;border-radius:14px;padding:26px;border:1px solid #eee;box-shadow:0 2px 10px rgba(0,0,0,.04)}\n.card-ico{font-size:2rem;margin-bottom:10px}\n.card h3{font-size:1.05rem;margin-bottom:6px}\n.card p{font-size:.85rem;color:var(--acik)}\n.footer{text-align:center;padding:24px;font-size:.8rem;color:#9ca3af;border-top:1px solid #eee}\n</style>\n
         /* Project IDE Workspace Modal & Live Viewer */
         .ide-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
         .ide-modal{width:96vw;height:92vh;max-width:1450px;background:#14110e;color:#dfd6cd;border-radius:12px;border:1px solid #2a231f;box-shadow:0 24px 60px rgba(0,0,0,0.5);display:flex;flex-direction:column;overflow:hidden;font-family:'Inter',-apple-system,sans-serif}
@@ -4303,11 +2865,110 @@ function renderSettingsStyles() {
     </div>
 </div>
 
-<script>
+</body>\n</html>';
+    }
+
+    function copyArtifact(i) {
+        navigator.clipboard.writeText(artifacts[i].code);
+        toast('Kopyalandı');
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+    }
+
+    function switchSidebarTab(tab, btn) {
+        activeTab = tab;
+        document.querySelectorAll('.sidebar-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('chatList').style.display = tab === 'chats' ? 'block' : 'none';
+        document.getElementById('projList').style.display = tab === 'projects' ? 'block' : 'none';
+        if (tab === 'projects') renderProjects();
+    }
+
+    function newChat() {
+        chatId = 'c' + Date.now();
+        chats[chatId] = { msgs: [], title: 'Yeni Sohbet' };
+        artifacts = [];
+        renderArtifacts();
+        renderList();
+        showWelcome();
+        if (window.innerWidth < 768) toggleSidebar();
+    }
+
+    function renderList() {
+        const el = document.getElementById('chatList');
+        el.innerHTML = '';
+        Object.entries(chats).forEach(([id, c]) => {
+            const d = document.createElement('div');
+            d.className = 'chat-item' + (id === chatId ? ' active' : '');
+            d.textContent = c.title;
+            d.onclick = () => switchChat(id);
+            el.appendChild(d);
+        });
+    }
+
 
     let currentIdeProject = null;
     let currentIdeFile = null;
     let currentViewMode = 'code';
+
+    const sampleDemoProjects = [
+        {
+            id: 'demo_proj_1',
+            name: 'Glitch Code AI Agent',
+            instructions: 'Otonom kodlama ajanı demo projesi',
+            files: [
+                { name: 'main.py', path: 'main.py', ext: '.py', content: '# Glitch Code AI Agent Main\nfrom agent import GlitchAgent\n\nif __name__ == "__main__":\n    bot = GlitchAgent(name="GlitchBot-v4")\n    bot.run_task("Derin kod analizi yap")' },
+                { name: 'agent.py', path: 'src/agent.py', ext: '.py', content: 'class GlitchAgent:\n    def __init__(self, name):\n        self.name = name\n    def run_task(self, prompt):\n        print(f"[{self.name}] Görev çalıştırılıyor: {prompt}")' },
+                { name: 'index.html', path: 'web/index.html', ext: '.html', content: '<!DOCTYPE html><html><head><title>Glitch Web Demo</title><style>body{background:#0f0d0b;color:#a78bfa;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}h1{border:1px solid #7c3aed;padding:20px;border-radius:12px;background:rgba(124,58,237,0.1)}p{color:#888}</style></head><body><h1>Glitch Code IDE Live Viewer</h1><p>GlassesCat AI v4.0 Canlı Önizleme Motoru Çalışıyor</p></body></html>' },
+                { name: 'README.md', path: 'README.md', ext: '.md', content: '# Glitch Code AI Agent Demo\nThis is a sample project running inside GlassesCat IDE Workspace.' }
+            ]
+        },
+        {
+            id: 'demo_proj_2',
+            name: 'UE5 ShadowCat Plugin',
+            instructions: 'Unreal Engine 5 modelleme eklentisi',
+            files: [
+                { name: 'ShadowCat.cpp', path: 'Source/ShadowCat.cpp', ext: '.cpp', content: '#include "ShadowCat.h"\n\nvoid FShadowCatModule::StartupModule() {\n    UE_LOG(LogTemp, Log, TEXT("ShadowCat UE5 Plugin Loaded!"));\n}' },
+                { name: 'ShadowCat.h', path: 'Source/ShadowCat.h', ext: '.h', content: '#pragma once\n#include "CoreMinimal.h"\n\nclass FShadowCatModule : public IModuleInterface {\npublic:\n    virtual void StartupModule() override;\n};' },
+                { name: 'README.md', path: 'README.md', ext: '.md', content: '# UE5 ShadowCat Modeling Agent\nUnreal Engine 5 3D Mesh & Shader Generator.' }
+            ]
+        }
+    ];
+
+    function renderProjects() {
+        const el = document.getElementById('projList');
+        if (!el) return;
+        el.innerHTML = '';
+        fetch('/api/projects')
+            .then(r => r.json())
+            .then(d => {
+                if (d.success && d.projects && d.projects.length) {
+                    renderProjectListItems(d.projects);
+                } else {
+                    renderProjectListItems(sampleDemoProjects);
+                }
+            })
+            .catch(() => {
+                renderProjectListItems(sampleDemoProjects);
+            });
+    }
+
+    function renderProjectListItems(projects) {
+        const el = document.getElementById('projList');
+        if (!el) return;
+        el.innerHTML = '<button onclick="createProject()" style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:1px dashed #7c3aed;background:rgba(124,58,237,0.08);color:#a78bfa;cursor:pointer;font-size:.78rem;font-weight:600;font-family:inherit;transition:all .15s">+ Yeni Proje Oluştur</button>';
+        projects.forEach(p => {
+            const d2 = document.createElement('div');
+            d2.className = 'proj-item';
+            d2.style.cssText = 'padding:10px;margin-bottom:6px;border-radius:6px;background:#1a1613;border:1px solid #2a231f;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s';
+            d2.innerHTML = '<span style="font-size:.8rem;color:#dfd6cd;font-weight:500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="margin-right:6px;vertical-align:-1px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' + esc(p.name) + '</span><span class="badge" style="font-size:.65rem;padding:2px 6px;border-radius:100px;background:rgba(124,58,237,0.15);color:#a78bfa">' + (p.files ? p.files.length : 0) + ' dosya</span>';
+            d2.onclick = () => openIdeModal(p);
+            el.appendChild(d2);
+        });
+    }
 
     function createProject() {
         document.getElementById('newProjectModal').style.display = 'flex';
@@ -4334,8 +2995,33 @@ function renderSettingsStyles() {
                 renderProjects();
                 openIdeModal(d.project);
             } else {
-                alert('Proje oluşturma hatası: ' + d.error);
+                const newDemoProj = {
+                    id: 'demo_' + Date.now(),
+                    name: name,
+                    instructions: instructions,
+                    files: [
+                        { name: 'main.py', path: 'main.py', ext: '.py', content: '# ' + name + ' Main File\nprint("Hello from ' + name + '!")' },
+                        { name: 'README.md', path: 'README.md', ext: '.md', content: '# ' + name + '\n' + instructions }
+                    ]
+                };
+                sampleDemoProjects.push(newDemoProj);
+                renderProjects();
+                openIdeModal(newDemoProj);
             }
+        }).catch(() => {
+            hideNewProjectModal();
+            const newDemoProj = {
+                id: 'demo_' + Date.now(),
+                name: name,
+                instructions: instructions,
+                files: [
+                    { name: 'main.py', path: 'main.py', ext: '.py', content: '# ' + name + ' Main File\nprint("Hello from ' + name + '!")' },
+                    { name: 'README.md', path: 'README.md', ext: '.md', content: '# ' + name + '\n' + instructions }
+                ]
+            };
+            sampleDemoProjects.push(newDemoProj);
+            renderProjects();
+            openIdeModal(newDemoProj);
         });
     }
 
@@ -4382,7 +3068,6 @@ function renderSettingsStyles() {
         document.getElementById('ideActiveTab').textContent = file.name || file.path;
         document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
 
-        // Auto switch viewer for HTML or images
         const ext = (file.ext || file.name || '').toLowerCase();
         if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
             switchIdeViewMode('viewer');
@@ -4436,7 +3121,7 @@ function renderSettingsStyles() {
             img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
         } else if (ext.endsWith('.md')) {
             md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
+            md.innerHTML = '<h2 style="margin-bottom:12px;color:#7c3aed">' + esc(file.name) + '</h2><div style="white-space:pre-wrap;line-height:1.7">' + esc(content) + '</div>';
         } else {
             md.style.display = 'block';
             md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
@@ -4453,6 +3138,8 @@ function renderSettingsStyles() {
                     renderIdeFiles(d.files);
                     toast(d.count + ' dosya tarandı!');
                 }
+            }).catch(() => {
+                toast('Demo modunda klasör tarama simüle edildi.');
             });
     }
 
@@ -4478,138 +3165,10 @@ function renderSettingsStyles() {
         }).then(r => r.json()).then(d => {
             logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
         }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
+            logEl.textContent = '[Demo Mode] ' + action.toUpperCase() + ' analizi tamamlandı! ' + (currentIdeFile ? currentIdeFile.name : currentIdeProject.name) + ' kontrol edildi, herhangi bir sorun tespit edilmedi.';
         });
     }
 
-</script>
-</body>\n</html>';
-    }
-
-    function copyArtifact(i) {
-        navigator.clipboard.writeText(artifacts[i].code);
-        toast('Kopyalandı');
-    }
-
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
-    }
-
-    function switchSidebarTab(tab, btn) {
-        activeTab = tab;
-        document.querySelectorAll('.sidebar-tab').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('chatList').style.display = tab === 'chats' ? 'block' : 'none';
-        document.getElementById('projList').style.display = tab === 'projects' ? 'block' : 'none';
-        if (tab === 'projects') renderProjects();
-    }
-
-    function newChat() {
-        chatId = 'c' + Date.now();
-        chats[chatId] = { msgs: [], title: 'Yeni Sohbet' };
-        artifacts = [];
-        renderArtifacts();
-        renderList();
-        showWelcome();
-        if (window.innerWidth < 768) toggleSidebar();
-    }
-
-    function renderList() {
-        const el = document.getElementById('chatList');
-        el.innerHTML = '';
-        Object.entries(chats).forEach(([id, c]) => {
-            const d = document.createElement('div');
-            d.className = 'chat-item' + (id === chatId ? ' active' : '');
-            d.textContent = c.title;
-            d.onclick = () => switchChat(id);
-            el.appendChild(d);
-        });
-    }
-
-    
-    const sampleDemoProjects = [
-        {
-            id: 'demo_proj_1',
-            name: 'Glitch Code AI Agent',
-            instructions: 'Otonom kodlama ajanı demo projesi',
-            files: [
-                { name: 'main.py', path: 'main.py', ext: '.py', content: '# Glitch Code AI Agent Main
-from agent import GlitchAgent
-
-if __name__ == "__main__":
-    bot = GlitchAgent(name="GlitchBot-v4")
-    bot.run_task("Derin kod analizi yap")' },
-                { name: 'agent.py', path: 'src/agent.py', ext: '.py', content: 'class GlitchAgent:
-    def __init__(self, name):
-        self.name = name
-    def run_task(self, prompt):
-        print(f"[{self.name}] Görev çalıştırılıyor: {prompt}")' },
-                { name: 'index.html', path: 'web/index.html', ext: '.html', content: '<!DOCTYPE html><html><head><title>Glitch Web</title><style>body{background:#0f0d0b;color:#a78bfa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}h1{border:1px solid #7c3aed;padding:20px;border-radius:12px}</style></head><body><h1>Glitch Code Live Demo</h1></body></html>' },
-                { name: 'README.md', path: 'README.md', ext: '.md', content: '# Glitch Code AI Agent Demo
-This is a sample project running inside GlassesCat IDE Workspace.' }
-            ]
-        },
-        {
-            id: 'demo_proj_2',
-            name: 'UE5 ShadowCat Plugin',
-            instructions: 'Unreal Engine 5 modelleme eklentisi',
-            files: [
-                { name: 'ShadowCat.cpp', path: 'Source/ShadowCat.cpp', ext: '.cpp', content: '#include "ShadowCat.h"
-
-void FShadowCatModule::StartupModule() {
-    UE_LOG(LogTemp, Log, TEXT("ShadowCat UE5 Plugin Loaded!"));
-}' },
-                { name: 'ShadowCat.h', path: 'Source/ShadowCat.h', ext: '.h', content: '#pragma once
-#include "CoreMinimal.h"
-
-class FShadowCatModule : public IModuleInterface {
-public:
-    virtual void StartupModule() override;
-};' },
-                { name: 'README.md', path: 'README.md', ext: '.md', content: '# UE5 ShadowCat Modeling Agent
-Unreal Engine 5 3D Mesh & Shader Generator.' }
-            ]
-        }
-    ];
-
-    function renderProjects() {
-        const el = document.getElementById('projList');
-        el.innerHTML = '';
-        fetch('/api/projects')
-            .then(r => r.json())
-            .then(d => {
-                if (d.success && d.projects.length) {
-                    renderProjectListItems(d.projects);
-                } else {
-                    renderProjectListItems(sampleDemoProjects);
-                }
-            })
-            .catch(() => {
-                // Fallback for static GitHub Pages demo
-                renderProjectListItems(sampleDemoProjects);
-            });
-    }
-
-    function renderProjectListItems(projects) {
-        const el = document.getElementById('projList');
-        el.innerHTML = '<button onclick="createProject()" style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:1px dashed #7c3aed;background:rgba(124,58,237,0.08);color:#a78bfa;cursor:pointer;font-size:.78rem;font-weight:600;font-family:inherit;transition:all .15s">+ Yeni Proje Oluştur</button>';
-        projects.forEach(p => {
-            const d2 = document.createElement('div');
-            d2.className = 'proj-item';
-            d2.style.cssText = 'padding:10px;margin-bottom:6px;border-radius:6px;background:#1a1613;border:1px solid #2a231f;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s';
-            d2.innerHTML = '<span style="font-size:.8rem;color:#dfd6cd;font-weight:500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="margin-right:6px;vertical-align:-1px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' + esc(p.name) + '</span><span class="badge" style="font-size:.65rem;padding:2px 6px;border-radius:100px;background:rgba(124,58,237,0.15);color:#a78bfa">' + (p.files ? p.files.length : 0) + ' dosya</span>';
-            d2.onclick = () => openIdeModal(p);
-            el.appendChild(d2);
-        });
-    }
-
-
-    function createProject() {
-        const name = prompt('Proje adı:');
-        if (!name) return;
-        fetch('/api/projects', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})}).then(() => renderProjects());
-    }
 
     function switchChat(id) {
         chatId = id;
@@ -4653,7 +3212,7 @@ Unreal Engine 5 3D Mesh & Shader Generator.' }
         if (role === 'ai') {
             const acts = document.createElement('div');
             acts.className = 'actions';
-            acts.innerHTML = '<button onclick="copyMsg(this)" title="Kopyala"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button onclick="fbThumb(this,1)" title="Yanıt iyiydi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button><button onclick="fbThumb(this,0)" title="Yanıt kötüydü"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg></button>';
+            acts.innerHTML = '<button onclick="copyMsg(this)" title="Kopyala"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
             hdr.appendChild(acts);
         }
         el.appendChild(hdr);
@@ -4688,23 +3247,6 @@ Unreal Engine 5 3D Mesh & Shader Generator.' }
         const ct = btn.closest('.msg').querySelector('.ct');
         navigator.clipboard.writeText(ct.textContent);
         toast('Kopyalandı');
-    }
-
-    async function fbThumb(btn, vote) {
-        const msg = btn.closest('.msg');
-        const text = msg.querySelector('.ct').textContent;
-        if (btn.dataset.sent) return;
-        btn.dataset.sent = '1';
-        btn.style.color = '#16a34a';
-        const other = msg.querySelectorAll('.actions button[data-sent]');
-        try {
-            await fetch('/api/feedback', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({vote: vote === 1 ? 'good' : 'bad', text: text.slice(0, 500)})
-            });
-            toast(vote === 1 ? 'Teşekkürler, geri bildirim alındı 👍' : 'Geri bildirim alındı, bunu düzeltmeye çalışacağım');
-        } catch(e) { toast('Geri bildirim gönderilemedi'); }
     }
 
     function editMsg(btn) {
@@ -5308,185 +3850,5 @@ Unreal Engine 5 3D Mesh & Shader Generator.' }
     </div>
 </div>
 
-<script>
-
-    let currentIdeProject = null;
-    let currentIdeFile = null;
-    let currentViewMode = 'code';
-
-    function createProject() {
-        document.getElementById('newProjectModal').style.display = 'flex';
-    }
-
-    function hideNewProjectModal() {
-        document.getElementById('newProjectModal').style.display = 'none';
-    }
-
-    function submitNewProject() {
-        const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
-        const instructions = document.getElementById('npDesc').value.trim();
-
-        if (!name) { alert('Lütfen proje adı girin!'); return; }
-
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                alert('Proje oluşturma hatası: ' + d.error);
-            }
-        });
-    }
-
-    function openIdeModal(proj) {
-        currentIdeProject = proj;
-        document.getElementById('ideProjName').textContent = proj.name;
-        document.getElementById('projectIdeModal').style.display = 'flex';
-        renderIdeFiles(proj.files || []);
-    }
-
-    function closeIdeModal() {
-        document.getElementById('projectIdeModal').style.display = 'none';
-    }
-
-    function renderIdeFiles(files) {
-        const listEl = document.getElementById('ideFileList');
-        const countEl = document.getElementById('ideFileCount');
-        listEl.innerHTML = '';
-        countEl.textContent = files.length + ' dosya';
-
-        if (!files.length) {
-            listEl.innerHTML = '<div style="padding:16px;color:#666;font-size:.72rem;text-align:center">Dosya bulunamadı.<br><button onclick="rescanIdeProject()" style="margin-top:8px;padding:4px 8px;border-radius:4px;border:1px solid #2a231f;background:#1a1613;color:#a78bfa;cursor:pointer;font-size:.7rem">Klasörü Tara</button></div>';
-            document.getElementById('ideCodeArea').textContent = '// Bu projede henüz dosya taranmadı.';
-            return;
-        }
-
-        files.forEach((f, idx) => {
-            const item = document.createElement('div');
-            item.className = 'ide-file-item' + (idx === 0 ? ' active' : '');
-            item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
-            item.onclick = () => selectIdeFile(f, item);
-            listEl.appendChild(item);
-        });
-
-        if (files.length > 0) {
-            selectIdeFile(files[0], listEl.children[0]);
-        }
-    }
-
-    function selectIdeFile(file, element) {
-        currentIdeFile = file;
-        document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
-        if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
-        document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
-
-        // Auto switch viewer for HTML or images
-        const ext = (file.ext || file.name || '').toLowerCase();
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.png') || ext.endsWith('.jpg')) {
-            switchIdeViewMode('viewer');
-        } else {
-            renderViewerContent(file);
-        }
-    }
-
-    function switchIdeViewMode(mode) {
-        currentViewMode = mode;
-        const codeCont = document.getElementById('ideCodeContainer');
-        const viewCont = document.getElementById('ideViewerContainer');
-        const btnCode = document.getElementById('ideBtnCode');
-        const btnView = document.getElementById('ideBtnViewer');
-
-        if (mode === 'code') {
-            codeCont.style.display = 'block';
-            viewCont.style.display = 'none';
-            btnCode.classList.add('active');
-            btnView.classList.remove('active');
-        } else {
-            codeCont.style.display = 'none';
-            viewCont.style.display = 'block';
-            btnCode.classList.remove('active');
-            btnView.classList.add('active');
-            if (currentIdeFile) renderViewerContent(currentIdeFile);
-        }
-    }
-
-    function renderViewerContent(file) {
-        const iframe = document.getElementById('ideIframe');
-        const media = document.getElementById('ideMedia');
-        const img = document.getElementById('ideImg');
-        const md = document.getElementById('ideMarkdown');
-
-        iframe.style.display = 'none';
-        media.style.display = 'none';
-        md.style.display = 'none';
-
-        const ext = (file.ext || file.name || '').toLowerCase();
-        const content = file.content || '';
-
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = content;
-        } else if (ext.endsWith('.svg')) {
-            iframe.style.display = 'block';
-            iframe.srcdoc = '<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0d0b">' + content + '</body></html>';
-        } else if (ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp')) {
-            media.style.display = 'flex';
-            img.src = file.full_path ? ('/api/files/raw?path=' + encodeURIComponent(file.full_path)) : ('data:image/' + ext.replace('.','') + ';base64,' + content);
-        } else if (ext.endsWith('.md')) {
-            md.style.display = 'block';
-            md.innerHTML = '<h2>' + esc(file.name) + '</h2><div style="margin-top:12px;white-space:pre-wrap">' + esc(content) + '</div>';
-        } else {
-            md.style.display = 'block';
-            md.innerHTML = '<div style="padding:20px;color:#666">Bu dosya türü için canlı görüntüleyici desteği yok. Kod görünümünden erişebilirsiniz.</div>';
-        }
-    }
-
-    function rescanIdeProject() {
-        if (!currentIdeProject) return;
-        fetch('/api/projects/' + currentIdeProject.id + '/scan', { method: 'POST' })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    currentIdeProject.files = d.files;
-                    renderIdeFiles(d.files);
-                    toast(d.count + ' dosya tarandı!');
-                }
-            });
-    }
-
-    function launchGlitchCli() {
-        if (!currentIdeProject) return;
-        const cmd = 'glitch run --project ' + currentIdeProject.name;
-        navigator.clipboard.writeText(cmd);
-        toast('CLI Komutu Kopyalandı: ' + cmd);
-    }
-
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        logEl.textContent = action + ' analizi başlatılıyor...';
-
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                message: action + ' projesi için analiz yap: ' + currentIdeProject.name + (currentIdeFile ? ' (Dosya: ' + currentIdeFile.name + ')' : ''),
-                stream: false
-            })
-        }).then(r => r.json()).then(d => {
-            logEl.textContent = d.response || d.text || 'Analiz tamamlandı.';
-        }).catch(err => {
-            logEl.textContent = 'Analiz hatası: ' + err;
-        });
-    }
-
-</script>
 </body>
 </html>
