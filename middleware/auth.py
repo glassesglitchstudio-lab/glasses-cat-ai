@@ -2,13 +2,14 @@ import os
 import hashlib
 import secrets
 import json
+from datetime import datetime
 from functools import wraps
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 
 USERS_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "auth_users.json")
 
-# Session depolama (production'da Redis/DB kullanın)
+# Session depolama
 sessions: dict = {}
 
 def _load_users() -> dict:
@@ -27,19 +28,35 @@ def _save_users(data: dict):
 users: dict = _load_users()
 
 def hash_password(password: str) -> str:
-    salt = secrets.token_hex(16)
-    h = hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
-    return f"{salt}:{h}"
+    """PBKDF2-HMAC-SHA256 ile güvenli, salt'lı şifreleme (100,000 tur)"""
+    salt = secrets.token_bytes(16)
+    key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+    return f"pbkdf2:{salt.hex()}:{key.hex()}"
 
 def verify_password(password: str, stored: str) -> bool:
-    salt, h = stored.split(":", 1)
-    return hashlib.sha256(f"{salt}{password}".encode()).hexdigest() == h
+    """Geriye dönük uyumlu şifre doğrulama (PBKDF2 + Legacy Salted SHA256)"""
+    if not stored:
+        return False
+    try:
+        parts = stored.split(":", 2)
+        if parts[0] == "pbkdf2":
+            salt = bytes.fromhex(parts[1])
+            expected_key = parts[2]
+            key = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+            return key.hex() == expected_key
+        elif len(parts) == 2:
+            salt_str, h = parts[0], parts[1]
+            return hashlib.sha256(f"{salt_str}{password}".encode()).hexdigest() == h
+        else:
+            return hashlib.sha256(password.encode()).hexdigest() == stored
+    except Exception:
+        return False
 
 def create_session(user_email: str) -> str:
     token = secrets.token_hex(32)
     sessions[token] = {
         "email": user_email,
-        "created": __import__("datetime").datetime.now().isoformat()
+        "created": datetime.now().isoformat()
     }
     return token
 

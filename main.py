@@ -712,6 +712,8 @@ async def chat(request: ChatRequest):
 
         # Model seçimi: frontend'den gelen modele göre yönlendir
 
+        deeper_data = None
+
         model_choice = (request.model or "X_OPUS").upper()
 
         
@@ -772,6 +774,8 @@ async def chat(request: ChatRequest):
 
                                 holder["thinking"] = res.get("thinking", "")
 
+                                holder["deeper"] = res.get("deeper")
+
                             except Exception as e:
 
                                 holder["error"] = str(e)
@@ -813,6 +817,12 @@ async def chat(request: ChatRequest):
                         if thinking_txt:
 
                             yield sse({"thinking": thinking_txt, "done": False})
+
+                        if holder.get("deeper"):
+
+                            yield sse({"deeper": holder["deeper"]})
+
+
 
                         text = extract_answer(text or "")
 
@@ -895,6 +905,8 @@ async def chat(request: ChatRequest):
                 response_text = result.get("response", "")
 
                 thinking_text = result.get("thinking", "")
+
+                deeper_data = result.get("deeper")
 
                 if result.get("routing"):
 
@@ -998,7 +1010,9 @@ async def chat(request: ChatRequest):
 
             "thoughts": thoughts[-3:] if thoughts else [],
 
-            "thinking": thinking_text
+            "thinking": thinking_text,
+
+            "deeper": deeper_data
 
         }
 
@@ -1958,29 +1972,29 @@ async def set_extended_thinking(data: dict):
 
 
 @app.post("/api/projects")
-
 async def create_project(data: dict):
-
     try:
-
         from glassescat_core import get_core
-
         c = get_core()
-
         proj = c.create_project(
-
             project_id=data.get("id", ""),
-
             name=data.get("name", ""),
-
-            instructions=data.get("instructions", "")
-
+            instructions=data.get("instructions", ""),
+            folder_path=data.get("folder_path", "")
         )
-
         return {"success": True, "project": proj}
-
     except Exception as e:
+        return {"success": False, "error": str(e)}
 
+@app.post("/api/projects/{project_id}/scan")
+async def scan_project(project_id: str, data: dict = None):
+    try:
+        from glassescat_core import get_core
+        c = get_core()
+        folder_path = (data or {}).get("folder_path", "")
+        files = c.scan_project_directory(project_id, folder_path=folder_path)
+        return {"success": True, "files": files, "count": len(files)}
+    except Exception as e:
         return {"success": False, "error": str(e)}
 
 
