@@ -4527,24 +4527,83 @@ function renderSettingsStyles() {
         });
     }
 
+    
+    const sampleDemoProjects = [
+        {
+            id: 'demo_proj_1',
+            name: 'Glitch Code AI Agent',
+            instructions: 'Otonom kodlama ajanı demo projesi',
+            files: [
+                { name: 'main.py', path: 'main.py', ext: '.py', content: '# Glitch Code AI Agent Main
+from agent import GlitchAgent
+
+if __name__ == "__main__":
+    bot = GlitchAgent(name="GlitchBot-v4")
+    bot.run_task("Derin kod analizi yap")' },
+                { name: 'agent.py', path: 'src/agent.py', ext: '.py', content: 'class GlitchAgent:
+    def __init__(self, name):
+        self.name = name
+    def run_task(self, prompt):
+        print(f"[{self.name}] Görev çalıştırılıyor: {prompt}")' },
+                { name: 'index.html', path: 'web/index.html', ext: '.html', content: '<!DOCTYPE html><html><head><title>Glitch Web</title><style>body{background:#0f0d0b;color:#a78bfa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}h1{border:1px solid #7c3aed;padding:20px;border-radius:12px}</style></head><body><h1>Glitch Code Live Demo</h1></body></html>' },
+                { name: 'README.md', path: 'README.md', ext: '.md', content: '# Glitch Code AI Agent Demo
+This is a sample project running inside GlassesCat IDE Workspace.' }
+            ]
+        },
+        {
+            id: 'demo_proj_2',
+            name: 'UE5 ShadowCat Plugin',
+            instructions: 'Unreal Engine 5 modelleme eklentisi',
+            files: [
+                { name: 'ShadowCat.cpp', path: 'Source/ShadowCat.cpp', ext: '.cpp', content: '#include "ShadowCat.h"
+
+void FShadowCatModule::StartupModule() {
+    UE_LOG(LogTemp, Log, TEXT("ShadowCat UE5 Plugin Loaded!"));
+}' },
+                { name: 'ShadowCat.h', path: 'Source/ShadowCat.h', ext: '.h', content: '#pragma once
+#include "CoreMinimal.h"
+
+class FShadowCatModule : public IModuleInterface {
+public:
+    virtual void StartupModule() override;
+};' },
+                { name: 'README.md', path: 'README.md', ext: '.md', content: '# UE5 ShadowCat Modeling Agent
+Unreal Engine 5 3D Mesh & Shader Generator.' }
+            ]
+        }
+    ];
+
     function renderProjects() {
         const el = document.getElementById('projList');
         el.innerHTML = '';
-        fetch('/api/projects').then(r => r.json()).then(d => {
-            if (!d.success || !d.projects.length) {
-                el.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:.78rem">Henüz proje yok.<br><button onclick="createProject()" style="margin-top:8px;padding:6px 14px;border-radius:6px;border:1px solid #7c3aed;background:transparent;color:#7c3aed;cursor:pointer;font-size:.75rem;font-family:inherit">+ Proje Oluştur</button></div>';
-                return;
-            }
-            el.innerHTML = '<button onclick="createProject()" style="width:100%;padding:6px;margin-bottom:8px;border-radius:6px;border:1px dashed #e0ddd5;background:transparent;color:#888;cursor:pointer;font-size:.75rem;font-family:inherit">+ Yeni Proje</button>';
-            d.projects.forEach(p => {
-                const d2 = document.createElement('div');
-                d2.className = 'proj-item';
-                d2.innerHTML = '<span>' + esc(p.name) + '</span><span class="badge">' + (p.files ? p.files.length : 0) + ' dosya</span>';
-                d2.onclick = () => { fetch('/api/projects/' + p.id).then(r=>r.json()).then(d=>{ if(d.success) openIdeModal(d.project); }); };
-                el.appendChild(d2);
+        fetch('/api/projects')
+            .then(r => r.json())
+            .then(d => {
+                if (d.success && d.projects.length) {
+                    renderProjectListItems(d.projects);
+                } else {
+                    renderProjectListItems(sampleDemoProjects);
+                }
+            })
+            .catch(() => {
+                // Fallback for static GitHub Pages demo
+                renderProjectListItems(sampleDemoProjects);
             });
+    }
+
+    function renderProjectListItems(projects) {
+        const el = document.getElementById('projList');
+        el.innerHTML = '<button onclick="createProject()" style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:1px dashed #7c3aed;background:rgba(124,58,237,0.08);color:#a78bfa;cursor:pointer;font-size:.78rem;font-weight:600;font-family:inherit;transition:all .15s">+ Yeni Proje Oluştur</button>';
+        projects.forEach(p => {
+            const d2 = document.createElement('div');
+            d2.className = 'proj-item';
+            d2.style.cssText = 'padding:10px;margin-bottom:6px;border-radius:6px;background:#1a1613;border:1px solid #2a231f;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s';
+            d2.innerHTML = '<span style="font-size:.8rem;color:#dfd6cd;font-weight:500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="margin-right:6px;vertical-align:-1px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' + esc(p.name) + '</span><span class="badge" style="font-size:.65rem;padding:2px 6px;border-radius:100px;background:rgba(124,58,237,0.15);color:#a78bfa">' + (p.files ? p.files.length : 0) + ' dosya</span>';
+            d2.onclick = () => openIdeModal(p);
+            el.appendChild(d2);
         });
     }
+
 
     function createProject() {
         const name = prompt('Proje adı:');
