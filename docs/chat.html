@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         ::selection{background:rgba(124,58,237,0.15)}
@@ -455,7 +456,7 @@
 <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
             <a href="#" class="sidebar-brand">
-            <img src="/static/glassescat-logo.png" alt="" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='glassescat-logo.png';}else{this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block';}">
+            <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block'">
             <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
             <div>
                 <div class="sidebar-brand-text">GlassesCat</div>
@@ -474,9 +475,20 @@
     </div>
     <div id="chatList" class="sidebar-list"></div>
     <div id="projList" class="sidebar-list" style="display:none"></div>
-    <div class="sidebar-footer">
-        <span id="sidebarModel">X_OPUS</span>
-        <button onclick="toggleSettings()">Ayarlar</button>
+    <div class="sidebar-footer" style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;">
+        <div id="userProfileBtn" onclick="toggleAuthModal()" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e0ddd5;border-radius:8px;padding:6px 10px;cursor:pointer;transition:all .2s;" title="Hesap / Bulut Ayarları">
+            <div style="display:flex;align-items:center;gap:6px;overflow:hidden;">
+                <span id="userAvatar" style="width:20px;height:20px;border-radius:50%;background:#f3f0ff;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:10px;font-weight:700;flex-shrink:0;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <span id="userEmailLabel" style="font-size:.75rem;color:#555;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">Giriş Yap</span>
+            </div>
+            <span id="userCloudBadge" style="font-size:.62rem;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:10px;font-weight:600;display:none;">Bulut</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span id="sidebarModel">X_OPUS</span>
+            <button onclick="toggleSettings()">Ayarlar</button>
+        </div>
     </div>
 </aside>
 <div id="sidebarOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:40" onclick="toggleSidebar()"></div>
@@ -489,7 +501,7 @@
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
-            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler"><img src="/static/skill-logo.png" alt="Skill" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='skill-logo.png';}" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;border-radius:50%">Skill</button>
+            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler"><img src="/static/skill-logo.png" alt="Skill" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;border-radius:50%">Skill</button>
             <button class="tb-btn" id="webSearchBtn" onclick="toggleWebSearch()" title="Web arama"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Web</button>
             <button class="tb-btn" id="thinkBtn" onclick="toggleThinking()" title="Derin düşünme"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg> Derin</button>
             <button class="tb-btn" onclick="toggleArtifacts()" id="artifactsBtn" title="Artifacts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> Çıktılar</button>
@@ -503,7 +515,7 @@
         <div class="msgs-wrap" id="msgsWrap">
             <div id="welcome" class="welcome">
                 <div class="welcome-logo">
-                    <img src="/static/glassescat-logo.png" alt="" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='glassescat-logo.png';}else{this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline';}">
+                    <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline'">
                     <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
                 <h1>GlassesCat AI v4.0</h1>
@@ -588,6 +600,53 @@
             <button id="sendBtn" class="send-btn" onclick="send()" disabled>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2.5L13.5 8L2.5 13.5V9.5L9.5 8L2.5 6.5V2.5Z"/></svg>
             </button>
+        </div>
+    </div>
+</div>
+
+<div id="authOverlay" class="upload-overlay" onclick="if(event.target===this)hideAuthModal()">
+    <div class="upload-modal" style="max-width:400px;text-align:left;border-radius:14px;padding:24px;">
+        <button class="close-overlay" onclick="hideAuthModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:12px;background:#f3f0ff;display:inline-flex;align-items:center;justify-content:center;color:#7c3aed;margin-bottom:8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h2 id="authTitle" style="font-size:1.15rem;font-weight:700;color:#111;margin:0;">GlassesCat Bulut Hesabı</h2>
+            <div class="sub" style="text-align:center;margin-top:4px;">Ayarlarınızı ve tercihlerinizi bulutta senkronize edin</div>
+        </div>
+
+        <div id="authLoggedInView" style="display:none;text-align:center;padding:12px 0;">
+            <div style="font-size:.85rem;color:#333;margin-bottom:4px;">Giriş yapıldı:</div>
+            <div id="authLoggedInEmail" style="font-weight:600;color:#7c3aed;font-size:.92rem;word-break:break-all;margin-bottom:14px;"></div>
+            <div style="display:flex;gap:8px;justify-content:center;">
+                <button onclick="syncCloudSettings(true)" style="padding:8px 16px;border-radius:8px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;cursor:pointer;font-size:.78rem;font-weight:600;">Ayarları Eşitle</button>
+                <button onclick="signOutSupabase()" style="padding:8px 16px;border-radius:8px;border:1px solid #e0ddd5;background:#fff;color:#dc2626;cursor:pointer;font-size:.78rem;">Çıkış Yap</button>
+            </div>
+        </div>
+
+        <div id="authLoggedOutView">
+            <div style="display:flex;gap:6px;margin-bottom:14px;background:#f5f5f5;padding:3px;border-radius:8px;">
+                <button id="authTabLogin" onclick="switchAuthTab('login')" class="sk-tab active" style="flex:1;text-align:center;">Giriş Yap</button>
+                <button id="authTabSignup" onclick="switchAuthTab('signup')" class="sk-tab" style="flex:1;text-align:center;">Kayıt Ol</button>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <div>
+                    <label style="font-size:.75rem;font-weight:600;color:#555;display:block;margin-bottom:4px;">E-posta</label>
+                    <input type="email" id="authEmail" placeholder="ornek@email.com" style="width:100%;padding:9px 12px;border:1px solid #e0ddd5;border-radius:8px;font-family:inherit;font-size:.82rem;outline:none;">
+                </div>
+                <div>
+                    <label style="font-size:.75rem;font-weight:600;color:#555;display:block;margin-bottom:4px;">Şifre</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" style="width:100%;padding:9px 12px;border:1px solid #e0ddd5;border-radius:8px;font-family:inherit;font-size:.82rem;outline:none;" onkeydown="if(event.key==='Enter')submitAuth()">
+                </div>
+                <div id="authStatusMsg" style="font-size:.75rem;display:none;padding:6px 10px;border-radius:6px;"></div>
+                
+                <button id="authSubmitBtn" onclick="submitAuth()" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:none;background:#7c3aed;color:#fff;font-weight:600;font-size:.82rem;cursor:pointer;transition:background .2s;">Giriş Yap</button>
+            </div>
+            <div style="margin-top:12px;text-align:center;font-size:.7rem;color:#888;">
+                🛡️ <b>Sıfır Günlük Politikası:</b> Sohbetleriniz buluta kaydedilmez, sadece tarayıcınızda kalır.
+            </div>
         </div>
     </div>
 </div>
@@ -805,6 +864,218 @@
     function onInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (typeof send === 'function') send(); } if (e.key === 'Escape') { const m = document.getElementById('slashMenu'); if (m) m.classList.remove('show'); } }
     function toggleSettings() { const o = document.getElementById('settingsOverlay'); if (o) o.classList.toggle('show'); }
 
+    const SUPABASE_URL = 'https://mpyegdfxaswpudieykgy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1weWVnZGZ4YXN3cHVkaWV5a2d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4ODc3NzAsImV4cCI6MjEwMjQ2Mzc3MH0.0mGqG8UaV_E02UtVf81TprUTK08VdKwmHdYud_bQfOo';
+    let supabaseClient = null;
+    let currentAuthUser = null;
+    let authMode = 'login';
+
+    try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+    } catch(e) { console.warn('Supabase client error:', e); }
+
+    function toggleAuthModal() {
+        const o = document.getElementById('authOverlay');
+        if (!o) return;
+        o.classList.toggle('show');
+        updateAuthModalView();
+    }
+
+    function hideAuthModal() {
+        const o = document.getElementById('authOverlay');
+        if (o) o.classList.remove('show');
+    }
+
+    function switchAuthTab(tab) {
+        authMode = tab;
+        const btnL = document.getElementById('authTabLogin');
+        const btnS = document.getElementById('authTabSignup');
+        const subBtn = document.getElementById('authSubmitBtn');
+        const msg = document.getElementById('authStatusMsg');
+        if (msg) msg.style.display = 'none';
+
+        if (tab === 'login') {
+            if (btnL) btnL.classList.add('active');
+            if (btnS) btnS.classList.remove('active');
+            if (subBtn) subBtn.textContent = 'Giriş Yap';
+        } else {
+            if (btnS) btnS.classList.add('active');
+            if (btnL) btnL.classList.remove('active');
+            if (subBtn) subBtn.textContent = 'Hesap Oluştur';
+        }
+    }
+
+    function updateAuthModalView() {
+        const inView = document.getElementById('authLoggedInView');
+        const outView = document.getElementById('authLoggedOutView');
+        const emailLabel = document.getElementById('userEmailLabel');
+        const cloudBadge = document.getElementById('userCloudBadge');
+        const loggedInEmail = document.getElementById('authLoggedInEmail');
+
+        if (currentAuthUser) {
+            if (inView) inView.style.display = 'block';
+            if (outView) outView.style.display = 'none';
+            if (emailLabel) emailLabel.textContent = currentAuthUser.email || 'Kullanıcı';
+            if (cloudBadge) cloudBadge.style.display = 'inline-block';
+            if (loggedInEmail) loggedInEmail.textContent = currentAuthUser.email;
+        } else {
+            if (inView) inView.style.display = 'none';
+            if (outView) outView.style.display = 'block';
+            if (emailLabel) emailLabel.textContent = 'Giriş Yap';
+            if (cloudBadge) cloudBadge.style.display = 'none';
+        }
+    }
+
+    async function submitAuth() {
+        if (!supabaseClient) {
+            if (typeof toast === 'function') toast('Supabase istemcisi hazır değil');
+            return;
+        }
+        const email = (document.getElementById('authEmail').value || '').trim();
+        const password = (document.getElementById('authPassword').value || '').trim();
+        const statusMsg = document.getElementById('authStatusMsg');
+        const submitBtn = document.getElementById('authSubmitBtn');
+
+        if (!email || !password) {
+            if (statusMsg) {
+                statusMsg.textContent = 'Lütfen e-posta ve şifrenizi girin.';
+                statusMsg.style.display = 'block';
+                statusMsg.style.background = '#fee2e2';
+                statusMsg.style.color = '#dc2626';
+            }
+            return;
+        }
+
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'İşleniyor...'; }
+
+        try {
+            if (authMode === 'login') {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                currentAuthUser = data.user;
+                updateAuthModalView();
+                await loadCloudSettings();
+                if (typeof toast === 'function') toast('Giriş yapıldı! Ayarlar eşitlendi.');
+                hideAuthModal();
+            } else {
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) throw error;
+                if (data.user && !data.session) {
+                    if (statusMsg) {
+                        statusMsg.textContent = 'Kayıt başarılı! E-posta onayından sonra giriş yapabilirsiniz.';
+                        statusMsg.style.display = 'block';
+                        statusMsg.style.background = '#dcfce7';
+                        statusMsg.style.color = '#16a34a';
+                    }
+                } else if (data.user) {
+                    currentAuthUser = data.user;
+                    updateAuthModalView();
+                    await syncCloudSettings();
+                    if (typeof toast === 'function') toast('Hesap oluşturuldu ve bulut bağlandı!');
+                    hideAuthModal();
+                }
+            }
+        } catch(err) {
+            if (statusMsg) {
+                statusMsg.textContent = err.message || 'Bir hata oluştu.';
+                statusMsg.style.display = 'block';
+                statusMsg.style.background = '#fee2e2';
+                statusMsg.style.color = '#dc2626';
+            }
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = authMode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur';
+            }
+        }
+    }
+
+    async function signOutSupabase() {
+        if (!supabaseClient) return;
+        try {
+            await supabaseClient.auth.signOut();
+            currentAuthUser = null;
+            updateAuthModalView();
+            if (typeof toast === 'function') toast('Çıkış yapıldı.');
+            hideAuthModal();
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    async function syncCloudSettings(showNotification = false) {
+        if (!supabaseClient || !currentAuthUser) return;
+        try {
+            const prefsText = (document.getElementById('settingsPrefs')?.value || '');
+            const payload = {
+                user_id: currentAuthUser.id,
+                preferred_model: currentModel,
+                agent_style: currentStyle,
+                extended_thinking: !!extendedThinking,
+                web_search_enabled: !!webSearchEnabled,
+                custom_instructions: prefsText,
+                updated_at: new Date().toISOString()
+            };
+            const { error } = await supabaseClient.from('user_settings').upsert(payload);
+            if (error) console.warn('Cloud sync warn:', error.message);
+            else if (showNotification && typeof toast === 'function') toast('Bulut ayarlarınız kaydedildi!');
+        } catch(e) {
+            console.warn('Sync error:', e);
+        }
+    }
+
+    async function loadCloudSettings() {
+        if (!supabaseClient || !currentAuthUser) return;
+        try {
+            const { data, error } = await supabaseClient.from('user_settings').select('*').eq('user_id', currentAuthUser.id).single();
+            if (data) {
+                if (data.preferred_model && typeof selectModel === 'function') selectModel(data.preferred_model);
+                if (data.agent_style && typeof setAgentMode === 'function') setAgentMode(data.agent_style);
+                if (data.extended_thinking !== undefined) {
+                    extendedThinking = data.extended_thinking;
+                    const b = document.getElementById('thinkBtn');
+                    const sb = document.getElementById('settingsThink');
+                    if (b) b.classList.toggle('active', extendedThinking);
+                    if (sb) sb.textContent = extendedThinking ? 'Açık' : 'Kapalı';
+                }
+                if (data.web_search_enabled !== undefined) {
+                    webSearchEnabled = data.web_search_enabled;
+                    const wb = document.getElementById('webSearchBtn');
+                    const swb = document.getElementById('settingsWeb');
+                    if (wb) wb.classList.toggle('active', webSearchEnabled);
+                    if (swb) swb.textContent = webSearchEnabled ? 'Açık' : 'Kapalı';
+                }
+                if (data.custom_instructions !== undefined) {
+                    const sp = document.getElementById('settingsPrefs');
+                    if (sp) sp.value = data.custom_instructions;
+                }
+            }
+        } catch(e) {
+            console.warn('Load cloud settings error:', e);
+        }
+    }
+
+    async function initSupabaseAuth() {
+        if (!supabaseClient) return;
+        try {
+            const { data } = await supabaseClient.auth.getSession();
+            if (data && data.session && data.session.user) {
+                currentAuthUser = data.session.user;
+                updateAuthModalView();
+                await loadCloudSettings();
+            }
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                currentAuthUser = session ? session.user : null;
+                updateAuthModalView();
+                if (event === 'SIGNED_IN') loadCloudSettings();
+            });
+        } catch(e) {
+            console.warn('Supabase session check error:', e);
+        }
+    }
+
     let chats = {}, chatId = null, busy = false, demoMode = true;
     let currentModel = 'X_OPUS';
     let currentStyle = 'normal';
@@ -956,6 +1227,7 @@
         document.querySelectorAll('.model-opt').forEach(o => o.classList.toggle('active', o.getAttribute('onclick').indexOf(id) >= 0));
         document.getElementById('modelDropdown').classList.remove('show');
         toast(id + ' seçildi');
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function toggleStyle() {
@@ -988,6 +1260,7 @@
         document.querySelectorAll('#settingsModes .sk-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.mode === mode);
         });
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
         // Call backend API
         fetch('/api/set_mode', {
             method: 'POST',
@@ -1035,6 +1308,7 @@ function renderSettingsStyles() {
         savedPrefs = document.getElementById('settingsPrefs').value;
         fetch('/api/settings/preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:savedPrefs})});
         toast('Tercihler kaydedildi');
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function renderSettingsSkillInfo() {
@@ -1074,18 +1348,21 @@ function renderSettingsStyles() {
         renderStyleList();
         fetch('/api/settings/style', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({style:s})});
         toast('Stil: ' + STYLES[s]);
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function savePrefs() {
         savedPrefs = document.getElementById('prefsInput').value;
         fetch('/api/settings/preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:savedPrefs})});
         toast('Tercihler kaydedildi');
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function toggleWebSearch() {
         webSearchEnabled = !webSearchEnabled;
         document.getElementById('webSearchBtn').classList.toggle('active', webSearchEnabled);
         toast(webSearchEnabled ? 'Web arama açık' : 'Web arama kapalı');
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function toggleSkillModal() {
@@ -1563,6 +1840,7 @@ function renderSettingsStyles() {
         document.getElementById('thinkBtn').innerHTML = thinkBtnHTML(extendedThinking);
         fetch('/api/settings/extended-thinking', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:extendedThinking})});
         toast(extendedThinking ? 'Derin düşünme açık' : 'Derin düşünme kapalı');
+        if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function toggleSwarm() {
@@ -3040,6 +3318,7 @@ function renderSettingsStyles() {
 
     newChat();
     checkBackend();
+    initSupabaseAuth();
 </script>
 
 <!-- New Project Modal -->
