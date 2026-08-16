@@ -518,8 +518,8 @@
                     <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline'">
                     <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
-                <h1 id="welcomeGreeting">GlassesCat AI v4.0</h1>
-                <div class="sub" id="welcomeSubGreeting">Nexus Memory (SQLite FTS5) ve Ollama AGI Motoru Aktif</div>
+                <h1 id="welcomeGreeting">Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Berkay</span>! 👋</h1>
+                <div class="sub" id="welcomeSubGreeting">GlassesCat AI Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?</div>
                 <div class="chips">
                     <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
                     <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
@@ -920,7 +920,7 @@
     }
 
     function getUserDisplayName(user) {
-        if (!user) return null;
+        if (!user) return 'Berkay';
         if (user.user_metadata) {
             if (user.user_metadata.full_name) return user.user_metadata.full_name;
             if (user.user_metadata.name) return user.user_metadata.name;
@@ -929,7 +929,7 @@
         if (user.email) {
             return user.email.split('@')[0];
         }
-        return 'Geliştirici';
+        return 'Berkay';
     }
 
     function updateAuthModalView() {
@@ -963,10 +963,10 @@
             if (cloudBadge) cloudBadge.style.display = 'none';
 
             if (greetingEl) {
-                greetingEl.textContent = 'GlassesCat AI v4.0';
+                greetingEl.innerHTML = 'Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Berkay</span>! 👋';
             }
             if (subGreetingEl) {
-                subGreetingEl.textContent = 'Nexus Memory (SQLite FTS5) ve Ollama AGI Motoru Aktif';
+                subGreetingEl.textContent = 'GlassesCat AI Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?';
             }
         }
     }
