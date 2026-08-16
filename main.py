@@ -4601,31 +4601,61 @@ async def generate_image(request: ImageRequest):
 
 
 
+# ==================== OLLAMA OTO-BASLATMA ====================
+
+def ensure_ollama_running():
+    """Ollama servisinin aktif olup olmadigini kontrol eder, kapaliysa arka planda otomatik baslatir."""
+    import socket
+    import subprocess
+    import shutil
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1.0)
+    is_running = (sock.connect_ex(('127.0.0.1', 11434)) == 0)
+    sock.close()
+
+    if is_running:
+        logger.info("[Ollama] Ollama servisi zaten calisiyor (port 11434).")
+        return True
+
+    logger.info("[Ollama] Ollama servisi kapali, otomatik baslatiliyor...")
+    ollama_path = shutil.which("ollama")
+    if not ollama_path:
+        default_win_path = os.path.expandvars(r"%LOCALAPPDATA%\Programs\Ollama\ollama.exe")
+        if os.path.exists(default_win_path):
+            ollama_path = default_win_path
+
+    if ollama_path:
+        try:
+            if os.name == 'nt':
+                subprocess.Popen([ollama_path, "serve"], creationflags=0x08000000 | 0x00000008)  # CREATE_NO_WINDOW | DETACHED_PROCESS
+            else:
+                subprocess.Popen([ollama_path, "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            logger.info("[Ollama] Ollama 'serve' arka planda basariyla baslatildi.")
+            return True
+        except Exception as err:
+            logger.warning(f"[Ollama] Ollama otomatik baslatilamadi: {err}")
+    else:
+        logger.warning("[Ollama] Ollama calistirilabilir dosyasi bulunamadi.")
+    return False
+
+@app.on_event("startup")
+async def startup_event():
+    ensure_ollama_running()
+
 # ==================== NIKO CORE BASLATMA ====================
 
-
-
 if CORE_AVAILABLE:
-
     try:
-
         core = get_core()
-
-        logger.info(f"Niko Core baslatildi: {core.toolformer.registry.count() if core.toolformer else 0} ara")
-
+        logger.info(f"Niko Core baslatildi: {core.toolformer.registry.count() if core.toolformer else 0} arac")
     except Exception as e:
-
         logger.warning(f"Niko Core baslatilamadi: {e}")
 
 
-
-
-
 if __name__ == "__main__":
-
     import uvicorn
-
+    ensure_ollama_running()
     # FastAPI motorunu 8000 portuna taşıyoruz, 5000 portu Web Arayüzü (Flask) için ayrıldı.
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
