@@ -456,10 +456,10 @@
 <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
             <a href="#" class="sidebar-brand">
-            <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block'">
+            <img src="glassescat-logo.png" alt="Elythra-AI GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'">
             <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
             <div>
-                <div class="sidebar-brand-text">GlassesCat</div>
+                <div class="sidebar-brand-text">Elythra-AI <span style="font-size:0.75rem;font-weight:400;color:#7c3aed;">/ GlassesCat</span></div>
                 <div class="sidebar-brand-sub">v4.0.0 Nexus Engine</div>
             </div>
         </a>
@@ -501,7 +501,7 @@
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
-            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler"><img src="/static/skill-logo.png" alt="Skill" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;border-radius:50%">Skill</button>
+            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler"><img src="skill-logo.png" alt="Skill" onerror="this.onerror=null;this.src='/static/skill-logo.png'" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;border-radius:50%">Skill</button>
             <button class="tb-btn" id="webSearchBtn" onclick="toggleWebSearch()" title="Web arama"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Web</button>
             <button class="tb-btn" id="thinkBtn" onclick="toggleThinking()" title="Derin düşünme"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg> Derin</button>
             <button class="tb-btn" onclick="toggleArtifacts()" id="artifactsBtn" title="Artifacts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> Çıktılar</button>
@@ -515,11 +515,11 @@
         <div class="msgs-wrap" id="msgsWrap">
             <div id="welcome" class="welcome">
                 <div class="welcome-logo">
-                    <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline'">
+                    <img src="glassescat-logo.png" alt="Elythra-AI GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'">
                     <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
                 <h1 id="welcomeGreeting">Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Berkay</span>! 👋</h1>
-                <div class="sub" id="welcomeSubGreeting">GlassesCat AI Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?</div>
+                <div class="sub" id="welcomeSubGreeting">GlassesCat (Elythra-AI) Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?</div>
                 <div class="chips">
                     <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
                     <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
@@ -690,7 +690,7 @@
 <div id="skillOverlay" class="upload-overlay" onclick="if(event.target===this)hideSkillModal()">
     <div class="upload-modal" style="text-align:left;max-width:540px">
         <button class="close-overlay" onclick="hideSkillModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <h2 style="text-align:center"><img src="/static/skill-logo.png" alt="Skill" style="width:32px;height:32px;vertical-align:middle;margin-right:8px;border-radius:50%"> Skill'ler</h2>
+        <h2 style="text-align:center"><img src="skill-logo.png" alt="Skill" onerror="this.onerror=null;this.src='/static/skill-logo.png'" style="width:32px;height:32px;vertical-align:middle;margin-right:8px;border-radius:50%"> Skill'ler</h2>
         <div class="sub" style="text-align:center">Hazır + kişisel skill'ler — GlassesCat'e yetenek verir</div>
         <div style="display:flex;gap:8px;margin-top:12px">
             <button id="skTabLocal" class="sk-tab active" onclick="switchSkillTab('local')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Yüklü</button>
@@ -870,7 +870,7 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="/static/skills-library.js"></script>
+<script src="skills-library.js" onerror="this.onerror=null;this.src='/static/skills-library.js'"></script>
 <script>
     function resize(t) { if (!t) return; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; }
     function onInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (typeof send === 'function') send(); } if (e.key === 'Escape') { const m = document.getElementById('slashMenu'); if (m) m.classList.remove('show'); } }
@@ -966,7 +966,7 @@
                 greetingEl.innerHTML = 'Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Berkay</span>! 👋';
             }
             if (subGreetingEl) {
-                subGreetingEl.textContent = 'GlassesCat AI Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?';
+                subGreetingEl.textContent = 'GlassesCat (Elythra-AI) Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?';
             }
         }
     }
@@ -2068,7 +2068,7 @@ function renderSettingsStyles() {
     function addSbMsg(role, text, html) {
         const el = document.createElement('div');
         el.className = 'msg ' + role;
-        el.innerHTML = '<div class="hdr"><div class="av">' + (role === 'user' ? 'S' : '<img src="/static/glassescat-logo.png" alt="" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<svg width=\\\'20\\\' height=\\\'20\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'#7c3aed\\\'><path d=\\\'M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z\\\'/></svg>\'" style="width:100%;height:100%;object-fit:contain;border-radius:50%">') + '</div><span class="nm">' + (role === 'user' ? 'Sen' : 'GlassesCat') + '</span></div><div class="ct">' + (role === 'user' ? esc(text) : (html ? text : format(text))) + '</div>';
+        el.innerHTML = '<div class="hdr"><div class="av">' + (role === 'user' ? 'S' : '<img src="glassescat-logo.png" alt="" onerror="this.onerror=null;this.src=\'/static/glassescat-logo.png\';">\'<svg width=\\\'20\\\' height=\\\'20\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'#7c3aed\\\'><path d=\\\'M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z\\\'/></svg>\'" style="width:100%;height:100%;object-fit:contain;border-radius:50%">') + '</div><span class="nm">' + (role === 'user' ? 'Sen' : 'GlassesCat') + '</span></div><div class="ct">' + (role === 'user' ? esc(text) : (html ? text : format(text))) + '</div>';
         document.getElementById('sbMsgs').appendChild(el);
         setTimeout(() => { const w = document.getElementById('sbMsgs'); if (w) w.scrollTop = w.scrollHeight; }, 20);
     }
@@ -2776,7 +2776,7 @@ function renderSettingsStyles() {
         const av = document.createElement('div');
         av.className = 'av';
         if (role === 'user') av.textContent = 'S';
-        else av.innerHTML = '<img src="/static/glassescat-logo.png" alt="" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<svg width=\\\'26\\\' height=\\\'26\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'#7c3aed\\\'><path d=\\\'M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z\\\'/></svg>\'">';
+        else av.innerHTML = '<img src="glassescat-logo.png" alt="" onerror="this.onerror=null;this.src=\'/static/glassescat-logo.png\';">\'<svg width=\\\'26\\\' height=\\\'26\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'#7c3aed\\\'><path d=\\\'M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z\\\'/></svg>\'">';
         hdr.appendChild(av);
         const nm = document.createElement('span');
         nm.className = 'nm';
