@@ -455,7 +455,7 @@
 <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
             <a href="#" class="sidebar-brand">
-            <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block'">
+            <img src="/static/glassescat-logo.png" alt="" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='glassescat-logo.png';}else{this.style.display='none';this.parentElement.querySelector('.fallback').style.display='block';}">
             <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
             <div>
                 <div class="sidebar-brand-text">GlassesCat</div>
@@ -489,7 +489,7 @@
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
-            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler"><img src="/static/skill-logo.png" alt="Skill" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;border-radius:50%">Skill</button>
+            <button class="tb-btn" onclick="toggleSkillModal()" title="Skill'ler"><img src="/static/skill-logo.png" alt="Skill" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='skill-logo.png';}" style="width:14px;height:14px;vertical-align:middle;margin-right:3px;border-radius:50%">Skill</button>
             <button class="tb-btn" id="webSearchBtn" onclick="toggleWebSearch()" title="Web arama"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Web</button>
             <button class="tb-btn" id="thinkBtn" onclick="toggleThinking()" title="Derin düşünme"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg> Derin</button>
             <button class="tb-btn" onclick="toggleArtifacts()" id="artifactsBtn" title="Artifacts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> Çıktılar</button>
@@ -503,7 +503,7 @@
         <div class="msgs-wrap" id="msgsWrap">
             <div id="welcome" class="welcome">
                 <div class="welcome-logo">
-                    <img src="/static/glassescat-logo.png" alt="" onerror="this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline'">
+                    <img src="/static/glassescat-logo.png" alt="" onerror="if(!this.dataset.triedLocal){this.dataset.triedLocal='1';this.src='glassescat-logo.png';}else{this.style.display='none';this.parentElement.querySelector('.fallback').style.display='inline';}">
                     <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
                 <h1>GlassesCat AI v4.0</h1>
