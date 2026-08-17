@@ -32,11 +32,21 @@ async def ollama_stream(message: str, model: str = None):
         model = model or os.getenv("DEFAULT_MODEL", "gulmzcetiner:latest")
         ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
 
+    def _clean_url(url: str) -> str:
+        u = (url or "http://localhost:11434").strip().rstrip("/")
+        if u.endswith("/api/chat"):
+            u = u[:-9]
+        elif u.endswith("/api/generate"):
+            u = u[:-13]
+        return u.rstrip("/")
+
+    target_url = f"{_clean_url(ollama_url)}/api/chat"
+
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             async with client.stream(
                 "POST",
-                f"{ollama_url}/api/chat",
+                target_url,
                 json={
                     "model": model,
                     "messages": [{"role": "user", "content": message}],

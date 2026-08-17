@@ -29,6 +29,11 @@ from routes.skills import router as skills_router
 from routes.theme import router as theme_router
 from routes.tools import router as tools_router
 from routes.mcp import router as mcp_router
+try:
+    from routes.multi_agent import router as multi_agent_router
+    MULTI_AGENT_OK = True
+except Exception:
+    MULTI_AGENT_OK = False
 
 router.include_router(chat_router, prefix="/api/chat", tags=["chat"])
 router.include_router(mcp_router, prefix="/api/mcp", tags=["mcp"])
@@ -53,3 +58,5 @@ router.include_router(plugins_router, prefix="/api/plugins", tags=["plugins"])
 router.include_router(skills_router, prefix="/api/skills", tags=["skills"])
 router.include_router(theme_router, prefix="/api/theme", tags=["theme"])
 router.include_router(tools_router, prefix="/api/tools", tags=["tools"])
+if MULTI_AGENT_OK:
+    router.include_router(multi_agent_router, prefix="/api/multi-agent", tags=["multi_agent"])

@@ -34,9 +34,9 @@
 
 
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Response
 
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, FileResponse
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -294,11 +294,74 @@ app = FastAPI(
 
 
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "web", "static")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "web", "templates")
+
 # Templates ve Static dosyalar
+templates = Jinja2Templates(directory=TEMPLATES_DIR if os.path.exists(TEMPLATES_DIR) else "web/templates")
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+elif os.path.exists("web/static"):
+    app.mount("/static", StaticFiles(directory="web/static"), name="static")
 
-templates = Jinja2Templates(directory="web/templates")
+def normalize_ollama_base_url(url: Optional[str] = None) -> str:
+    base = (url or os.getenv("OLLAMA_URL", "http://localhost:11434")).strip().rstrip("/")
+    if base.endswith("/api/chat"):
+        base = base[:-9]
+    elif base.endswith("/api/generate"):
+        base = base[:-13]
+    return base.rstrip("/")
 
-app.mount("/static", StaticFiles(directory="web/static"), name="static")
+def _find_static_file(filename: str) -> Optional[str]:
+    candidates = [
+        os.path.join(STATIC_DIR, filename),
+        os.path.join(BASE_DIR, "docs", filename),
+        os.path.join(BASE_DIR, filename),
+        os.path.join("web", "static", filename),
+        os.path.join("docs", filename),
+        filename,
+    ]
+    for c in candidates:
+        if os.path.exists(c) and os.path.isfile(c):
+            return c
+    return None
+
+# Root statik dosya rotaları (404 önleyici)
+@app.get("/glassescat-logo.png")
+async def get_root_logo():
+    p = _find_static_file("glassescat-logo.png")
+    if p:
+        return FileResponse(p, media_type="image/png")
+    return Response(status_code=404)
+
+@app.get("/skill-logo.png")
+async def get_root_skill_logo():
+    p = _find_static_file("skill-logo.png")
+    if p:
+        return FileResponse(p, media_type="image/png")
+    return Response(status_code=404)
+
+@app.get("/skills-library.js")
+async def get_root_skills_lib():
+    p = _find_static_file("skills-library.js")
+    if p:
+        return FileResponse(p, media_type="application/javascript")
+    return Response(status_code=404)
+
+@app.get("/select-script.js")
+async def get_root_select_script():
+    p = _find_static_file("select-script.js")
+    if p:
+        return FileResponse(p, media_type="application/javascript")
+    return Response(status_code=404)
+
+@app.get("/favicon.ico")
+async def get_root_favicon():
+    p = _find_static_file("glassescat-logo.png")
+    if p:
+        return FileResponse(p, media_type="image/png")
+    return Response(status_code=204)
 
 
 
@@ -496,9 +559,11 @@ async def call_ai_engine(message: str, config: Dict[str, Any], num_predict: int 
 
             }
 
+            target_url = f"{normalize_ollama_base_url(config.get('url'))}/api/chat"
+
             response = await client.post(
 
-                f"{config['url']}/api/chat",
+                target_url,
 
                 json=payload
 
@@ -732,13 +797,17 @@ async def chat(request: ChatRequest):
 
                 try:
 
-                    if model_choice in ("X_GLITCH_OPUS", "X_FABLE_CODER"):
+                    if model_choice in ("X_OPUS", "X_GLITCH_OPUS", "X_FABLE_CODER"):
 
                         from xopus_router import get_xopus, GLITCH_MODEL, CODE_MODEL
 
                         xopus = get_xopus()
 
-                        override = GLITCH_MODEL if model_choice == "X_GLITCH_OPUS" else CODE_MODEL
+                        override = None
+                        if model_choice == "X_GLITCH_OPUS":
+                            override = GLITCH_MODEL
+                        elif model_choice == "X_FABLE_CODER":
+                            override = CODE_MODEL
 
                         for ch in xopus.chat_stream(
 
@@ -756,79 +825,99 @@ async def chat(request: ChatRequest):
 
                     elif CORE_AVAILABLE:
 
-                        import threading
+                        # ── GERÇEK TOKEN-BY-TOKEN STREAMING ──
+                        # Ollama API'ye stream:true ile bağlanıp her token'ı anında yield ediyoruz
+                        core = get_core()
+                        raw_ollama_url = "http://localhost:11434"
+                        if core and core.model_router:
+                            raw_ollama_url = getattr(core.model_router, 'ollama_url', raw_ollama_url)
+                        
+                        target_api_url = f"{normalize_ollama_base_url(raw_ollama_url)}/api/chat"
+                        
+                        stream_model = request.model
+                        if not stream_model and core and core.model_router:
+                            stream_model = getattr(core.model_router, 'default_model', None)
+                        if not stream_model:
+                            stream_model = os.getenv("DEFAULT_MODEL", "glassesglitchstudio/x_opus:V1_X_OPUS")
 
-                        from glassescat_agent_loop import extract_answer
-
-                        holder = {}
-
-                        def run_core():
-
-                            try:
-
-                                core = get_core()
-
-                                res = core.process_message(request.message)
-
-                                holder["text"] = res.get("response", "")
-
-                                holder["thinking"] = res.get("thinking", "")
-
-                                holder["deeper"] = res.get("deeper")
-
-                            except Exception as e:
-
-                                holder["error"] = str(e)
-
-                        th = threading.Thread(target=run_core, daemon=True)
-
-                        th.start()
-
-                        th.join(timeout=120)
-
-                        if holder.get("error"):
-
-                            yield sse({"error": holder["error"]})
-
-                            return
-
-                        text = holder.get("text", "")
-
-                        if isinstance(text, dict):
-
-                            text = text.get("response") or text.get("text") or text.get("error") or str(text)
-
-                        elif isinstance(text, str) and text.startswith("{") and ("'response'" in text[:80] or "'error'" in text[:80]):
-
-                            try:
-
-                                inner = json.loads(text.replace("'", '"'))
-
-                                if isinstance(inner, dict):
-
-                                    text = inner.get("response") or inner.get("text") or inner.get("error") or str(inner)
-
-                            except Exception:
-
-                                pass
-
-                        thinking_txt = holder.get("thinking", "")
-
-                        if thinking_txt:
-
-                            yield sse({"thinking": thinking_txt, "done": False})
-
-                        if holder.get("deeper"):
-
-                            yield sse({"deeper": holder["deeper"]})
-
-
-
-                        text = extract_answer(text or "")
-
-                        yield sse({"token": text, "done": False})
-
-                        yield sse({"done": True})
+                        # Sistem prompt'u
+                        system_prompt = "Sen GlassesCat'sın. Yardımcı ve nazik bir Türkçe yapay zeka asistanısın. Kısa ve faydalı yanıtlar verirsin."
+                        
+                        # Extended thinking desteği
+                        think_enabled = getattr(core, '_extended_thinking', False) if core else False
+                        
+                        try:
+                            async with httpx.AsyncClient(timeout=180.0) as client:
+                                async with client.stream(
+                                    "POST",
+                                    target_api_url,
+                                    json={
+                                        "model": stream_model,
+                                        "messages": [
+                                            {"role": "system", "content": system_prompt},
+                                            {"role": "user", "content": request.message}
+                                        ],
+                                        "stream": True,
+                                        "think": think_enabled,
+                                        "options": {"temperature": 0.7, "num_predict": 2000}
+                                    }
+                                ) as response:
+                                    thinking_buf = ""
+                                    async for line in response.aiter_lines():
+                                        if not line:
+                                            continue
+                                        try:
+                                            data = json.loads(line)
+                                        except json.JSONDecodeError:
+                                            continue
+                                        
+                                        msg = data.get("message", {})
+                                        content = msg.get("content", "")
+                                        
+                                        # Thinking content (deepseek-r1 tarzı <think> blokları)
+                                        thinking = msg.get("thinking", "")
+                                        if thinking:
+                                            thinking_buf += thinking
+                                            yield sse({"thinking": thinking, "done": False})
+                                            continue
+                                        
+                                        # Normal token
+                                        if content:
+                                            yield sse({"token": content, "done": False})
+                                        
+                                        # Stream bitti
+                                        if data.get("done"):
+                                            break
+                                    
+                            yield sse({"done": True})
+                        
+                        except Exception as stream_err:
+                            logger.warning(f"Ollama streaming hatası, fallback: {stream_err}")
+                            # Fallback: Core ile non-streaming
+                            import threading
+                            from glassescat_agent_loop import extract_answer
+                            holder = {}
+                            def run_core():
+                                try:
+                                    res = core.process_message(request.message)
+                                    holder["text"] = res.get("response", "")
+                                    holder["thinking"] = res.get("thinking", "")
+                                except Exception as e:
+                                    holder["error"] = str(e)
+                            th = threading.Thread(target=run_core, daemon=True)
+                            th.start()
+                            th.join(timeout=120)
+                            if holder.get("error"):
+                                yield sse({"error": holder["error"]})
+                                return
+                            text = holder.get("text", "")
+                            if isinstance(text, dict):
+                                text = text.get("response") or text.get("text") or str(text)
+                            text = extract_answer(text or "")
+                            if holder.get("thinking"):
+                                yield sse({"thinking": holder["thinking"], "done": False})
+                            yield sse({"token": text, "done": False})
+                            yield sse({"done": True})
 
                     else:
 

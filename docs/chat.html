@@ -286,6 +286,9 @@
         @keyframes gcdot{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 
         .input-area{padding:10px 20px 16px;display:flex;flex-direction:column;align-items:center}
+        .stop-btn{width:34px;height:34px;border-radius:50%;border:none;background:#ef4444;color:#fff;cursor:pointer;font-size:.85rem;display:none;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+        .stop-btn:hover{background:#dc2626;transform:scale(1.05)}
+        .stop-btn.visible{display:flex}
         .input-outer{width:100%;max-width:720px;background:#fff;border:1px solid #e0ddd5;border-radius:14px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 14px rgba(0,0,0,0.03);transition:all .2s cubic-bezier(0.16, 1, 0.3, 1)}
         .inline-model{flex-shrink:0;border-color:transparent;background:rgba(124,58,237,0.06);border-radius:8px;transition:all .15s}
         .inline-model:hover{border-color:#7c3aed;background:rgba(124,58,237,0.1)}
@@ -369,10 +372,14 @@
         .toast.show{opacity:1}
         .hidden{display:none!important}
 
-        @keyframes swarmPulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0.3)}50%{box-shadow:0 0 0 6px rgba(124,58,237,0.1)}}
-        @keyframes swarmSpin{to{transform:rotate(360deg)}}
-        .swarm-running{animation:swarmPulse 1.2s ease-in-out infinite!important;border-color:#7c3aed!important}
-        .swarm-spinner{display:inline-block;width:10px;height:10px;border:2px solid #e0ddd5;border-top-color:#7c3aed;border-radius:50%;animation:swarmSpin .6s linear infinite;vertical-align:middle;margin-right:4px}
+        @keyframes agentPulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0.3)}50%{box-shadow:0 0 0 6px rgba(124,58,237,0.1)}}
+        @keyframes agentSpin{to{transform:rotate(360deg)}}
+        .agent-running{animation:agentPulse 1.2s ease-in-out infinite!important;border-color:#7c3aed!important}
+        .agent-spinner{display:inline-block;width:10px;height:10px;border:2px solid #e0ddd5;border-top-color:#7c3aed;border-radius:50%;animation:agentSpin .6s linear infinite;vertical-align:middle;margin-right:4px}
+        .agent-card{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;transition:all .3s ease;font-size:.75rem}
+        .agent-card.running{background:rgba(124,58,237,0.06);border-left:2px solid #7c3aed}
+        .agent-card.done{border-left:2px solid #16a34a}
+        .agent-card .elapsed{font-size:.6rem;color:#999;margin-left:auto}
         @keyframes pillIn{from{opacity:0;transform:translateY(4px) scale(.95)}to{opacity:1;transform:none}}
         .websearch-row{display:flex;flex-direction:column;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e0ddd5;border-radius:12px;margin:4px 0;box-shadow:0 1px 2px rgba(0,0,0,.03);animation:pillIn .3s ease}
         .websearch-hdr{display:flex;align-items:center;gap:8px;font-size:.8rem;color:#555;font-weight:500}
@@ -506,7 +513,7 @@
             <button class="tb-btn" id="thinkBtn" onclick="toggleThinking()" title="Derin düşünme"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg> Derin</button>
             <button class="tb-btn" onclick="toggleArtifacts()" id="artifactsBtn" title="Artifacts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> Çıktılar</button>
             <button class="tb-btn" onclick="showUploadModal()" title="Dosya yükle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
-            <button class="tb-btn" id="swarmBtn" onclick="toggleSwarm()" title="Swarm Agent"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg> Swarm</button>
+            <button class="tb-btn" id="multiAgentBtn" onclick="toggleMultiAgent()" title="Multi-Agent Orkestrasyon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg> Multi-Agent</button>
             <button class="tb-btn" onclick="toggleBuilder()" title="Site Builder"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Site</button>
         </div>
     </div>
@@ -599,6 +606,9 @@
             </div>
             <button id="sendBtn" class="send-btn" onclick="send()" disabled>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2.5L13.5 8L2.5 13.5V9.5L9.5 8L2.5 6.5V2.5Z"/></svg>
+            </button>
+            <button id="stopBtn" class="stop-btn" onclick="stopGeneration()" title="Yanıtı durdur">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>
             </button>
         </div>
     </div>
@@ -1149,8 +1159,10 @@
     let currentStyle = 'normal';
     let webSearchEnabled = false;
     let extendedThinking = false;
-    let swarmMode = false;
-    let swarmSubtasks = [];
+    let multiAgentMode = false;
+    let multiAgentSubtasks = [];
+    let activeAbortController = null;
+    let multiAgentSessionId = 'ma-' + Date.now();
     let artifacts = [];
     let pendingFile = null;
     let activeTab = 'chats';
@@ -1898,8 +1910,8 @@ function renderSettingsStyles() {
     function thinkBtnHTML(open) {
         return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>' + (open ? 'Açık' : 'Derin');
     }
-    function swarmBtnHTML(on) {
-        return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg>' + (on ? 'Swarm: Açık' : 'Swarm');
+    function multiAgentBtnHTML(on) {
+        return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg>' + (on ? 'Multi-Agent: Açık' : 'Multi-Agent');
     }
 
     function toggleThinking() {
@@ -1911,37 +1923,83 @@ function renderSettingsStyles() {
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
-    function toggleSwarm() {
-        swarmMode = !swarmMode;
-        document.getElementById('swarmBtn').classList.toggle('active', swarmMode);
-        document.getElementById('swarmBtn').classList.toggle('swarm-running', swarmMode);
-        document.getElementById('swarmBtn').innerHTML = swarmBtnHTML(swarmMode);
-        renderSwarmSubtasks([]);
-        toast(swarmMode ? 'Swarm Agent açık — paralel alt ajanlar çalışacak' : 'Swarm kapalı');
+    function toggleMultiAgent() {
+        multiAgentMode = !multiAgentMode;
+        document.getElementById('multiAgentBtn').classList.toggle('active', multiAgentMode);
+        document.getElementById('multiAgentBtn').classList.toggle('agent-running', multiAgentMode);
+        document.getElementById('multiAgentBtn').innerHTML = multiAgentBtnHTML(multiAgentMode);
+        renderAgentPanel([]);
+        toast(multiAgentMode ? 'Multi-Agent açık — paralel ajanlar çalışacak' : 'Multi-Agent kapalı');
     }
 
-    function renderSwarmSubtasks(tasks) {
+    function showStopBtn() {
+        document.getElementById('sendBtn').style.display = 'none';
+        document.getElementById('stopBtn').classList.add('visible');
+    }
+    function hideStopBtn() {
+        document.getElementById('stopBtn').classList.remove('visible');
+        document.getElementById('sendBtn').style.display = '';
+    }
+
+    function stopGeneration() {
+        if (activeAbortController) {
+            activeAbortController.abort();
+            activeAbortController = null;
+        }
+        // Backend'e de iptal gönder
+        fetch('/api/multi-agent/abort', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({session_id: multiAgentSessionId})
+        }).catch(() => {});
+        hideStopBtn();
+        busy = false;
+        updateBtn();
+        showThinkDone();
+        toast('Yanıt durduruldu');
+    }
+
+    const AGENT_ICONS = {
+        clipboard: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>',
+        brain: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 017 7c0 2.5-1.3 4.8-3.4 6.2L12 18l-3.6-2.8C6.3 13.8 5 11.5 5 9a7 7 0 017-7z"/></svg>',
+        globe: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>',
+        database: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',
+        code: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+        languages: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1"/><path d="M22 22l-5-10-5 10M14 18h6"/></svg>',
+        sparkles: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/></svg>',
+        bot: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="16" r="1"/></svg>',
+    };
+
+    function renderAgentPanel(agents, results) {
         const inner = document.getElementById('msgsInner');
-        let existing = document.getElementById('swarmPanel');
-        if (!tasks || !tasks.length) {
+        let existing = document.getElementById('agentPanel');
+        if (!agents || !agents.length) {
             if (existing) existing.remove();
             return;
         }
         if (!existing) {
             existing = document.createElement('div');
-            existing.id = 'swarmPanel';
-            existing.style.cssText = 'margin-bottom:8px;padding:12px 14px;background:#f8f8f8;border:1px solid #e0ddd5;border-radius:10px;font-size:.75rem';
+            existing.id = 'agentPanel';
+            existing.style.cssText = 'margin-bottom:8px;padding:14px 16px;background:linear-gradient(135deg,#faf9ff,#f5f3ff);border:1px solid #e0ddd5;border-radius:12px;font-size:.75rem';
             inner.appendChild(existing);
         }
-        existing.innerHTML = '<div style="font-weight:600;margin-bottom:8px;color:#7c3aed"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg>Swarm Agent <span class="swarm-spinner"></span> — Alt Ajanlar</div>'
-            + tasks.map(t =>
-                '<div style="display:flex;align-items:center;gap:8px;padding:4px 0' + (t.status === 'running' ? ';border-radius:6px;background:rgba(124,58,237,0.04)' : '') + '">'
-                + '<span>' + (t.status === 'running' ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' : t.status === 'done' ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>') + '</span>'
-                + '<span>' + (SKILL_ICONS[t.icon] || '') + '</span>'
-                + '<span style="color:#333">' + t.label + '</span>'
-                + '<span style="margin-left:auto;font-size:.65rem;color:' + (t.status === 'done' ? '#16a34a' : '#7c3aed') + '">' + t.status + '</span>'
-                + '</div>'
-            ).join('');
+        const hdr = '<div style="font-weight:600;margin-bottom:10px;color:#7c3aed;display:flex;align-items:center;gap:6px">'
+            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg>'
+            + 'Multi-Agent Orkestrasyon <span class="agent-spinner"></span></div>';
+        const cards = agents.map(a => {
+            const status = (results && results[a.id]) ? 'done' : 'running';
+            const elapsed = (results && results[a.id] && results[a.id].elapsed) ? results[a.id].elapsed + 's' : '';
+            const icon = AGENT_ICONS[a.icon] || AGENT_ICONS.bot;
+            return '<div class="agent-card ' + status + '">'
+                + '<span>' + icon + '</span>'
+                + '<span style="color:#333;font-weight:500">' + a.label + '</span>'
+                + (status === 'done'
+                    ? '<span style="color:#16a34a;font-size:.65rem">✓ tamamlandı</span>'
+                    : '<span style="color:#7c3aed;font-size:.65rem">çalışıyor...</span>')
+                + (elapsed ? '<span class="elapsed">' + elapsed + '</span>' : '')
+                + '</div>';
+        }).join('');
+        existing.innerHTML = hdr + cards;
         scrollBottom();
     }
 
@@ -2068,7 +2126,8 @@ function renderSettingsStyles() {
     function addSbMsg(role, text, html) {
         const el = document.createElement('div');
         el.className = 'msg ' + role;
-        el.innerHTML = '<div class="hdr"><div class="av">' + (role === 'user' ? 'S' : '<img src="glassescat-logo.png" alt="" onerror="this.onerror=null;this.src=\'/static/glassescat-logo.png\';">\'<svg width=\\\'20\\\' height=\\\'20\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'#7c3aed\\\'><path d=\\\'M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z\\\'/></svg>\'" style="width:100%;height:100%;object-fit:contain;border-radius:50%">') + '</div><span class="nm">' + (role === 'user' ? 'Sen' : 'GlassesCat') + '</span></div><div class="ct">' + (role === 'user' ? esc(text) : (html ? text : format(text))) + '</div>';
+        const avHtml = role === 'user' ? 'S' : '<img src="glassescat-logo.png" alt="GlassesCat" onerror="this.onerror=null;this.src=\'/static/glassescat-logo.png\';" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">';
+        el.innerHTML = '<div class="hdr"><div class="av">' + avHtml + '</div><span class="nm">' + (role === 'user' ? 'Sen' : 'GlassesCat') + '</span></div><div class="ct">' + (role === 'user' ? esc(text) : (html ? text : format(text))) + '</div>';
         document.getElementById('sbMsgs').appendChild(el);
         setTimeout(() => { const w = document.getElementById('sbMsgs'); if (w) w.scrollTop = w.scrollHeight; }, 20);
     }
@@ -2776,7 +2835,7 @@ function renderSettingsStyles() {
         const av = document.createElement('div');
         av.className = 'av';
         if (role === 'user') av.textContent = 'S';
-        else av.innerHTML = '<img src="glassescat-logo.png" alt="" onerror="this.onerror=null;this.src=\'/static/glassescat-logo.png\';">\'<svg width=\\\'26\\\' height=\\\'26\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'#7c3aed\\\'><path d=\\\'M4 9c0-4 4-6 8-6s8 2 8 6v6h-2v3a3 3 0 0 1-3 3h-2v-2h2a1 1 0 0 0 1-1v-3H4V9zm3-1a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM2 15h10v2H2v-2z\\\'/></svg>\'">';
+        else av.innerHTML = '<img src="glassescat-logo.png" alt="GlassesCat" onerror="this.onerror=null;this.src=\'/static/glassescat-logo.png\';" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">';
         hdr.appendChild(av);
         const nm = document.createElement('span');
         nm.className = 'nm';
@@ -2965,6 +3024,8 @@ function renderSettingsStyles() {
         const b = document.getElementById('sendBtn');
         b.disabled = !v || busy;
         b.classList.toggle('active', v.length > 0);
+        // Busy iken stop butonu göster
+        if (busy) { showStopBtn(); } else { hideStopBtn(); }
     }
 
     function checkSlash() {
@@ -3005,35 +3066,85 @@ function renderSettingsStyles() {
             chats[chatId].title = t.slice(0, 40);
         }
         addMsg('user', t, true);
-        i.value = ''; resize(i); updateBtn(); busy = true;
+        i.value = ''; resize(i); busy = true; updateBtn();
         const wantSearch = webSearchEnabled || t.toLowerCase().startsWith('/search ');
         const sk = (!wantSearch && !isSlash) ? matchSkill(t) : null;
-        if (swarmMode && !isSlash) {
-            showThink('Swarm Multi-Agent Motoru Aktif', '✦ 6 Paralel Alt Ajan Eşzamanlı Çalışıyor...');
-            await new Promise(r => setTimeout(r, 300));
+        if (multiAgentMode && !isSlash) {
+            showThink('Multi-Agent Orkestrasyon Aktif', '✦ Paralel Ajanlar Eşzamanlı Çalışıyor...');
+            await new Promise(r => setTimeout(r, 200));
             try {
-                const tasks = [
-                    {name:'web_search', label:'Web\'de ara', icon:'globe', status:'running'},
-                    {name:'memory_search', label:'Hafızada ara', icon:'book', status:'running'},
-                    {name:'ai_analyze', label:'AI analiz', icon:'robot', status:'running'},
-                    {name:'code_gen', label:'Kod üretimi', icon:'code', status:'running'},
-                    {name:'skill_matcher', label:'Skill eşleştirme', icon:'target', status:'running'},
-                    {name:'translate', label:'Çeviri', icon:'globe', status:'running'}
-                ];
-                renderSwarmSubtasks(tasks);
-                const res = await fetch('/api/swarm', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})});
-                const d = await res.json();
-                showThinkDone();
-                if (d.success) {
-                    renderSwarmSubtasks(d.subtasks || tasks.map(s=>({...s,status:'done'})));
-                    await typeText(d.response, true);
-                } else {
-                    renderSwarmSubtasks([]);
-                    addMsg('ai', 'Swarm hatası: ' + (d.error || 'bilinmeyen'), true);
+                activeAbortController = new AbortController();
+                multiAgentSessionId = 'ma-' + Date.now();
+                addMsg('ai', '', true);
+                const el = document.getElementById('msgsInner').lastElementChild;
+                const ct = el.querySelector('.ct');
+                const typer = createTyper(ct);
+                let agentInfos = [];
+                let agentResults = {};
+                let fullText = '';
+
+                const res = await fetch('/api/multi-agent/run', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: t, session_id: multiAgentSessionId}),
+                    signal: activeAbortController.signal
+                });
+                const reader = res.body.getReader();
+                const dec = new TextDecoder();
+                let buf = '';
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    buf += dec.decode(value, {stream: true});
+                    let idx;
+                    while ((idx = buf.indexOf('\n\n')) !== -1) {
+                        const chunk = buf.slice(0, idx).trim();
+                        buf = buf.slice(idx + 2);
+                        if (!chunk.startsWith('data:')) continue;
+                        let d;
+                        try { d = JSON.parse(chunk.slice(5).trim()); } catch(e) { continue; }
+
+                        if (d.type === 'plan') {
+                            agentInfos = d.agents || [];
+                            renderAgentPanel(agentInfos, {});
+                        } else if (d.type === 'agent_start') {
+                            // Zaten panel'de running olarak gösteriliyor
+                        } else if (d.type === 'agent_done') {
+                            agentResults[d.agent] = {elapsed: d.elapsed, result: d.result};
+                            renderAgentPanel(agentInfos, agentResults);
+                        } else if (d.type === 'token') {
+                            fullText += d.content;
+                            typer.push(d.content);
+                        } else if (d.type === 'done') {
+                            fullText = d.full_response || fullText;
+                        } else if (d.type === 'error') {
+                            if (d.message !== 'İptal edildi') {
+                                addMsg('ai', 'Multi-Agent hatası: ' + d.message, true);
+                            }
+                            break;
+                        }
+                    }
                 }
+                typer.flush();
+                ct.innerHTML = format(fullText);
+                // Tüm ajanları done olarak göster
+                agentInfos.forEach(a => { if (!agentResults[a.id]) agentResults[a.id] = {elapsed: 0}; });
+                renderAgentPanel(agentInfos, agentResults);
+                showThinkDone();
+                if (chatId && chats[chatId]) {
+                    const ms = chats[chatId].msgs;
+                    if (ms.length) ms[ms.length - 1].text = fullText;
+                }
+                setTimeout(() => hljs.highlightAll(), 50);
             } catch(e) {
-                renderSwarmSubtasks([]);
-                addMsg('ai', 'Swarm hatası: ' + e.message, true);
+                if (e.name === 'AbortError') {
+                    toast('Multi-Agent durduruldu');
+                } else {
+                    renderAgentPanel([]);
+                    addMsg('ai', 'Multi-Agent hatası: ' + e.message, true);
+                }
+            } finally {
+                activeAbortController = null;
             }
         } else if (wantSearch) {
             if (!demoMode) {
