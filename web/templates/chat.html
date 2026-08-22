@@ -67,44 +67,68 @@
         .model-opt.disabled{opacity:.3;cursor:default}
         .sep{height:1px;background:#e0ddd5;margin:4px 8px}
 
-        .content-area{flex:1;display:flex;overflow:hidden;position:relative}
-        .msgs-wrap{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-        .msgs-inner{width:100%;max-width:720px;margin:0 auto;flex:1;display:flex;flex-direction:column;padding:20px 24px 8px}
+        /* ─── CYBER OMNIBOX & DARK STUDIO AESTHETICS (MATCHING REFERENCE UI) ─── */
+        body { background: #08070d; color: #e2daf8; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .sidebar { background: #0c0a13; border-right: 1px solid rgba(255, 255, 255, 0.08); color: #dfd6cd; }
+        .sidebar-brand-text { color: #fff; }
+        .sidebar-search, .new-chat-btn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
+        .new-chat-btn:hover { background: #1a1628; border-color: #7c3aed; color: #fff; }
+        .sidebar-tabs { border-bottom-color: rgba(255, 255, 255, 0.08); }
+        .sidebar-tab { color: #888; }
+        .sidebar-tab.active { color: #c084fc; border-bottom-color: #a855f7; }
+        .chat-item { color: #aaa; }
+        .chat-item:hover { background: rgba(124,58,237,0.1); color: #fff; }
+        .chat-item.active { background: rgba(124,58,237,0.2); color: #c084fc; }
+        .sidebar-footer { border-top-color: rgba(255, 255, 255, 0.08); background: #0c0a13; }
+        #userProfileBtn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
+        .topbar { background: rgba(12, 10, 19, 0.85); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .tb-btn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
+        .tb-btn:hover { border-color: #7c3aed; color: #fff; }
+        .tb-btn.active { background: rgba(124,58,237,0.2); border-color: #7c3aed; color: #c084fc; }
+        .content-area { background: radial-gradient(circle at 50% 38%, rgba(124, 58, 237, 0.14) 0%, rgba(10, 9, 16, 0.85) 60%, #08070d 100%); }
+        .input-area { background: transparent; border-top: none; }
 
-        .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:0 24px 10vh}
-        .welcome-logo{width:52px;height:52px;border-radius:50%;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:20px;font-size:1.6rem}
-        .welcome-logo img{width:100%;height:100%;object-fit:contain;border-radius:50%}
-        .welcome-logo .fallback{display:none}
-        .welcome h1{font-size:1.5rem;font-weight:600;letter-spacing:-.02em;color:#1a1a1a}
-        .welcome .sub{color:#888;font-size:.85rem;margin-top:4px}
-        .welcome .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:28px;justify-content:center;max-width:400px}
-        .welcome .chip{padding:7px 18px;border-radius:100px;border:1px solid #e0ddd5;background:#fff;color:#555;font-size:.8rem;cursor:pointer;transition:all .15s;font-family:inherit}
-        .welcome .chip:hover{border-color:#7c3aed;color:#7c3aed}
+        /* Center Welcome Branding */
+        .welcome { padding: 0 20px 8vh; }
+        .welcome-cyber-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 24px; }
+        .welcome-cyber-title { font-size: 1.6rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+        .welcome-cyber-badge { font-size: 0.68rem; padding: 3px 10px; border-radius: 100px; background: rgba(124, 58, 237, 0.25); color: #c084fc; border: 1px solid rgba(124, 58, 237, 0.4); font-weight: 600; letter-spacing: 0.04em; }
 
-        .msg{padding:14px 0;animation:fadeIn .2s ease-out}
-        .msg .hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-        .msg .av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:600;overflow:hidden;flex-shrink:0}
-        .msg .av img{width:100%;height:100%;object-fit:contain}
-        .msg.user .av{background:#e0ddd5;color:#555}
-        .msg.ai .av{background:rgba(124,58,237,0.08)}
-        .msg .nm{font-size:.8rem;font-weight:600;color:#333}
-        .msg .actions{display:flex;gap:4px;margin-left:auto}
-        .msg .actions button{background:none;border:none;color:#bbb;cursor:pointer;font-size:.7rem;padding:2px 4px;border-radius:4px;transition:all .1s}
-        .msg .actions button:hover{color:#7c3aed;background:rgba(124,58,237,0.04)}
-        .msg .ct{margin-left:34px;font-size:.88rem;line-height:1.7;color:#2a2a2a}
-        .msg .ct pre{background:#f8f8f8!important;border:1px solid #e0ddd5;border-radius:8px;padding:12px;margin:8px 0;overflow-x:auto;font-family:'JetBrains Mono','Courier New',monospace;font-size:.78rem}
-        .msg .ct :not(pre)>code{background:rgba(124,58,237,0.06);color:#7c3aed;padding:1px 5px;border-radius:3px;font-size:.82rem}
-        .msg .ct img{max-width:100%;border-radius:8px;margin:8px 0}
-        .msg .edit-area{display:none;margin-left:34px;margin-top:6px}
-        .msg .edit-area.show{display:block}
-        .msg .edit-area textarea{width:100%;padding:10px;border:1px solid #e0ddd5;border-radius:8px;background:#fff;font-family:inherit;font-size:.85rem;resize:none;outline:none}
-        .msg .edit-area textarea:focus{border-color:#7c3aed}
-        .msg .edit-actions{display:flex;gap:6px;margin-top:6px}
-        .msg .edit-actions button{padding:5px 14px;border-radius:6px;border:1px solid #e0ddd5;cursor:pointer;font-size:.75rem;font-family:inherit;transition:all .1s}
-        .msg .edit-actions .save{background:#7c3aed;color:#fff;border-color:#7c3aed}
-        .msg .edit-actions .save:hover{background:#6d28d9}
-        .msg .edit-actions .cancel{background:#fff;color:#555}
-        .msg .edit-actions .cancel:hover{background:#f5f5f5}
+        /* Context Pills Bar above Omnibox */
+        .cyber-context-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; justify-content: flex-start; width: 100%; max-width: 760px; }
+        .cyber-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 100px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #dfd6cd; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; position: relative; user-select: none; }
+        .cyber-pill:hover { background: rgba(124, 58, 237, 0.2); border-color: rgba(124, 58, 237, 0.4); color: #fff; }
+
+        /* Floating Omnibox Card */
+        .cyber-omnibox-card { width: 100%; max-width: 760px; background: rgba(18, 15, 28, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 20px; padding: 18px 20px 14px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(124, 58, 237, 0.12); transition: all 0.2s ease; display: flex; flex-direction: column; margin: 0 auto; }
+        .cyber-omnibox-card:focus-within { border-color: rgba(124, 58, 237, 0.6); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(124, 58, 237, 0.25); }
+        .cyber-textarea { width: 100%; background: transparent; border: none; outline: none; color: #fff; font-family: inherit; font-size: 0.95rem; line-height: 1.6; resize: none; min-height: 48px; max-height: 200px; }
+        .cyber-textarea::placeholder { color: rgba(255, 255, 255, 0.35); }
+        .cyber-bottom-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 8px; flex-wrap: wrap; }
+        .cyber-left-tools, .cyber-right-tools { display: flex; align-items: center; gap: 8px; }
+        .cyber-icon-btn { width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+        .cyber-icon-btn:hover { background: rgba(124, 58, 237, 0.25); color: #fff; border-color: #7c3aed; }
+        .cyber-pill-inline { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #ccc; font-size: 0.74rem; cursor: pointer; transition: all 0.15s; position: relative; user-select: none; }
+        .cyber-pill-inline:hover { background: rgba(124, 58, 237, 0.18); color: #fff; border-color: rgba(124, 58, 237, 0.35); }
+        .cyber-dot { width: 6px; height: 6px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px #a855f7; }
+        .cyber-send-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: #a78bfa; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .cyber-send-btn:not(:disabled) { background: #7c3aed; color: #fff; box-shadow: 0 0 16px rgba(124, 58, 237, 0.6); transform: scale(1.05); }
+        .cyber-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .cyber-stop-btn { width: 36px; height: 36px; border-radius: 50%; background: #dc2626; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        /* Cyber Dropdown */
+        .cyber-dropdown { position: absolute; bottom: calc(100% + 8px); left: 0; min-width: 230px; background: #13101d; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 12px; padding: 6px; z-index: 100; display: none; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7); animation: fadeIn 0.15s ease; }
+        .cyber-dropdown.right-align { left: auto; right: 0; }
+        .cyber-dropdown.show { display: block; }
+        .cyber-opt { padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.76rem; color: #dfd6cd; transition: background 0.1s; display: flex; flex-direction: column; text-align: left; }
+        .cyber-opt:hover { background: rgba(124, 58, 237, 0.25); color: #fff; }
+        .cyber-opt.active { background: rgba(124, 58, 237, 0.35); color: #c084fc; font-weight: 600; }
+        .cyber-opt .sub { font-size: 0.62rem; color: #888; margin-top: 2px; }
+        .cyber-sep { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 4px 6px; }
+
+        .msg.user .ct { background: rgba(255, 255, 255, 0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; }
+        .msg.ai .ct { color: #e0d9fc; }
+        .msg.ai pre { background: #120f1e !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #f3e8ff; }
 
         /* ─── NEURAL THINKING HUD (FUTURISTIC / QUANTUM AI) ─── */
         .neural-think-hud {
@@ -524,17 +548,13 @@
     <div class="content-area">
         <div class="msgs-wrap" id="msgsWrap">
             <div id="welcome" class="welcome">
-                <div class="welcome-logo">
-                    <img src="glassescat-logo.png" alt="Elythra-AI GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'">
-                    <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
-                </div>
-                <h1 id="welcomeGreeting">Merhaba, <span id="welcomeUserName" style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Kullanıcı</span>! 👋</h1>
-                <div class="welcome-sub" id="welcomeSubGreeting">GlassesCat AI & 🔥 EPIC 671B Nexus Motoru Aktif. Bugün ne inşa ediyoruz?</div>
-                <div class="chips">
-                    <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
-                    <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
-                    <button class="chip" onclick="sendSug('Sistem durumunu göster')">Sistem İstatistikleri</button>
-                    <button class="chip" onclick="sendSug('EpicCoder yetenekleri ve otonom kodlama')">⚡ EpicCoder Motoru</button>
+                <div class="welcome-cyber-brand">
+                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden">
+                        <img src="glassescat-logo.png" alt="GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'" style="width:100%;height:100%;object-fit:cover">
+                    </div>
+                    <div class="welcome-cyber-title">
+                        探索未至之境 <span class="welcome-cyber-badge">EPIC v4.0</span>
+                    </div>
                 </div>
             </div>
             <div id="msgsInner" class="msgs-inner hidden"></div>
@@ -549,7 +569,7 @@
         </div>
     </div>
 
-    <div class="input-area" style="position:relative">
+    <div class="input-area" style="position:relative;padding:0 20px 24px;width:100%;max-width:800px;margin:0 auto">
         <!-- Futuristic Neural Thinking HUD -->
         <div id="think" class="neural-think-hud" style="display:none">
             <div class="neural-hud-left">
@@ -588,30 +608,71 @@
             <div class="slash-opt" onclick="runSlash('/export')"><span class="key">/export</span><span class="desc">Sohbeti dışa aktar</span></div>
             <div class="slash-opt" onclick="runSlash('/share')"><span class="key">/share</span><span class="desc">Paylaşım linki</span></div>
         </div>
-        <div class="input-outer" id="inputOuter">
-            <div class="model-selector inline-model" onclick="toggleDropdown('modelDropdown')">
-                <span class="dot"></span>
-                <span id="modelName">🔥 EPIC</span>
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                <div id="modelDropdown" class="model-dropdown">
-                    <div class="model-opt active" onclick="selectModel('EPIC')">🔥 EPIC (671B Nexus)<span class="sub">GlassesGlitchStudio Flagship (Aktif)</span></div>
-                    <div class="model-opt" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1 14B<span class="sub">UE5 & C++ Amiral Gemisi</span></div>
-                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
-                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
-                    <div class="model-opt" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
-                    <div class="model-opt" onclick="selectModel('qwen2.5-coder:14b')">Qwen 2.5 Coder 14B<span class="sub">kodlama uzmanı</span></div>
+
+        <!-- Context Pills Bar above Omnibox (Matching Image) -->
+        <div class="cyber-context-bar">
+            <div class="cyber-pill" onclick="toggleDropdown('projectPillDropdown')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span id="activeProjectPillName">dsh-demo</span>
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                <div id="projectPillDropdown" class="cyber-dropdown">
+                    <div class="cyber-opt active" onclick="selectPillProject('proj_ue5_spatial', 'dsh-demo')">📁 dsh-demo (UE5 Spatial Audio)</div>
+                    <div class="cyber-opt" onclick="selectPillProject('proj_python_sqlite', 'python-engine')">📁 python-engine (SQLite Core)</div>
+                    <div class="cyber-opt" onclick="selectPillProject('proj_cyber_web', 'cyber-studio')">📁 cyber-studio (Web Viewer)</div>
+                    <div class="cyber-sep"></div>
+                    <div class="cyber-opt" onclick="createProject()">+ Yeni Proje Oluştur...</div>
                 </div>
             </div>
-            <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yazın veya / komutları..." oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
-            <div class="input-tools">
-                <button onclick="showUploadModal()" title="Dosya yükle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+            <div class="cyber-pill" onclick="toggleDropdown('modePillDropdown')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4"/></svg>
+                <span id="activeModePillName">创造模式</span>
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                <div id="modePillDropdown" class="cyber-dropdown">
+                    <div class="cyber-opt active" onclick="selectPillMode('code', '创造模式')">🧬 创造模式 (Otonom Kodlama)</div>
+                    <div class="cyber-opt" onclick="selectPillMode('multiagent', 'Multi-Agent')">⚡ Multi-Agent Nexus</div>
+                    <div class="cyber-opt" onclick="selectPillMode('chat', 'Sohbet Modu')">💬 Standart Sohbet</div>
+                </div>
             </div>
-            <button id="sendBtn" class="send-btn" onclick="send()" disabled>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2.5L13.5 8L2.5 13.5V9.5L9.5 8L2.5 6.5V2.5Z"/></svg>
-            </button>
-            <button id="stopBtn" class="stop-btn" onclick="stopGeneration()" title="Yanıtı durdur">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>
-            </button>
+        </div>
+
+        <!-- Floating Cyber Omnibox Card (Matching Image) -->
+        <div class="cyber-omnibox-card" id="inputOuter">
+            <textarea id="inputBox" class="cyber-textarea" rows="2" placeholder="描述你想要构建的内容 (Geliştirmek istediğin projeyi veya kodu tanımla...)" oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
+            <div class="cyber-bottom-bar">
+                <div class="cyber-left-tools">
+                    <button class="cyber-icon-btn" onclick="showUploadModal()" title="Dosya Ekle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                    <div class="cyber-pill-inline" onclick="toggleDropdown('workspaceWriteDropdown')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span id="workspaceModeLabel">Workspace Write</span>
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                        <div id="workspaceWriteDropdown" class="cyber-dropdown">
+                            <div class="cyber-opt active" onclick="setWorkspaceMode('Workspace Write')">🛡️ Workspace Write (Tam Erişim)</div>
+                            <div class="cyber-opt" onclick="setWorkspaceMode('Read Only')">🔒 Read Only (Salt Okunur)</div>
+                            <div class="cyber-opt" onclick="setWorkspaceMode('Autonomous')">⚡ Autonomous Execute (Otonom)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cyber-right-tools">
+                    <div class="cyber-pill-inline" onclick="toggleDropdown('modelDropdown')">
+                        <span class="cyber-dot"></span>
+                        <span id="modelName">🔥 EPIC High</span>
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                        <div id="modelDropdown" class="cyber-dropdown right-align">
+                            <div class="cyber-opt active" onclick="selectModel('EPIC')">🔥 EPIC (671B Nexus) High<span class="sub">GlassesGlitchStudio Flagship</span></div>
+                            <div class="cyber-opt" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1 14B<span class="sub">UE5 & C++ Amiral Gemisi</span></div>
+                            <div class="cyber-opt" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
+                            <div class="cyber-opt" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
+                            <div class="cyber-opt" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
+                        </div>
+                    </div>
+                    <button id="sendBtn" class="cyber-send-btn" onclick="send()" disabled title="Gönder">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                    </button>
+                    <button id="stopBtn" class="cyber-stop-btn" onclick="stopGeneration()" title="Durdur" style="display:none">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1326,7 +1387,43 @@
     }
 
     function toggleDropdown(id) {
-        document.getElementById(id).classList.toggle('show');
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('show');
+    }
+
+    function selectPillProject(projId, label) {
+        const p = sampleDemoProjects.find(x => x.id === projId);
+        const nameToShow = label || (p ? p.name : projId);
+        const el = document.getElementById('activeProjectPillName');
+        if (el) el.textContent = nameToShow;
+        toast('📁 Proje Bağlandı: ' + nameToShow);
+        const d = document.getElementById('projectPillDropdown');
+        if (d) d.classList.remove('show');
+    }
+
+    function selectPillMode(mode, label) {
+        const el = document.getElementById('activeModePillName');
+        if (el) el.textContent = label;
+        if (mode === 'multiagent') {
+            multiAgentMode = true;
+            const b = document.getElementById('multiAgentBtn');
+            if (b) b.classList.add('active');
+        } else {
+            multiAgentMode = false;
+            const b = document.getElementById('multiAgentBtn');
+            if (b) b.classList.remove('active');
+        }
+        toast('🧬 Mod: ' + label);
+        const d = document.getElementById('modePillDropdown');
+        if (d) d.classList.remove('show');
+    }
+
+    function setWorkspaceMode(mode) {
+        const el = document.getElementById('workspaceModeLabel');
+        if (el) el.textContent = mode;
+        toast('🛡️ İzin Düzeyi: ' + mode);
+        const d = document.getElementById('workspaceWriteDropdown');
+        if (d) d.classList.remove('show');
     }
 
     function selectModel(id) {
