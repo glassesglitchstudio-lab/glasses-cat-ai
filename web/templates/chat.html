@@ -3097,11 +3097,13 @@
             }
         } else if (sk) {
             showThink((sk.name || 'Özel Yetenek').toUpperCase() + ' Yeteneği Yürütülüyor', '✦ Özel Ajan Protokolü Devrede...');
-            await new Promise(r => setTimeout(r, 450));
+            await new Promise(r => setTimeout(r, 200));
             showSkillBadge(sk);
-            await new Promise(r => setTimeout(r, 400));
-            const r = await skillResponse(sk, t);
-            await typeText(r, true);
+            try {
+                await streamReply(t);
+            } catch(e) {
+                console.warn('Chat error:', e);
+            }
         } else if (isSlash) {
             const r = handleSlash(t);
             await typeText(r, true);
