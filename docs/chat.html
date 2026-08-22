@@ -3318,8 +3318,9 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
 
         const ext = (file.ext || file.name || '').toLowerCase();
         const content = file.content || '';
+        const isHtml = content.includes('<!DOCTYPE') || content.includes('<html') || content.includes('<canvas') || content.includes('<body') || ext.endsWith('.html') || ext.endsWith('.htm');
 
-        if (ext.endsWith('.html') || ext.endsWith('.htm')) {
+        if (isHtml) {
             if (iframe) {
                 iframe.style.display = 'block';
                 iframe.srcdoc = content;
@@ -3342,7 +3343,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         } else {
             if (md) {
                 md.style.display = 'block';
-                md.innerHTML = '<div style="padding:20px;color:#64748b">Bu dosya türü için canlı görüntüleyici desteği yok. ‹/› Kod sekmesinden düzenleyebilirsiniz.</div>';
+                md.innerHTML = '<div style="padding:20px;color:#94a3b8;font-family:monospace;white-space:pre-wrap;line-height:1.6">' + esc(content || 'Dosya boş.') + '</div>';
             }
         }
     }
@@ -3357,20 +3358,23 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         const fname = currentIdeFile.name || '';
         const ext = (currentIdeFile.ext || fname).toLowerCase();
         const content = currentIdeFile.content || '';
+        const isHtml = content.includes('<!DOCTYPE') || content.includes('<html') || content.includes('<canvas') || content.includes('<body') || ext.endsWith('.html') || ext.endsWith('.htm') || ext.endsWith('.svg');
 
         logTerminal(`\n⚡ [${new Date().toLocaleTimeString()}] '${fname}' çalıştırılıyor...`, '#a78bfa');
 
-        if (ext.endsWith('.html') || ext.endsWith('.svg') || ext.endsWith('.htm')) {
+        if (isHtml) {
             switchIdeViewMode('viewer');
             renderViewerContent(currentIdeFile);
-            logTerminal(`✓ Canlı HTML web önizleme penceresine yüklendi.`, '#10b981');
-            toast('✓ Canlı web önizlemesi güncellendi!');
+            logTerminal(`✓ Canlı HTML & Canvas uygulaması önizleme penceresine yüklendi ve başlatıldı.`, '#10b981');
+            toast('✓ Canlı web önizlemesi ve oyun başlatıldı!');
             return;
         }
 
         switchIdeViewMode('terminal');
 
-        if (ext.endsWith('.js') || ext.endsWith('.ts')) {
+        const isJs = ext.endsWith('.js') || ext.endsWith('.ts') || (!ext.endsWith('.py') && !ext.endsWith('.cpp') && !ext.endsWith('.h') && (content.includes('function ') || content.includes('console.log') || content.includes('const ') || content.includes('let ')));
+
+        if (isJs) {
             try {
                 const logs = [];
                 const customConsole = {
@@ -3394,7 +3398,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
             } catch(err) {
                 logTerminal(`❌ Çalışma Zamanı Hatası: ${err.message}`, '#ef4444');
             }
-        } else if (ext.endsWith('.py')) {
+        } else if (ext.endsWith('.py') || content.includes('def ') || content.includes('import ')) {
             logTerminal(`🐍 Python Sözdizimi & Yapısal Doğrulama:`, '#f59e0b');
             const lines = content.split('\n');
             const imports = lines.filter(l => l.trim().startsWith('import ') || l.trim().startsWith('from '));
@@ -3405,7 +3409,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
             logTerminal(`  • Sınıflar (${classes.length}): ${classes.map(c => c.trim().split('(')[0].replace('class ','')).join(', ') || 'Yok'}`, '#94a3b8');
             logTerminal(`  • Fonksiyonlar (${defs.length}): ${defs.map(d => d.trim().split('(')[0].replace('async ','').replace('def ','')).join(', ') || 'Yok'}`, '#94a3b8');
             logTerminal(`✓ Python scripti sözdizimsel olarak geçerli!`, '#10b981');
-        } else if (ext.endsWith('.cpp') || ext.endsWith('.h')) {
+        } else if (ext.endsWith('.cpp') || ext.endsWith('.h') || content.includes('#include') || content.includes('UCLASS')) {
             logTerminal(`🎮 Unreal Engine C++ Derleme Kontrolü:`, '#c084fc');
             const hasUClass = content.includes('UCLASS') || content.includes('GENERATED_BODY');
             const hasModule = content.includes('IModuleInterface') || content.includes('IMPLEMENT_MODULE');
@@ -3413,7 +3417,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
             logTerminal(`  • UE5 Modül Tanımı: ${hasModule ? '✓ Doğru' : 'N/A'}`, '#94a3b8');
             logTerminal(`✓ C++ sözdizimi Unreal Engine 5.4 standartlarına uygun!`, '#10b981');
         } else {
-            logTerminal(`📄 Dosya Okundu (${content.length} bayt, ${content.split('\n').length} satır).`, '#38bdf8');
+            logTerminal(`📄 Dosya İçeriği: (${content.length} bayt, ${content.split('\n').length} satır).`, '#38bdf8');
         }
     }
 
