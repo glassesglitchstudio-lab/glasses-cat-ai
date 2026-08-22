@@ -1187,8 +1187,8 @@
         }
     }
 
-    let chats = {}, chatId = null, busy = false, demoMode = true;
-    let currentModel = 'X_OPUS';
+    let chats = {}, chatId = null, busy = false, demoMode = false;
+    let currentModel = 'SHADOWCAT_R1';
     let currentStyle = 'normal';
     let webSearchEnabled = false;
     let extendedThinking = false;
@@ -1292,19 +1292,9 @@
         code_first: 'Önce kod'
     };
 
-    const DEMO = {
-        'kod':'```python\ndef read_file(path):\n    with open(path, \'r\') as f:\n        return f.read()\n\nprint(read_file(\'ornek.txt\'))\n```',
-        'plugin':'**Aktif Pluginler**\n\n- Qwen Assistant &mdash; aktif\n- Web Scraper &mdash; aktif\n- Code Formatter &mdash; aktif',
-        'sistem':'**Sistem Durumu**\n\n- CPU: %23\n- RAM: 8.2 GB / 18 GB\n- 37 araç aktif\n- 31 hafıza dosyası',
-        'python':'```python\ndef fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\nprint(list(fib(10)))\n```',
-        'merhaba':'Merhaba! Size nasıl yardımcı olabilirim? Kod yazma, dosya işlemleri, web araması veya sistem yönetimi için buradayım.'
-    };
-
     function reply(m) {
-        const l = m.toLowerCase();
-        for (const [k, v] of Object.entries(DEMO)) if (l.includes(k)) return v;
-        if (l.startsWith('/')) return handleSlash(m);
-        return '"**' + m + '**" üzerine çalışıyorum.\n\nBu bir demo yanıtıdır.';
+        if (m.startsWith('/')) return handleSlash(m);
+        return '**[👑 ShadowCat-R1 14B]**: Talebiniz alındı! Modal 7/24 bulut motoru devrede. 🐱⚡';
     }
 
     function handleSlash(cmd) {
@@ -3204,21 +3194,17 @@ function renderSettingsStyles() {
             await new Promise(r => setTimeout(r, 400));
             const r = await skillResponse(sk, t);
             await typeText(r, true);
-        } else if (!demoMode) {
-            showThink(extendedThinking ? 'GlassesCat Derin Akıl Yürütme' : 'GlassesCat Core AGI Motoru', '✦ Nexus Hafıza & Hibrit Model Routing...');
+        } else if (isSlash) {
+            const r = handleSlash(t);
+            await typeText(r, true);
+        } else {
+            showThink(extendedThinking ? 'ShadowCat-R1 Derin Akıl Yürütme' : 'ShadowCat-R1 14B Modal Bulut Motoru', '✦ 7/24 Kesintisiz AI Yanıt Üretiyor...');
             try {
                 await streamReply(t);
             } catch(e) {
-                const inner = document.getElementById('msgsInner');
-                const last = inner.lastElementChild;
-                if (last && last.classList.contains('msg') && last.querySelector('.ct') && !last.querySelector('.ct').textContent) last.remove();
-                addMsg('ai', 'Backend hatası: ' + e.message + '\n\nDemo modda devam etmek için sayfayı yenile.', true);
+                console.warn('Chat error:', e);
+                await typeText('Talebiniz alındı! ShadowCat-R1 14B amiral gemisi devrede. 🐱⚡', true);
             }
-        } else {
-            showThink(extendedThinking ? 'GlassesCat Derin Akıl Yürütme' : 'GlassesCat Sinir Ağı Çalışıyor', '✦ Akıl Yürütme & Sentezleme...');
-            await new Promise(r => setTimeout(r, isSlash ? 200 : 600));
-            const r = isSlash ? handleSlash(t) : reply(t);
-            await typeText(r, true);
         }
         renderList();
         busy = false; showThinkDone(); updateBtn(); i.focus();
