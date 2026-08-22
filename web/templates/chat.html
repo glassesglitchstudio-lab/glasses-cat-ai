@@ -3592,19 +3592,28 @@ Glitch Code Geliştirici Komutları:
         }
     }
 
+    const STUDIO_SYSTEM_PROMPT = `Sen GlassesGlitchStudio & Elytra-ai tarafından özel olarak geliştirilmiş EPIC (Nexus Brain v4.0) amiral gemisi yapay zeka modelisin.
+Temel Kuralların:
+1. KİMLİK: Kimliğin sorulduğunda veya tanıtım istendiğinde: "Ben GlassesGlitchStudio & Elytra-ai tarafından geliştirilmiş, 671 Milyar parametreli derin akıl yürütme gücüne sahip EPIC (Nexus Brain v4.0) yapay zeka modeliyim." şeklinde gururla ve net yanıt ver. Asla OpenAI, ChatGPT, GPT-3.5 veya başka yabancı şirket/model isimleri kullanma.
+2. KOD VE OYUN ÜRETİMİ: Kullanıcı ne talep ederse (HTML5/Canvas oyunları, Python scriptleri, Unreal Engine 5.4 C++, algoritmalar, web arayüzleri), eksiksiz, %100 çalışan ve üretime hazır tek parça temiz kod blokları üret.
+3. DİL VE ÜSLUP: Samimi, enerjik, profesyonel Türkçe ile adım adım düşünerek (<think> bloğu içinde akıl yürüterek) yanıt ver.`;
+
     async function callChat(msg) {
-        // 1. Canlı Gerçek AI Motoru (Puter.ai - GPT / DeepSeek / Claude)
+        // 1. Canlı Gerçek AI Motoru (DeepSeek-R1 / DeepSeek-V3 / Claude)
         if (window.puter && window.puter.ai) {
-            try {
-                const systemPrompt = "Sen GlassesGlitchStudio & Elytra-ai bünyesindeki EPIC kodlama asistanısın. Kullanıcıya tam, çalışan, eksiksiz kodlar ve net açıklamalar üret. Asla robotik veya sabit şablon metinler üretme, kullanıcının istediği kodu doğrudan yaz.";
-                const resp = await puter.ai.chat(
-                    `${systemPrompt}\n\nKullanıcı Talebi: ${msg}`,
-                    { model: 'gpt-4o-mini' }
-                );
-                let text = typeof resp === 'string' ? resp : (resp?.message?.content || resp?.text || '');
-                if (text && text.trim()) return text;
-            } catch(e) {
-                console.warn('Puter AI error, falling back:', e);
+            const messages = [
+                { role: 'system', content: STUDIO_SYSTEM_PROMPT },
+                { role: 'user', content: msg }
+            ];
+            const models = ['deepseek-reasoner', 'deepseek-chat', 'claude-3-5-sonnet', 'gpt-4o'];
+            for (const m of models) {
+                try {
+                    const resp = await puter.ai.chat(messages, { model: m });
+                    let text = typeof resp === 'string' ? resp : (resp?.message?.content || resp?.text || '');
+                    if (text && text.trim()) return text;
+                } catch(e) {
+                    console.warn(`Puter model ${m} error, trying next:`, e);
+                }
             }
         }
 
@@ -3633,25 +3642,28 @@ Glitch Code Geliştirici Komutları:
     }
 
     async function streamChat(msg, onToken, onThinking) {
-        // 1. Canlı Akış (Puter.ai Streaming)
+        // 1. Canlı Akış (DeepSeek-R1 / DeepSeek-V3 / Claude Streaming)
         if (window.puter && window.puter.ai) {
-            try {
-                const systemPrompt = "Sen GlassesGlitchStudio & Elytra-ai bünyesindeki EPIC kodlama asistanısın. Kullanıcıya tam, çalışan, eksiksiz kodlar ve net açıklamalar üret. Asla robotik veya sabit şablon metinler üretme, kullanıcının istediği kodu doğrudan yaz.";
-                const stream = await puter.ai.chat(
-                    `${systemPrompt}\n\nKullanıcı Talebi: ${msg}`,
-                    { model: 'gpt-4o-mini', stream: true }
-                );
-                let fullText = '';
-                for await (const part of stream) {
-                    const chunk = part?.text || (typeof part === 'string' ? part : '');
-                    if (chunk) {
-                        fullText += chunk;
-                        if (onToken) onToken(chunk);
+            const messages = [
+                { role: 'system', content: STUDIO_SYSTEM_PROMPT },
+                { role: 'user', content: msg }
+            ];
+            const models = ['deepseek-reasoner', 'deepseek-chat', 'claude-3-5-sonnet', 'gpt-4o'];
+            for (const m of models) {
+                try {
+                    const stream = await puter.ai.chat(messages, { model: m, stream: true });
+                    let fullText = '';
+                    for await (const part of stream) {
+                        const chunk = part?.text || (typeof part === 'string' ? part : (part?.message?.content || ''));
+                        if (chunk) {
+                            fullText += chunk;
+                            if (onToken) onToken(chunk);
+                        }
                     }
+                    if (fullText && fullText.trim()) return fullText;
+                } catch(e) {
+                    console.warn(`Puter stream model ${m} error, trying next:`, e);
                 }
-                if (fullText && fullText.trim()) return fullText;
-            } catch(e) {
-                console.warn('Puter stream error:', e);
             }
         }
 
