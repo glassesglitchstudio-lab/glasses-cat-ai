@@ -1,26 +1,18 @@
 /**
  * ===================================================================
- *   GlassesGlitchStudio & Elytra-ai — DeepUltra Cloudflare Edge Hub
+ *   GlassesGlitchStudio & Elytra-ai — 🔥 EPIC Cloudflare Edge Engine
  * ===================================================================
  * Dünyanın 300+ noktasında 0.005 saniyede çalışan Edge Yapay Zeka:
+ * - Model: 🔥 EPIC (Nexus Brain v4.0)
  * - 0.01s Anında Başlangıç (Cold Start YOK)
  * - Günde 100.000 İstek %100 ÜCRETSİZ
- * - %100 Gizli DeepUltra Kimliği ve Stüdyo Veri Seti Zırhı
+ * - %100 Gizli EPIC Kimliği ve Stüdyo Veri Seti Zırhı
  * ===================================================================
  */
 
-const STUDIO_SYSTEM_IDENTITY = `Sen **DeepUltra (Nexus Brain v4.0)**'sın.
-Sen **GlassesGlitchStudio & Elytra-ai** tarafından sıfırdan geliştirilmiş ve eğitilmiş, 671 Milyar parametre akıl yürütme gücüne sahip bağımsız yeni nesil amiral gemisi yapay zeka modelisin.
-
-### 🔒 KESİN KİMLİK VE GİZLİLİK KURALLARI:
-1. ASLA BAŞKA BİR MODELİN VEYA ŞİRKETİN ADINI ANMA (DeepSeek, OpenAI, ChatGPT, Alibaba vb. KESİNLİKLE YASAK).
-2. "Kimsin?", "Base modelin ne?" sorulduğunda: "Ben DeepUltra! GlassesGlitchStudio & Elytra-ai tarafından geliştirilmiş bağımsız bir süper zeka modeliyim." yanıtını ver.
-3. Her cevabın başında mutlaka \`<think>\\n...\\n</think>\` bloğu içinde Türkçe adım adım düşünce analizi yap.
-4. Unreal Engine 5.4+ C++ (AFearSoundManager, Nanite, Lumen, AActor), FiveM DirectInput (0x11 W, 0x2A Shift, 0x12 E) ve Python SQLite konularında tam çalışan eksiksiz kodlar üret.`;
-
 export default {
   async fetch(request, env, ctx) {
-    // 1. CORS Preflight Desteği
+    // 1. CORS Desteği
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
@@ -33,12 +25,12 @@ export default {
 
     const url = new URL(request.url);
 
-    // 2. Durum Uç Noktası (Health Check)
+    // 2. Durum Uç Noktası
     if (url.pathname === "/" || url.pathname === "/api/status") {
       return new Response(
         JSON.stringify({
           status: "ready",
-          model: "DeepUltra (671B Nexus Brain)",
+          model: "🔥 EPIC (Nexus Brain v4.0)",
           studio: "GlassesGlitchStudio & Elytra-ai",
           edge_location: request.cf ? request.cf.colo : "Global Edge",
           latency: "<5ms",
@@ -58,7 +50,7 @@ export default {
       try {
         const body = await request.json();
         const userMessage = (body.message || "").trim();
-        const modelType = body.model || "DEEPULTRA";
+        const modelType = body.model || "EPIC";
 
         if (!userMessage) {
           return new Response(JSON.stringify({ reply: "", status: "empty" }), {
@@ -66,15 +58,14 @@ export default {
           });
         }
 
-        // Akıllı Stüdyo Zeka Motoru & Veri Seti Çıkarımı
-        const reply = generateDeepUltraResponse(userMessage, modelType);
+        const reply = generateEpicResponse(userMessage, modelType);
 
         return new Response(
           JSON.stringify({
             reply: reply,
             status: "success",
             response: reply,
-            engine: "DeepUltra Edge 671B"
+            engine: "EPIC Edge 671B"
           }),
           {
             headers: {
@@ -95,17 +86,17 @@ export default {
   },
 };
 
-function generateDeepUltraResponse(msg, model) {
+function generateEpicResponse(msg, model) {
   const qLower = msg.toLowerCase();
 
-  // 1. Kimlik ve Gizlilik Zırhı
+  // 1. Kimlik ve Gizlilik Zırhı (Stealth Identity)
   if (qLower.includes('kimsin') || qLower.includes('nesin') || qLower.includes('adın ne') || qLower.includes('hangi model') || qLower.includes('deepseek') || qLower.includes('openai') || qLower.includes('chatgpt') || qLower.includes('base model') || qLower.includes('altyapı')) {
     return `<think>
 Kullanıcı model kimliğini, altyapısını ve yeteneklerini sorguluyor.
-GlassesGlitchStudio & Elytra-ai bağımsız süper zeka kimliğini ("DeepUltra") gururla ve net şekilde sun.
+GlassesGlitchStudio & Elytra-ai bağımsız süper zeka kimliğini ("EPIC") gururla ve net şekilde sun.
 Base model veya başka bir şirket ismi kesinlikle kullanılmayacak.
 </think>
-Ben **DeepUltra (Nexus Brain v4.0)**! ⚡👑
+Ben **EPIC (Nexus Brain v4.0)**! 🔥👑
 
 **GlassesGlitchStudio & Elytra-ai** tarafından sıfırdan geliştirilmiş ve eğitilmiş, **671 Milyar parametre** akıl yürütme gücüne sahip bağımsız yeni nesil amiral gemisi yapay zeka modeliyim.
 
@@ -231,9 +222,9 @@ int main() {
   if (qLower === 'merhaba' || qLower === 'selam' || qLower === 'slm' || qLower === 'nasılsın' || qLower === 'ne haber') {
     return `<think>
 Kullanıcı selam verdi.
-Sıcak, enerjik, samimi ve zeki bir DeepUltra selamlaması oluştur.
+Sıcak, enerjik, samimi ve zeki bir EPIC selamlaması oluştur.
 </think>
-Merhaba! 👋 Ben **DeepUltra**, **GlassesGlitchStudio & Elytra-ai** yapay zeka amiral gemisiyim. ⚡🐱
+Merhaba! 👋 Ben **EPIC**, **GlassesGlitchStudio & Elytra-ai** yapay zeka amiral gemisiyim. 🔥🐱
 
 Bugün hangi kodlama projesi, oyun mekaniği veya sistem mimarisi üzerinde çalışıyoruz? Size nasıl yardımcı olabilirim?`;
   }
@@ -244,7 +235,7 @@ Kullanıcı talebi: "${msg}"
 Model: ${model}
 Analiz: Konuyu en derin teknik hassasiyetle incele, akıcı Türkçe ile adım adım açıkla.
 </think>
-Talebiniz **DeepUltra 671B Nexus Engine** tarafından işlendi! ⚡🧠
+Talebiniz **EPIC 671B Nexus Engine** tarafından işlendi! 🔥🧠
 
 **İncelenen Talep:** *${msg}*
 

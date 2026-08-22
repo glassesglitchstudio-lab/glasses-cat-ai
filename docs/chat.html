@@ -496,7 +496,7 @@
             <span id="userCloudBadge" style="font-size:.62rem;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:10px;font-weight:600;display:none;">Bulut</span>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span id="sidebarModel">⚡ DeepUltra</span>
+            <span id="sidebarModel">🔥 EPIC</span>
             <button onclick="toggleSettings()">Ayarlar</button>
         </div>
     </div>
@@ -591,10 +591,10 @@
         <div class="input-outer" id="inputOuter">
             <div class="model-selector inline-model" onclick="toggleDropdown('modelDropdown')">
                 <span class="dot"></span>
-                <span id="modelName">⚡ DeepUltra</span>
+                <span id="modelName">🔥 EPIC</span>
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 <div id="modelDropdown" class="model-dropdown">
-                    <div class="model-opt active" onclick="selectModel('DEEPULTRA')">⚡ DeepUltra (671B Nexus)<span class="sub">GlassesGlitchStudio Flagship (Aktif)</span></div>
+                    <div class="model-opt active" onclick="selectModel('EPIC')">🔥 EPIC (671B Nexus)<span class="sub">GlassesGlitchStudio Flagship (Aktif)</span></div>
                     <div class="model-opt" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1 14B<span class="sub">UE5 & C++ Amiral Gemisi</span></div>
                     <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
                     <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
@@ -791,7 +791,7 @@
         <div id="settingsPers" style="margin-top:16px">
             <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Varsayılan Model</label>
             <div style="display:flex;gap:6px;flex-wrap:wrap" id="settingsModels">
-                <button class="sk-tab active" data-model="DEEPULTRA" onclick="selectModel('DEEPULTRA')">⚡ DeepUltra</button>
+                <button class="sk-tab active" data-model="EPIC" onclick="selectModel('EPIC')">🔥 EPIC</button>
                 <button class="sk-tab" data-model="SHADOWCAT_R1" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1</button>
                 <button class="sk-tab" data-model="X_FABLE_CODER" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER</button>
                 <button class="sk-tab" data-model="X_GLITCH_OPUS" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS</button>
@@ -1194,7 +1194,7 @@
     }
 
     let chats = {}, chatId = null, busy = false, demoMode = false;
-    let currentModel = 'DEEPULTRA';
+    let currentModel = 'EPIC';
     let currentStyle = 'normal';
     let webSearchEnabled = false;
     let extendedThinking = false;
@@ -1332,6 +1332,7 @@
     function selectModel(id) {
         currentModel = id;
         const labels = {
+            'EPIC': '🔥 EPIC',
             'DEEPULTRA': '⚡ DeepUltra',
             'SHADOWCAT_R1': '👑 ShadowCat-R1',
             'X_FABLE_CODER': '🚀 X_FABLE_CODER',
