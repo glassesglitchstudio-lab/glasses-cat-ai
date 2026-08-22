@@ -548,13 +548,17 @@
     <div class="content-area">
         <div class="msgs-wrap" id="msgsWrap">
             <div id="welcome" class="welcome">
-                <div class="welcome-cyber-brand">
-                    <div style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden">
-                        <img src="glassescat-logo.png" alt="GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'" style="width:100%;height:100%;object-fit:cover">
-                    </div>
-                    <div class="welcome-cyber-title">
-                        探索未至之境 <span class="welcome-cyber-badge">EPIC v4.0</span>
-                    </div>
+                <div class="welcome-logo">
+                    <img src="glassescat-logo.png" alt="GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'">
+                    <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
+                </div>
+                <h1 id="welcomeGreeting">Merhaba, <span id="welcomeUserName" style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Kullanıcı</span>! 👋</h1>
+                <div class="welcome-sub" id="welcomeSubGreeting">GlassesCat AI & 🔥 EPIC 671B Nexus Motoru Aktif. Bugün ne inşa ediyoruz?</div>
+                <div class="chips">
+                    <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
+                    <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
+                    <button class="chip" onclick="sendSug('Sistem durumunu göster')">Sistem İstatistikleri</button>
+                    <button class="chip" onclick="sendSug('EpicCoder yetenekleri ve otonom kodlama')">⚡ EpicCoder Motoru</button>
                 </div>
             </div>
             <div id="msgsInner" class="msgs-inner hidden"></div>
@@ -569,7 +573,7 @@
         </div>
     </div>
 
-    <div class="input-area" style="position:relative;padding:0 20px 24px;width:100%;max-width:800px;margin:0 auto">
+    <div class="input-area" style="position:relative">
         <!-- Futuristic Neural Thinking HUD -->
         <div id="think" class="neural-think-hud" style="display:none">
             <div class="neural-hud-left">
@@ -609,70 +613,30 @@
             <div class="slash-opt" onclick="runSlash('/share')"><span class="key">/share</span><span class="desc">Paylaşım linki</span></div>
         </div>
 
-        <!-- Context Pills Bar above Omnibox (Matching Image) -->
-        <div class="cyber-context-bar">
-            <div class="cyber-pill" onclick="toggleDropdown('projectPillDropdown')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <span id="activeProjectPillName">dsh-demo</span>
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
-                <div id="projectPillDropdown" class="cyber-dropdown">
-                    <div class="cyber-opt active" onclick="selectPillProject('proj_ue5_spatial', 'dsh-demo')">📁 dsh-demo (UE5 Spatial Audio)</div>
-                    <div class="cyber-opt" onclick="selectPillProject('proj_python_sqlite', 'python-engine')">📁 python-engine (SQLite Core)</div>
-                    <div class="cyber-opt" onclick="selectPillProject('proj_cyber_web', 'cyber-studio')">📁 cyber-studio (Web Viewer)</div>
-                    <div class="cyber-sep"></div>
-                    <div class="cyber-opt" onclick="createProject()">+ Yeni Proje Oluştur...</div>
+        <div class="input-outer" id="inputOuter">
+            <div class="model-selector inline-model" onclick="toggleDropdown('modelDropdown')">
+                <span class="dot"></span>
+                <span id="modelName">🔥 EPIC</span>
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <div id="modelDropdown" class="model-dropdown">
+                    <div class="model-opt active" onclick="selectModel('EPIC')">🔥 EPIC (671B Nexus)<span class="sub">GlassesGlitchStudio Flagship (Aktif)</span></div>
+                    <div class="model-opt" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1 14B<span class="sub">UE5 & C++ Amiral Gemisi</span></div>
+                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
+                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
+                    <div class="model-opt" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
+                    <div class="model-opt" onclick="selectModel('qwen2.5-coder:14b')">Qwen 2.5 Coder 14B<span class="sub">kodlama uzmanı</span></div>
                 </div>
             </div>
-            <div class="cyber-pill" onclick="toggleDropdown('modePillDropdown')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4"/></svg>
-                <span id="activeModePillName">创造模式</span>
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
-                <div id="modePillDropdown" class="cyber-dropdown">
-                    <div class="cyber-opt active" onclick="selectPillMode('code', '创造模式')">🧬 创造模式 (Otonom Kodlama)</div>
-                    <div class="cyber-opt" onclick="selectPillMode('multiagent', 'Multi-Agent')">⚡ Multi-Agent Nexus</div>
-                    <div class="cyber-opt" onclick="selectPillMode('chat', 'Sohbet Modu')">💬 Standart Sohbet</div>
-                </div>
+            <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yazın veya / komutları..." oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
+            <div class="input-tools">
+                <button onclick="showUploadModal()" title="Dosya yükle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
             </div>
-        </div>
-
-        <!-- Floating Cyber Omnibox Card (Matching Image) -->
-        <div class="cyber-omnibox-card" id="inputOuter">
-            <textarea id="inputBox" class="cyber-textarea" rows="2" placeholder="描述你想要构建的内容 (Geliştirmek istediğin projeyi veya kodu tanımla...)" oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
-            <div class="cyber-bottom-bar">
-                <div class="cyber-left-tools">
-                    <button class="cyber-icon-btn" onclick="showUploadModal()" title="Dosya Ekle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-                    <div class="cyber-pill-inline" onclick="toggleDropdown('workspaceWriteDropdown')">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        <span id="workspaceModeLabel">Workspace Write</span>
-                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
-                        <div id="workspaceWriteDropdown" class="cyber-dropdown">
-                            <div class="cyber-opt active" onclick="setWorkspaceMode('Workspace Write')">🛡️ Workspace Write (Tam Erişim)</div>
-                            <div class="cyber-opt" onclick="setWorkspaceMode('Read Only')">🔒 Read Only (Salt Okunur)</div>
-                            <div class="cyber-opt" onclick="setWorkspaceMode('Autonomous')">⚡ Autonomous Execute (Otonom)</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="cyber-right-tools">
-                    <div class="cyber-pill-inline" onclick="toggleDropdown('modelDropdown')">
-                        <span class="cyber-dot"></span>
-                        <span id="modelName">🔥 EPIC High</span>
-                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
-                        <div id="modelDropdown" class="cyber-dropdown right-align">
-                            <div class="cyber-opt active" onclick="selectModel('EPIC')">🔥 EPIC (671B Nexus) High<span class="sub">GlassesGlitchStudio Flagship</span></div>
-                            <div class="cyber-opt" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1 14B<span class="sub">UE5 & C++ Amiral Gemisi</span></div>
-                            <div class="cyber-opt" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
-                            <div class="cyber-opt" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
-                            <div class="cyber-opt" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
-                        </div>
-                    </div>
-                    <button id="sendBtn" class="cyber-send-btn" onclick="send()" disabled title="Gönder">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-                    </button>
-                    <button id="stopBtn" class="cyber-stop-btn" onclick="stopGeneration()" title="Durdur" style="display:none">
-                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>
-                    </button>
-                </div>
-            </div>
+            <button id="sendBtn" class="send-btn" onclick="send()" disabled>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2.5L13.5 8L2.5 13.5V9.5L9.5 8L2.5 6.5V2.5Z"/></svg>
+            </button>
+            <button id="stopBtn" class="stop-btn" onclick="stopGeneration()" title="Yanıtı durdur">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>
+            </button>
         </div>
     </div>
 </div>
@@ -1423,6 +1387,14 @@
         if (el) el.textContent = mode;
         toast('🛡️ İzin Düzeyi: ' + mode);
         const d = document.getElementById('workspaceWriteDropdown');
+        if (d) d.classList.remove('show');
+    }
+
+    function setIdeWorkspaceMode(mode) {
+        const el = document.getElementById('ideWorkspaceModeLabel');
+        if (el) el.textContent = mode;
+        toast('🛡️ Proje İzni: ' + mode);
+        const d = document.getElementById('ideWorkspaceWriteDropdown');
         if (d) d.classList.remove('show');
     }
 
@@ -4189,30 +4161,70 @@ Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engin
                     <div id="ideMarkdown" class="ide-viewer-markdown" style="display:none"></div>
                 </div>
             </div>
-            <div class="ide-ai-panel">
-                <div class="ide-ai-hdr" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a231f;padding-bottom:8px">
-                    <div style="display:flex;align-items:center;gap:6px">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                        <span style="font-weight:700;color:#c084fc;font-size:.82rem">⚡ EpicCoder Studio</span>
+            <div class="ide-ai-panel" style="width:380px;background:#0d0a16;border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;padding:14px;position:relative">
+                <!-- Top Branding -->
+                <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <span style="font-weight:700;color:#fff;font-size:.88rem">探索未至之境</span>
                     </div>
-                    <span style="font-size:.65rem;color:#4ade80;background:rgba(74,222,128,0.1);padding:1px 6px;border-radius:10px;font-weight:600">● Otonom AI</span>
+                    <span class="welcome-cyber-badge">EPIC v4.0</span>
                 </div>
-                <div class="ide-ai-actions" style="margin-top:8px">
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Güvenlik</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Onar</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Test</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Refactor</button>
+
+                <!-- Context Pills inside IDE -->
+                <div class="cyber-context-bar" style="margin-top:10px;margin-bottom:8px;gap:6px">
+                    <div class="cyber-pill" style="font-size:.72rem;padding:4px 10px" onclick="toggleDropdown('ideProjectPillDropdown')">
+                        <span id="ideActiveProjectPillName">📁 dsh-demo</span>
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </div>
+                    <div class="cyber-pill" style="font-size:.72rem;padding:4px 10px" onclick="toggleDropdown('ideModePillDropdown')">
+                        <span id="ideActiveModePillName">🧬 创造模式</span>
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </div>
                 </div>
+
+                <!-- Quick Tools -->
+                <div class="ide-ai-actions" style="margin-top:4px;gap:4px">
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Güvenlik</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Onar</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Test</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Refactor</button>
+                </div>
+                
                 <div class="ide-ai-log" id="ideAiLog" style="display:none"></div>
-                <!-- Interactive EpicCoder Chat Area inside IDE -->
+
+                <!-- Interactive Chat History inside IDE -->
                 <div class="ide-chat-history" id="ideChatHistory" style="flex:1;overflow-y:auto;margin-top:10px;padding-right:4px;display:flex;flex-direction:column;gap:8px;font-size:.75rem">
-                    <div style="padding:10px;border-radius:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.15);color:#dfd6cd">
-                        <span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> Merhaba! Bu projenin kodlarını incelemeye, yeni C++/Python fonksiyonları yazmaya veya hata ayıklamaya hazırım. Dosyanızla ilgili ne yapmamı istersiniz?
+                    <div style="padding:10px;border-radius:10px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.18);color:#dfd6cd">
+                        <span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> Merhaba! Proje çalışma alanı hazır. Dosya düzenlemeye, kod yazmaya ve debug etmeye başlayabiliriz.
                     </div>
                 </div>
-                <div class="ide-chat-input-box" style="margin-top:8px;display:flex;gap:6px;padding-top:8px;border-top:1px solid #2a231f">
-                    <input id="ideChatInput" type="text" placeholder="EpicCoder'a kod yazdır veya soru sor..." style="flex:1;background:#1a1613;border:1px solid #2a231f;border-radius:6px;padding:8px 10px;color:#fff;font-size:.75rem;outline:none" onkeydown="if(event.key==='Enter')sendIdeChat()">
-                    <button onclick="sendIdeChat()" style="background:#7c3aed;border:none;border-radius:6px;color:#fff;padding:8px 12px;cursor:pointer;font-weight:600;font-size:.75rem">Gönder</button>
+
+                <!-- Floating Cyber Omnibox for Project IDE (Matching Reference UI) -->
+                <div class="cyber-omnibox-card" style="margin-top:10px;padding:12px 14px 10px;border-radius:14px;background:rgba(20,17,30,0.95);box-shadow:0 10px 30px rgba(0,0,0,0.5)">
+                    <textarea id="ideChatInput" class="cyber-textarea" rows="2" placeholder="描述你想要构建的内容 (Projeye kod yazdır veya soru sor...)" style="font-size:.82rem;min-height:38px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendIdeChat();}"></textarea>
+                    <div class="cyber-bottom-bar" style="margin-top:8px">
+                        <div class="cyber-left-tools">
+                            <button class="cyber-icon-btn" style="width:28px;height:28px" onclick="toast('Dosya bağlamı eklendi')" title="Dosya Ekle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                            <div class="cyber-pill-inline" style="padding:3px 8px;font-size:.68rem" onclick="toggleDropdown('ideWorkspaceWriteDropdown')">
+                                <span id="ideWorkspaceModeLabel">Workspace Write</span>
+                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                                <div id="ideWorkspaceWriteDropdown" class="cyber-dropdown">
+                                    <div class="cyber-opt active" onclick="setIdeWorkspaceMode('Workspace Write')">🛡️ Workspace Write</div>
+                                    <div class="cyber-opt" onclick="setIdeWorkspaceMode('Read Only')">🔒 Read Only</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cyber-right-tools">
+                            <div class="cyber-pill-inline" style="padding:3px 8px;font-size:.68rem">
+                                <span class="cyber-dot"></span>
+                                <span>EPIC High</span>
+                            </div>
+                            <button class="cyber-send-btn" style="width:30px;height:30px" onclick="sendIdeChat()" title="Gönder">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
