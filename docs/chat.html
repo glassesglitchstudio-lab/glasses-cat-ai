@@ -2021,16 +2021,23 @@
             existing.style.cssText = 'margin-bottom:8px;padding:14px 16px;background:linear-gradient(135deg,#faf9ff,#f5f3ff);border:1px solid #e0ddd5;border-radius:12px;font-size:.75rem';
             inner.appendChild(existing);
         }
-        const hdr = '<div style="font-weight:600;margin-bottom:10px;color:#7c3aed;display:flex;align-items:center;gap:6px">'
-            + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg>'
-            + 'Multi-Agent Orkestrasyon <span class="agent-spinner"></span></div>';
+        const doneCount = results ? Object.keys(results).length : 0;
+        const allDone = doneCount === agents.length && doneCount > 0;
+        const hdr = '<div style="font-weight:600;margin-bottom:10px;color:#7c3aed;display:flex;align-items:center;justify-content:space-between">'
+            + '<div style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M6.8 7.3l3.6 3.4M17.2 7.3l-3.6 3.4M6.8 16.7l3.6-3.4M17.2 16.7l-3.6-3.4"/></svg>'
+            + 'Multi-Agent Orkestrasyon</div>'
+            + (allDone
+                ? '<span style="color:#16a34a;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px">✓ Tamamlandı</span>'
+                : '<span class="agent-spinner"></span>')
+            + '</div>';
         const cards = agents.map(a => {
             const status = (results && results[a.id]) ? 'done' : 'running';
             const elapsed = (results && results[a.id] && results[a.id].elapsed) ? results[a.id].elapsed + 's' : '';
             const icon = AGENT_ICONS[a.icon] || AGENT_ICONS.bot;
+            const labelText = a.name || a.label || a.id;
             return '<div class="agent-card ' + status + '">'
                 + '<span>' + icon + '</span>'
-                + '<span style="color:#333;font-weight:500">' + a.label + '</span>'
+                + '<span style="color:#333;font-weight:500">' + labelText + '</span>'
                 + (status === 'done'
                     ? '<span style="color:#16a34a;font-size:.65rem">✓ tamamlandı</span>'
                     : '<span style="color:#7c3aed;font-size:.65rem">çalışıyor...</span>')
@@ -3473,24 +3480,59 @@ int main() {
 * **\`std::endl\`:** Yeni bir satıra geçer (\`\\n\`) ve akış tampon belleğini (buffer) diske/ekrana basıp temizler.`;
         }
 
-        // 5. Selamlaşma ve Genel Sohbet
+        // 5. Python Nedir / Genel Bilgi
+        if (qLower.includes('python nedir') || (qLower.includes('python') && (qLower.includes('nedir') || qLower.includes('anlat') || qLower.includes('ne işe yarar')))) {
+            return `<think>
+Kullanıcı Python programlama dilinin ne olduğunu, kullanım alanlarını ve özelliklerini soruyor.
+1. Python'un tanımı (yüksek seviyeli, yorumlanan, nesne yönelimli).
+2. Temel avantajları (kolay sözdizimi, zengin kütüphane ekosistemi, hızlı prototipleme).
+3. Kullanım alanları: Yapay Zeka/ML, Web Geliştirme (FastAPI/Django), Veri Analizi, Otomasyon & Scripting.
+4. Örnek kod ve özet.
+</think>
+**Python**, 1991 yılında Guido van Rossum tarafından geliştirilen, okunabilirliği ve sadeliği ön planda tutan **yüksek seviyeli, dinamik ve genel amaçlı** bir programlama dilidir. 🐍⚡
+
+### 🌟 Python'un Temel Özellikleri:
+1. **Sade ve Okunabilir Sözdizimi (Clean Syntax):**  
+   Karmaşık parantez ve noktalı virgül kalabalığı yerine girintilere (indentation) dayalıdır. Sözde kod (pseudocode) yazar gibi kolayca kodlanabilir.
+2. **Yorumlanan (Interpreted) Dil:**  
+   Kodlar derleme (compile) adımı beklemeden doğrudan satır satır çalıştırılır, bu da geliştirmeyi çok hızlandırır.
+3. **Zengin Kütüphane Ekosistemi:**  
+   Dünyadaki en geniş açık kaynak kütüphane desteğine sahiptir.
+
+---
+
+### 🚀 Başlıca Kullanım Alanları:
+* 🤖 **Yapay Zeka ve Makine Öğrenimi:** PyTorch, TensorFlow, Scikit-learn, Hugging Face.
+* 🌐 **Web Geliştirme:** FastAPI, Django, Flask.
+* 📊 **Veri Analizi & Veri Bilimi:** Pandas, NumPy, Matplotlib.
+* 🛠️ **Otomasyon & Scripting:** Sistem yönetimi, web scraping (BeautifulSoup) ve bot geliştirme.
+
+\`\`\`python
+# Python ile 1 Satırda Merhaba
+print("Python ile Geleceği Kodlayın! 🚀")
+\`\`\`
+
+Python ile ilgili özel bir kütüphane, algoritma veya proje geliştirmek ister misiniz?`;
+        }
+
+        // 6. Selamlaşma ve Genel Sohbet
         if (qLower === 'merhaba' || qLower === 'selam' || qLower === 'slm' || qLower === 'nasılsın' || qLower === 'ne haber') {
             return `<think>
 Kullanıcı selam verdi.
-Sıcak, enerjik, samimi ve zeki bir DeepUltra selamlaması oluştur.
+Sıcak, enerjik, samimi ve zeki bir EPIC selamlaması oluştur.
 </think>
-Merhaba! 👋 Ben **DeepUltra**, **GlassesGlitchStudio & Elytra-ai** yapay zeka amiral gemisiyim. ⚡🐱
+Merhaba! 👋 Ben **EPIC**, **GlassesGlitchStudio & Elytra-ai** yapay zeka amiral gemisiyim. 🔥🐱
 
 Bugün hangi kodlama projesi, oyun mekaniği veya sistem mimarisi üzerinde çalışıyoruz? Size nasıl yardımcı olabilirim?`;
         }
 
-        // 6. Genel Akıllı Sentez
+        // 7. Genel Akıllı Sentez
         return `<think>
 Kullanıcı talebi: "${q}"
 Model: ${modelLabel}
 Analiz: Konuyu en derin teknik hassasiyetle incele, akıcı Türkçe ile adım adım açıkla.
 </think>
-Talebiniz **DeepUltra 671B Nexus Engine** tarafından işlendi! ⚡🧠
+Talebiniz **EPIC 671B Nexus Engine** tarafından işlendi! 🔥🧠
 
 **İncelenen Talep:** *${q}*
 
