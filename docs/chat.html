@@ -529,12 +529,12 @@
                     <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
                 <h1 id="welcomeGreeting">Merhaba, <span id="welcomeUserName" style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Kullanıcı</span>! 👋</h1>
-                <div class="welcome-sub" id="welcomeSubGreeting">GlassesCat AI & ShadowCat-R1 14B Bulut Motoru Aktif. Bugün ne inşa ediyoruz?</div>
+                <div class="welcome-sub" id="welcomeSubGreeting">GlassesCat AI & 🔥 EPIC 671B Nexus Motoru Aktif. Bugün ne inşa ediyoruz?</div>
                 <div class="chips">
                     <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
                     <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
                     <button class="chip" onclick="sendSug('Sistem durumunu göster')">Sistem İstatistikleri</button>
-                    <button class="chip" onclick="sendSug('Glitch Code entegrasyon durumu')">Glitch Code Entegrasyonu</button>
+                    <button class="chip" onclick="sendSug('EpicCoder yetenekleri ve otonom kodlama')">⚡ EpicCoder Motoru</button>
                 </div>
             </div>
             <div id="msgsInner" class="msgs-inner hidden"></div>
@@ -2805,49 +2805,104 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
 
     function submitNewProject() {
         const name = document.getElementById('npName').value.trim();
-        const folder_path = document.getElementById('npFolder').value.trim();
+        const tpl = document.getElementById('npTemplate') ? document.getElementById('npTemplate').value : 'ue5';
         const instructions = document.getElementById('npDesc').value.trim();
 
         if (!name) { alert('Lütfen proje adı girin!'); return; }
 
-        fetch('/api/projects', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name, folder_path, instructions })
-        }).then(r => r.json()).then(d => {
-            hideNewProjectModal();
-            if (d.success) {
-                renderProjects();
-                openIdeModal(d.project);
-            } else {
-                const newDemoProj = {
-                    id: 'demo_' + Date.now(),
-                    name: name,
-                    instructions: instructions,
-                    files: [
-                        { name: 'main.py', path: 'main.py', ext: '.py', content: '# ' + name + ' Main File\nprint("Hello from ' + name + '!")' },
-                        { name: 'README.md', path: 'README.md', ext: '.md', content: '# ' + name + '\n' + instructions }
-                    ]
-                };
-                sampleDemoProjects.push(newDemoProj);
-                renderProjects();
-                openIdeModal(newDemoProj);
-            }
-        }).catch(() => {
-            hideNewProjectModal();
-            const newDemoProj = {
-                id: 'demo_' + Date.now(),
-                name: name,
-                instructions: instructions,
-                files: [
-                    { name: 'main.py', path: 'main.py', ext: '.py', content: '# ' + name + ' Main File\nprint("Hello from ' + name + '!")' },
-                    { name: 'README.md', path: 'README.md', ext: '.md', content: '# ' + name + '\n' + instructions }
-                ]
-            };
-            sampleDemoProjects.push(newDemoProj);
-            renderProjects();
-            openIdeModal(newDemoProj);
-        });
+        let files = [];
+        let category = 'Genel Proje';
+
+        if (tpl === 'ue5') {
+            category = 'Unreal Engine 5.4 C++';
+            files = [
+                {
+                    name: 'PluginModule.cpp',
+                    path: 'Source/Private/PluginModule.cpp',
+                    ext: '.cpp',
+                    content: `#include "CoreMinimal.h"\n#include "Modules/ModuleManager.h"\n\nclass F${name.replace(/[^a-zA-Z0-9]/g,'')}Module : public IModuleInterface\n{\npublic:\n    virtual void StartupModule() override {\n        UE_LOG(LogTemp, Log, TEXT("⚡ [EpicCoder] ${name} Modülü Başlatıldı!"));\n    }\n};\n\nIMPLEMENT_MODULE(F${name.replace(/[^a-zA-Z0-9]/g,'')}Module, ${name.replace(/[^a-zA-Z0-9]/g,'')});`
+                },
+                {
+                    name: 'GameplayActor.h',
+                    path: 'Source/Public/GameplayActor.h',
+                    ext: '.h',
+                    content: `#pragma once\n#include "CoreMinimal.h"\n#include "GameFramework/Actor.h"\n#include "GameplayActor.generated.h"\n\nUCLASS()\nclass AGameplayActor : public AActor\n{\n    GENERATED_BODY()\npublic:\n    AGameplayActor();\n};`
+                },
+                {
+                    name: 'README.md',
+                    path: 'README.md',
+                    ext: '.md',
+                    content: `# ${name}\n**Kategori:** Unreal Engine 5.4 C++\n**Motor:** EpicCoder Studio\n\n${instructions || 'Özel UE5 C++ Oyun ve Eklenti Mimarisi.'}`
+                }
+            ];
+        } else if (tpl === 'python') {
+            category = 'Python 3.12 & SQLite';
+            files = [
+                {
+                    name: 'main.py',
+                    path: 'main.py',
+                    ext: '.py',
+                    content: `# ${name} - Python Async Core\nimport asyncio\n\nasync def main():\n    print("⚡ [EpicCoder] ${name} Python Motoru Aktif!")\n\nif __name__ == '__main__':\n    asyncio.run(main())`
+                },
+                {
+                    name: 'database.py',
+                    path: 'database.py',
+                    ext: '.py',
+                    content: `import sqlite3\n\ndef init_db():\n    with sqlite3.connect("${name.toLowerCase().replace(/[^a-z0-9]/g,'_')}.db") as conn:\n        cursor = conn.cursor()\n        cursor.execute("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, key TEXT, value TEXT)")\n        conn.commit()\n        print("✓ Veritabanı hazır.")`
+                },
+                {
+                    name: 'README.md',
+                    path: 'README.md',
+                    ext: '.md',
+                    content: `# ${name}\n**Kategori:** Python Backend & SQLite\n\n${instructions || 'Hafif ve asenkron Python mimarisi.'}`
+                }
+            ];
+        } else if (tpl === 'web') {
+            category = 'Glassmorphism Web';
+            files = [
+                {
+                    name: 'index.html',
+                    path: 'index.html',
+                    ext: '.html',
+                    content: `<!DOCTYPE html>\n<html>\n<head>\n    <title>${name}</title>\n    <style>\n        body{background:#0a0910;color:#c084fc;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}\n        .box{background:rgba(124,58,237,0.1);border:1px solid #7c3aed;padding:30px;border-radius:12px;text-align:center}\n    </style>\n</head>\n<body>\n    <div class="box">\n        <h1>⚡ ${name}</h1>\n        <p>GlassesCat EpicCoder Web Önizlemesi</p>\n    </div>\n</body>\n</html>`
+                },
+                {
+                    name: 'README.md',
+                    path: 'README.md',
+                    ext: '.md',
+                    content: `# ${name}\n**Kategori:** Web Dashboard\n\n${instructions || 'Canlı önizlemeli modern web arayüzü.'}`
+                }
+            ];
+        } else {
+            files = [
+                {
+                    name: 'main.txt',
+                    path: 'main.txt',
+                    ext: '.txt',
+                    content: `# ${name}\nProje başlangıç dosyası.`
+                },
+                {
+                    name: 'README.md',
+                    path: 'README.md',
+                    ext: '.md',
+                    content: `# ${name}\n${instructions || 'Özel proje çalışma alanı.'}`
+                }
+            ];
+        }
+
+        const newDemoProj = {
+            id: 'proj_' + Date.now(),
+            name: name,
+            category: category,
+            instructions: instructions,
+            files: files
+        };
+
+        sampleDemoProjects.unshift(newDemoProj);
+        hideNewProjectModal();
+        renderProjects();
+        openIdeModal(newDemoProj);
+        toast('✓ ' + name + ' projesi EpicCoder çalışma alanında açıldı!');
     }
 
     function openIdeModal(proj) {
@@ -3037,6 +3092,42 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
                 logEl.innerHTML = '<div style="color:#4ade80">✓ ' + action.toUpperCase() + ' analizi başarıyla tamamlandı!</div>';
             }
         }, 350);
+    }
+
+    async function sendIdeChat() {
+        const input = document.getElementById('ideChatInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+
+        const hist = document.getElementById('ideChatHistory');
+        
+        // Kullanıcı mesajı
+        const userDiv = document.createElement('div');
+        userDiv.style.cssText = 'padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;margin-left:14px;word-break:break-word';
+        userDiv.innerHTML = '<span style="font-weight:600;color:#38bdf8">Sen:</span> ' + esc(msg);
+        hist.appendChild(userDiv);
+
+        // AI yanıt alanı
+        const aiDiv = document.createElement('div');
+        aiDiv.style.cssText = 'padding:10px;border-radius:8px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:#e0d9fc;word-break:break-word';
+        aiDiv.innerHTML = '<span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> <span class="ide-ai-txt">Analiz ediliyor...</span>';
+        hist.appendChild(aiDiv);
+        hist.scrollTop = hist.scrollHeight;
+
+        const txtEl = aiDiv.querySelector('.ide-ai-txt');
+
+        const contextPrompt = (currentIdeProject ? '[Proje: ' + currentIdeProject.name + '] ' : '')
+            + (currentIdeFile ? '[Aktif Dosya: ' + currentIdeFile.name + '] ' : '')
+            + msg;
+
+        try {
+            const res = await callChat(contextPrompt);
+            txtEl.innerHTML = format(res || 'Talebiniz EpicCoder tarafından işlendi.');
+        } catch(e) {
+            txtEl.innerHTML = '⚠️ Sunucu Hatası: Bulut sunucusuna ulaşılamadı.';
+        }
+        hist.scrollTop = hist.scrollHeight;
     }
 
 
@@ -3932,22 +4023,27 @@ Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engin
 <div id="newProjectModal" class="upload-overlay" style="display:none" onclick="if(event.target===this)hideNewProjectModal()">
     <div class="upload-modal" style="max-width:500px">
         <button class="close-overlay" onclick="hideNewProjectModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <h2>Yeni Proje Oluştur</h2>
-        <div class="sub">GlassesCat Workspace & Glitch Code Entegrasyonu</div>
+        <h2>Yeni Stüdyo Projesi Oluştur</h2>
+        <div class="sub">GlassesCat Workspace & ⚡ EpicCoder Otonom Motoru</div>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
             <div>
                 <label style="font-size:.75rem;color:#666;display:block;margin-bottom:4px">Proje Adı</label>
-                <input id="npName" type="text" placeholder="Örn: My Awesome Game" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0ddd5;font-size:.82rem;outline:none">
+                <input id="npName" type="text" placeholder="Örn: My UE5 Project / Python Engine" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0ddd5;font-size:.82rem;outline:none">
             </div>
             <div>
-                <label style="font-size:.75rem;color:#666;display:block;margin-bottom:4px">Proje Dizin Yolu (Opsiyonel)</label>
-                <input id="npFolder" type="text" placeholder="Örn: C:\Users\ErCuM\CascadeProjects\my-project" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0ddd5;font-size:.82rem;outline:none">
+                <label style="font-size:.75rem;color:#666;display:block;margin-bottom:4px">Proje Şablonu</label>
+                <select id="npTemplate" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0ddd5;font-size:.82rem;outline:none;background:#fff">
+                    <option value="ue5">🎮 Unreal Engine 5.4 C++ Plugin</option>
+                    <option value="python">🐍 Python SQLite Async Backend</option>
+                    <option value="web">⚡ Cyber-Cat Neon Web Dashboard</option>
+                    <option value="empty">📄 Sıfırdan Boş Proje</option>
+                </select>
             </div>
             <div>
-                <label style="font-size:.75rem;color:#666;display:block;margin-bottom:4px">Açıklama & Talimatlar</label>
-                <textarea id="npDesc" rows="3" placeholder="Proje detayları ve AI talimatları..." style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0ddd5;font-size:.82rem;outline:none;font-family:inherit"></textarea>
+                <label style="font-size:.75rem;color:#666;display:block;margin-bottom:4px">Açıklama & AI Talimatları</label>
+                <textarea id="npDesc" rows="3" placeholder="EpicCoder'a özel mimari talimatları..." style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0ddd5;font-size:.82rem;outline:none;font-family:inherit"></textarea>
             </div>
-            <button onclick="submitNewProject()" style="padding:10px;border-radius:8px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-weight:600;font-size:.82rem;cursor:pointer;margin-top:6px;font-family:inherit">Oluştur ve Çalışma Alanını Aç</button>
+            <button onclick="submitNewProject()" style="padding:10px;border-radius:8px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-weight:600;font-size:.82rem;cursor:pointer;margin-top:6px;font-family:inherit">Oluştur ve EpicCoder Çalışma Alanını Aç</button>
         </div>
     </div>
 </div>
@@ -3960,12 +4056,12 @@ Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engin
                 <div class="ide-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                     <span id="ideProjName">Proje Yükleniyor...</span>
-                    <span class="ide-title-badge" id="ideProjBadge">Glitch Workspace</span>
+                    <span class="ide-title-badge" id="ideProjBadge">⚡ EpicCoder Workspace</span>
                 </div>
             </div>
             <div class="ide-hdr-right">
                 <button class="ide-btn" onclick="rescanIdeProject()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Klasörü Tara</button>
-                <button class="ide-btn primary" onclick="launchGlitchCli()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Glitch Code ile Çalıştır</button>
+                <button class="ide-btn primary" onclick="launchGlitchCli()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> ⚡ EpicCoder Terminal</button>
                 <button class="ide-btn" onclick="closeIdeModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
         </div>
@@ -3997,19 +4093,30 @@ Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engin
                 </div>
             </div>
             <div class="ide-ai-panel">
-                <div class="ide-ai-hdr">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
-                    <span>AI Proje Asistanı</span>
+                <div class="ide-ai-hdr" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a231f;padding-bottom:8px">
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        <span style="font-weight:700;color:#c084fc;font-size:.82rem">⚡ EpicCoder Studio</span>
+                    </div>
+                    <span style="font-size:.65rem;color:#4ade80;background:rgba(74,222,128,0.1);padding:1px 6px;border-radius:10px;font-weight:600">● Otonom AI</span>
                 </div>
-                <div class="ide-ai-actions">
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Secret Scanner (Güvenlik)</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Self-Healing (Otomatik Tamir)</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Test Generator (Birim Test)</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('api_doc')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> API Doc Generator (Swagger)</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('perf_profiler')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Perf Profiler & Dep Analyzer</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Refactor & Code Migration</button>
+                <div class="ide-ai-actions" style="margin-top:8px">
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Güvenlik</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Onar</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Test</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:4px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Refactor</button>
                 </div>
-                <div class="ide-ai-log" id="ideAiLog">AI analiz çıktısı buraya gelecek...</div>
+                <div class="ide-ai-log" id="ideAiLog" style="display:none"></div>
+                <!-- Interactive EpicCoder Chat Area inside IDE -->
+                <div class="ide-chat-history" id="ideChatHistory" style="flex:1;overflow-y:auto;margin-top:10px;padding-right:4px;display:flex;flex-direction:column;gap:8px;font-size:.75rem">
+                    <div style="padding:10px;border-radius:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.15);color:#dfd6cd">
+                        <span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> Merhaba! Bu projenin kodlarını incelemeye, yeni C++/Python fonksiyonları yazmaya veya hata ayıklamaya hazırım. Dosyanızla ilgili ne yapmamı istersiniz?
+                    </div>
+                </div>
+                <div class="ide-chat-input-box" style="margin-top:8px;display:flex;gap:6px;padding-top:8px;border-top:1px solid #2a231f">
+                    <input id="ideChatInput" type="text" placeholder="EpicCoder'a kod yazdır veya soru sor..." style="flex:1;background:#1a1613;border:1px solid #2a231f;border-radius:6px;padding:8px 10px;color:#fff;font-size:.75rem;outline:none" onkeydown="if(event.key==='Enter')sendIdeChat()">
+                    <button onclick="sendIdeChat()" style="background:#7c3aed;border:none;border-radius:6px;color:#fff;padding:8px 12px;cursor:pointer;font-weight:600;font-size:.75rem">Gönder</button>
+                </div>
             </div>
         </div>
     </div>
