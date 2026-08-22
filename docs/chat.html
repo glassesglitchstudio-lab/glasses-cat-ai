@@ -496,7 +496,7 @@
             <span id="userCloudBadge" style="font-size:.62rem;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:10px;font-weight:600;display:none;">Bulut</span>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span id="sidebarModel">X_OPUS</span>
+            <span id="sidebarModel">⚡ DeepUltra</span>
             <button onclick="toggleSettings()">Ayarlar</button>
         </div>
     </div>
@@ -791,9 +791,11 @@
         <div id="settingsPers" style="margin-top:16px">
             <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Varsayılan Model</label>
             <div style="display:flex;gap:6px;flex-wrap:wrap" id="settingsModels">
+                <button class="sk-tab active" data-model="DEEPULTRA" onclick="selectModel('DEEPULTRA')">⚡ DeepUltra</button>
+                <button class="sk-tab" data-model="SHADOWCAT_R1" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1</button>
+                <button class="sk-tab" data-model="X_FABLE_CODER" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER</button>
+                <button class="sk-tab" data-model="X_GLITCH_OPUS" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS</button>
                 <button class="sk-tab" data-model="X_OPUS" onclick="selectModel('X_OPUS')">X_OPUS</button>
-                <button class="sk-tab" data-model="X_GLITCH_OPUS" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS</button>
-                <button class="sk-tab" data-model="X_FABLE_CODER" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER</button>
             </div>
             <div style="margin-top:18px">
                 <label style="font-size:.82rem;font-weight:500;color:#333;display:block;margin-bottom:6px">Yanıt Stili</label>
@@ -1329,11 +1331,28 @@
 
     function selectModel(id) {
         currentModel = id;
-        document.getElementById('modelName').textContent = id.replace('_', ' ');
-        document.getElementById('sidebarModel').textContent = id;
-        document.querySelectorAll('.model-opt').forEach(o => o.classList.toggle('active', o.getAttribute('onclick').indexOf(id) >= 0));
-        document.getElementById('modelDropdown').classList.remove('show');
-        toast(id + ' seçildi');
+        const labels = {
+            'DEEPULTRA': '⚡ DeepUltra',
+            'SHADOWCAT_R1': '👑 ShadowCat-R1',
+            'X_FABLE_CODER': '🚀 X_FABLE_CODER',
+            'X_GLITCH_OPUS': '🦁 X_GLITCH_OPUS',
+            'X_OPUS': 'X_OPUS v4.0',
+            'qwen2.5-coder:14b': 'Qwen 2.5 Coder'
+        };
+        const displayName = labels[id] || id;
+        const mEl = document.getElementById('modelName');
+        if (mEl) mEl.textContent = displayName;
+        const sEl = document.getElementById('sidebarModel');
+        if (sEl) sEl.textContent = displayName;
+        document.querySelectorAll('.model-opt').forEach(o => {
+            o.classList.toggle('active', (o.getAttribute('onclick') || '').indexOf(id) >= 0);
+        });
+        document.querySelectorAll('#settingsModels button').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-model') === id);
+        });
+        const dEl = document.getElementById('modelDropdown');
+        if (dEl) dEl.classList.remove('show');
+        toast(displayName + ' seçildi');
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
