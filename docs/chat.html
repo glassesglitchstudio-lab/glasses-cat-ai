@@ -3019,7 +3019,9 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
     function renderIdeFiles(files) {
         const listEl = document.getElementById('ideFileList');
         const countEl = document.getElementById('ideFileCount');
+        const pillDrop = document.getElementById('ideProjectPillDropdown');
         listEl.innerHTML = '';
+        if (pillDrop) pillDrop.innerHTML = '';
         countEl.textContent = files.length + ' dosya';
 
         if (!files.length) {
@@ -3034,6 +3036,18 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
             item.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ' + esc(f.path || f.name);
             item.onclick = () => selectIdeFile(f, item);
             listEl.appendChild(item);
+
+            if (pillDrop) {
+                const opt = document.createElement('div');
+                opt.className = 'cyber-opt' + (idx === 0 ? ' active' : '');
+                opt.innerHTML = '📄 ' + esc(f.name || f.path);
+                opt.onclick = (e) => {
+                    e.stopPropagation();
+                    selectIdeFile(f, item);
+                    pillDrop.classList.remove('show');
+                };
+                pillDrop.appendChild(opt);
+            }
         });
 
         if (files.length > 0) {
@@ -3045,7 +3059,19 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         currentIdeFile = file;
         document.querySelectorAll('.ide-file-item').forEach(el => el.classList.remove('active'));
         if (element) element.classList.add('active');
-        document.getElementById('ideActiveTab').textContent = file.name || file.path;
+        const tabEl = document.getElementById('ideActiveTab');
+        if (tabEl) tabEl.textContent = file.name || file.path;
+        
+        const pillName = document.getElementById('ideActiveProjectPillName');
+        if (pillName) pillName.textContent = '📁 ' + (file.name || file.path);
+
+        const pillDrop = document.getElementById('ideProjectPillDropdown');
+        if (pillDrop) {
+            pillDrop.querySelectorAll('.cyber-opt').forEach(opt => {
+                opt.classList.toggle('active', opt.textContent.includes(file.name || file.path));
+            });
+        }
+
         document.getElementById('ideCodeArea').textContent = file.content || '// İçerik okunamadı veya boş.';
 
         const ext = (file.ext || file.name || '').toLowerCase();
@@ -3152,46 +3178,130 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         toast('✓ GlassesCat CLI Komutu Kopyalandı: ' + cmd);
     }
 
-    function ideAiAction(action) {
-        const logEl = document.getElementById('ideAiLog');
-        if (!currentIdeProject) return;
-        const fname = currentIdeFile ? currentIdeFile.name : 'Genel Proje';
-        const codeSnippet = (currentIdeFile && currentIdeFile.content) ? currentIdeFile.content.slice(0, 300) : '';
-        
-        logEl.innerHTML = '<span style="color:#c084fc">⚡ GlassesCat Zekası ' + fname + ' dosyasını analiz ediyor...</span>';
+    function toggleDropdown(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const isShown = el.classList.contains('show');
+        document.querySelectorAll('.cyber-dropdown').forEach(d => d.classList.remove('show'));
+        if (!isShown) el.classList.add('show');
+    }
 
-        setTimeout(() => {
-            if (action === 'secret_scan') {
-                logEl.innerHTML = '<div style="color:#4ade80;font-weight:600;margin-bottom:6px">🛡️ GÜVENLİK DENETİMİ TAMAMLANDI:</div>'
-                    + '<div style="color:#e0d9fc;line-height:1.5">• Açıkta API Key / Parola: <b>Bulunamadı (Temiz)</b><br>'
-                    + '• SQL Injection / Bellek Sızıntısı Riski: <b>0 Risk (Güvenli)</b><br>'
-                    + '• Güvenlik Skoru: <b>%100 A+ (Production Ready)</b></div>';
-            } else if (action === 'self_healing') {
-                logEl.innerHTML = '<div style="color:#38bdf8;font-weight:600;margin-bottom:6px">✨ SELF-HEALING KOD ONARIMI:</div>'
-                    + '<div style="color:#e0d9fc;line-height:1.5">• Sözdizimi (Syntax): <b>Kusursuz</b><br>'
-                    + '• Bellek & Kaynak Yönetimi: <b>Optimize edildi</b><br>'
-                    + '• Hata olasılığı: <b>Sıfırlandı, kod çalışmaya hazır!</b></div>';
-            } else if (action === 'test_gen') {
-                logEl.innerHTML = '<div style="color:#a78bfa;font-weight:600;margin-bottom:6px">🧪 BİRİM TESTLERİ OLUŞTURULDU:</div>'
-                    + '<div style="color:#e0d9fc;line-height:1.5">• Test Framework: <b>PyTest / GTest</b><br>'
-                    + '• Test Kapsamı (Coverage): <b>%100 Fonksiyon Doğrulama</b><br>'
-                    + '• Durum: <b>Tüm test senaryoları geçti (PASS)</b></div>';
-            } else if (action === 'api_doc') {
-                logEl.innerHTML = '<div style="color:#fbbf24;font-weight:600;margin-bottom:6px">📋 API & MODÜL DOKÜMANTASYONU:</div>'
-                    + '<div style="color:#e0d9fc;line-height:1.5">• Standart: <b>OpenAPI / Unreal C++ Doxygen</b><br>'
-                    + '• Modül Hiyerarşisi ve fonksiyon imzaları eksiksiz haritalandı.</div>';
-            } else if (action === 'perf_profiler') {
-                logEl.innerHTML = '<div style="color:#ec4899;font-weight:600;margin-bottom:6px">⚡ PERFORMANS VE BELLEK PROFİLİ:</div>'
-                    + '<div style="color:#e0d9fc;line-height:1.5">• Zaman Karmaşıklığı: <b>O(1) / O(log N) Optimum</b><br>'
-                    + '• CPU / RAM Yükü: <b>Minimum (~0.02ms çalışma süresi)</b></div>';
-            } else if (action === 'refactor') {
-                logEl.innerHTML = '<div style="color:#818cf8;font-weight:600;margin-bottom:6px">🚀 CLEAN-CODE REFACTORING:</div>'
-                    + '<div style="color:#e0d9fc;line-height:1.5">• SOLID prensipleri uygulandı.<br>'
-                    + '• Kod okunabilirliği ve modülerlik en üst seviyeye taşındı.</div>';
-            } else {
-                logEl.innerHTML = '<div style="color:#4ade80">✓ ' + action.toUpperCase() + ' analizi başarıyla tamamlandı!</div>';
+    function setIdeMode(modeName) {
+        const pill = document.getElementById('ideActiveModePillName');
+        if (pill) pill.textContent = modeName;
+        document.querySelectorAll('#ideModePillDropdown .cyber-opt').forEach(opt => {
+            opt.classList.toggle('active', opt.textContent.trim() === modeName);
+        });
+        const drop = document.getElementById('ideModePillDropdown');
+        if (drop) drop.classList.remove('show');
+        toast('Çalışma Modu: ' + modeName);
+    }
+
+    function setIdeWorkspaceMode(modeName) {
+        const lbl = document.getElementById('ideWorkspaceModeLabel');
+        if (lbl) lbl.textContent = modeName;
+        document.querySelectorAll('#ideWorkspaceWriteDropdown .cyber-opt').forEach(opt => {
+            opt.classList.toggle('active', opt.textContent.includes(modeName));
+        });
+        const drop = document.getElementById('ideWorkspaceWriteDropdown');
+        if (drop) drop.classList.remove('show');
+        toast('Proje İzni: ' + modeName);
+    }
+
+    function addNewIdeFilePrompt() {
+        if (!currentIdeProject) {
+            toast('Önce bir proje açın');
+            return;
+        }
+        const name = prompt('Yeni dosya adını girin (Örn: utils.py, main.cpp, style.css, App.js):');
+        if (!name || !name.trim()) return;
+        const cleanName = name.trim();
+        const ext = cleanName.includes('.') ? cleanName.substring(cleanName.lastIndexOf('.')) : '.txt';
+        const newFile = {
+            name: cleanName,
+            path: cleanName,
+            ext: ext,
+            content: `// ⚡ ${cleanName} - EpicCoder Proje Dosyası\n// Oluşturuldu: ${new Date().toLocaleTimeString()}\n\n`
+        };
+        if (!currentIdeProject.files) currentIdeProject.files = [];
+        currentIdeProject.files.push(newFile);
+        renderIdeFiles(currentIdeProject.files);
+        selectIdeFile(newFile);
+        toast('✓ ' + cleanName + ' dosyası projeye eklendi!');
+    }
+
+    function applyCodeToEditor(codeText) {
+        if (!currentIdeFile) {
+            toast('Düzenlenecek aktif dosya yok.');
+            return;
+        }
+        currentIdeFile.content = codeText;
+        const codeArea = document.getElementById('ideCodeArea');
+        if (codeArea) codeArea.textContent = codeText;
+        switchIdeViewMode('code');
+        toast('✓ Kod aktif dosyaya (' + (currentIdeFile.name || 'Dosya') + ') aktarıldı!');
+    }
+
+    async function ideAiAction(action) {
+        if (!currentIdeProject) {
+            toast('Aktif bir proje bulunamadı.');
+            return;
+        }
+        const fname = currentIdeFile ? currentIdeFile.name : 'Genel Proje';
+        const fileContent = currentIdeFile ? (currentIdeFile.content || '') : '';
+        
+        let promptText = '';
+        let userActionName = '';
+
+        if (action === 'secret_scan') {
+            userActionName = '🛡️ Güvenlik Denetimi & Zafiyet Taraması';
+            promptText = `[GÜVENLİK ANALİZİ] "${fname}" dosyasını güvenlik açıkları, hardcoded API anahtarları, SQL injection, bellek sızıntısı ve riskli fonksiyonlar açısından analiz et. Tespit edilen riskleri ve düzeltilmiş güvenli kod bloklarını sun. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'self_healing') {
+            userActionName = '✨ Otomatik Hata Onarımı (Self-Healing)';
+            promptText = `[SELF-HEALING ONARIM] "${fname}" dosyasındaki olası derleme/çalışma zamanı hatalarını, mantıksal bugları ve eksik importları bulup onar. Tam ve hatasız çalışan nihai kodu ver. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'test_gen') {
+            userActionName = '🧪 Birim Testleri Oluştur (Unit Tests)';
+            promptText = `[TEST OLUŞTURUCU] "${fname}" dosyası için %100 kapsayıcı birim testleri (Unit Tests) ve test suite kodunu yaz. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'refactor') {
+            userActionName = '‹/› Clean-Code & Performans Refactoring';
+            promptText = `[REFACTORING] "${fname}" dosyasını modern standartlara, SOLID prensiplerine ve yüksek performansa göre yeniden düzenle (refactor et). Tam ve temiz kodu sun. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        }
+
+        const hist = document.getElementById('ideChatHistory');
+        
+        // Kullanıcı aksiyonu
+        const userDiv = document.createElement('div');
+        userDiv.style.cssText = 'padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;margin-left:14px;word-break:break-word';
+        userDiv.innerHTML = '<span style="font-weight:600;color:#a78bfa">⚡ Görev:</span> ' + userActionName + ' (<code>' + esc(fname) + '</code>)';
+        hist.appendChild(userDiv);
+
+        // AI Yanıtı
+        const aiDiv = document.createElement('div');
+        aiDiv.style.cssText = 'padding:10px;border-radius:8px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:#e0d9fc;word-break:break-word';
+        aiDiv.innerHTML = '<span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> <span class="ide-ai-txt">Analiz yapılıyor ve kod üretiliyor...</span>';
+        hist.appendChild(aiDiv);
+        hist.scrollTop = hist.scrollHeight;
+
+        const txtEl = aiDiv.querySelector('.ide-ai-txt');
+
+        try {
+            const res = await callChat(promptText);
+            txtEl.innerHTML = format(res || 'İşlem tamamlandı.');
+            
+            // Eğer yanıtta kod bloğu varsa 'Editöre Uygula' butonu ekle
+            const codeBlockMatch = res.match(/```(?:\w+)?\n([\s\S]*?)```/);
+            if (codeBlockMatch && codeBlockMatch[1]) {
+                const cleanCode = codeBlockMatch[1].trim();
+                const applyBtn = document.createElement('button');
+                applyBtn.style.cssText = 'margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit';
+                applyBtn.innerHTML = '✓ Bu Kodu Dosyaya Uygula (' + esc(fname) + ')';
+                applyBtn.onclick = () => applyCodeToEditor(cleanCode);
+                aiDiv.appendChild(applyBtn);
             }
-        }, 350);
+        } catch(e) {
+            txtEl.innerHTML = '⚠️ Sunucu Hatası: İşlem gerçekleştirilemedi.';
+        }
+        hist.scrollTop = hist.scrollHeight;
     }
 
     async function sendIdeChat() {
@@ -3216,14 +3326,26 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         hist.scrollTop = hist.scrollHeight;
 
         const txtEl = aiDiv.querySelector('.ide-ai-txt');
+        const fname = currentIdeFile ? currentIdeFile.name : 'Proje Dosyası';
+        const fileContent = currentIdeFile ? (currentIdeFile.content || '') : '';
 
         const contextPrompt = (currentIdeProject ? '[Proje: ' + currentIdeProject.name + '] ' : '')
-            + (currentIdeFile ? '[Aktif Dosya: ' + currentIdeFile.name + '] ' : '')
+            + (currentIdeFile ? '[Aktif Dosya: ' + fname + ']\n[Dosya İçeriği]:\n```\n' + fileContent.slice(0, 800) + '\n```\n' : '')
             + msg;
 
         try {
             const res = await callChat(contextPrompt);
             txtEl.innerHTML = format(res || 'Talebiniz EpicCoder tarafından işlendi.');
+            
+            const codeBlockMatch = res.match(/```(?:\w+)?\n([\s\S]*?)```/);
+            if (codeBlockMatch && codeBlockMatch[1]) {
+                const cleanCode = codeBlockMatch[1].trim();
+                const applyBtn = document.createElement('button');
+                applyBtn.style.cssText = 'margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit';
+                applyBtn.innerHTML = '✓ Bu Kodu Dosyaya Uygula (' + esc(fname) + ')';
+                applyBtn.onclick = () => applyCodeToEditor(cleanCode);
+                aiDiv.appendChild(applyBtn);
+            }
         } catch(e) {
             txtEl.innerHTML = '⚠️ Sunucu Hatası: Bulut sunucusuna ulaşılamadı.';
         }
@@ -4219,59 +4341,66 @@ Yedek yerel Nexus AI zekası devreye alınıyor.
                 <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px">
                     <div style="display:flex;align-items:center;gap:8px">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                        <span style="font-weight:700;color:#fff;font-size:.88rem">探索未至之境</span>
+                        <span style="font-weight:700;color:#fff;font-size:.88rem">⚡ EpicCoder Stüdyo</span>
                     </div>
-                    <span class="welcome-cyber-badge">EPIC v4.0</span>
+                    <span class="welcome-cyber-badge">EPIC (671B Nexus)</span>
                 </div>
 
                 <!-- Context Pills inside IDE -->
-                <div class="cyber-context-bar" style="margin-top:10px;margin-bottom:8px;gap:6px">
-                    <div class="cyber-pill" style="font-size:.72rem;padding:4px 10px" onclick="toggleDropdown('ideProjectPillDropdown')">
-                        <span id="ideActiveProjectPillName">📁 dsh-demo</span>
+                <div class="cyber-context-bar" style="margin-top:10px;margin-bottom:8px;gap:6px;position:relative">
+                    <div class="cyber-pill" style="font-size:.72rem;padding:4px 10px;position:relative" onclick="toggleDropdown('ideProjectPillDropdown')">
+                        <span id="ideActiveProjectPillName">📁 Dosyalar</span>
                         <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                        <div id="ideProjectPillDropdown" class="cyber-dropdown">
+                            <!-- Populated dynamically with project files -->
+                        </div>
                     </div>
-                    <div class="cyber-pill" style="font-size:.72rem;padding:4px 10px" onclick="toggleDropdown('ideModePillDropdown')">
-                        <span id="ideActiveModePillName">🧬 创造模式</span>
+                    <div class="cyber-pill" style="font-size:.72rem;padding:4px 10px;position:relative" onclick="toggleDropdown('ideModePillDropdown')">
+                        <span id="ideActiveModePillName">⚡ Otonom Kodlama</span>
                         <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                        <div id="ideModePillDropdown" class="cyber-dropdown">
+                            <div class="cyber-opt active" onclick="setIdeMode('⚡ Otonom Kodlama')">⚡ Otonom Kodlama</div>
+                            <div class="cyber-opt" onclick="setIdeMode('🛡️ Güvenlik & Denetim')">🛡️ Güvenlik & Denetim</div>
+                            <div class="cyber-opt" onclick="setIdeMode('🧪 Test & Debug')">🧪 Test & Debug</div>
+                            <div class="cyber-opt" onclick="setIdeMode('✨ Clean Refactor')">✨ Clean Refactor</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Quick Tools -->
+                <!-- Functional Quick Tools -->
                 <div class="ide-ai-actions" style="margin-top:4px;gap:4px">
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Güvenlik</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> Onar</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Test</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Refactor</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 🛡️ Güvenlik Tara</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> ✨ Hataları Onar</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> 🧪 Test Yaz</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> ‹/› Refactor Et</button>
                 </div>
-                
-                <div class="ide-ai-log" id="ideAiLog" style="display:none"></div>
 
                 <!-- Interactive Chat History inside IDE -->
                 <div class="ide-chat-history" id="ideChatHistory" style="flex:1;overflow-y:auto;margin-top:10px;padding-right:4px;display:flex;flex-direction:column;gap:8px;font-size:.75rem">
                     <div style="padding:10px;border-radius:10px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.18);color:#dfd6cd">
-                        <span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> Merhaba! Proje çalışma alanı hazır. Dosya düzenlemeye, kod yazmaya ve debug etmeye başlayabiliriz.
+                        <span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> Merhaba! Proje çalışma alanı hazır. Sol panelden dosya seçebilir, düzenleyebilir veya yapay zekaya kod yazdırabilirsiniz.
                     </div>
                 </div>
 
-                <!-- Floating Cyber Omnibox for Project IDE (Matching Reference UI) -->
+                <!-- Floating Cyber Omnibox for Project IDE -->
                 <div class="cyber-omnibox-card" style="margin-top:10px;padding:12px 14px 10px;border-radius:14px;background:rgba(20,17,30,0.95);box-shadow:0 10px 30px rgba(0,0,0,0.5)">
-                    <textarea id="ideChatInput" class="cyber-textarea" rows="2" placeholder="描述你想要构建的内容 (Projeye kod yazdır veya soru sor...)" style="font-size:.82rem;min-height:38px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendIdeChat();}"></textarea>
+                    <textarea id="ideChatInput" class="cyber-textarea" rows="2" placeholder="EpicCoder'a kod yazdır, soru sor veya geliştirme talimatı ver... (Enter ile gönder)" style="font-size:.82rem;min-height:38px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendIdeChat();}"></textarea>
                     <div class="cyber-bottom-bar" style="margin-top:8px">
                         <div class="cyber-left-tools">
-                            <button class="cyber-icon-btn" style="width:28px;height:28px" onclick="toast('Dosya bağlamı eklendi')" title="Dosya Ekle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                            <button class="cyber-icon-btn" style="width:28px;height:28px" onclick="addNewIdeFilePrompt()" title="Projeye Yeni Dosya Ekle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
                             <div class="cyber-pill-inline" style="padding:3px 8px;font-size:.68rem" onclick="toggleDropdown('ideWorkspaceWriteDropdown')">
-                                <span id="ideWorkspaceModeLabel">Workspace Write</span>
+                                <span id="ideWorkspaceModeLabel">🛡️ Workspace: Yazılabilir</span>
                                 <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"/></svg>
                                 <div id="ideWorkspaceWriteDropdown" class="cyber-dropdown">
-                                    <div class="cyber-opt active" onclick="setIdeWorkspaceMode('Workspace Write')">🛡️ Workspace Write</div>
-                                    <div class="cyber-opt" onclick="setIdeWorkspaceMode('Read Only')">🔒 Read Only</div>
+                                    <div class="cyber-opt active" onclick="setIdeWorkspaceMode('🛡️ Workspace: Yazılabilir')">🛡️ Yazılabilir (Tam Yetki)</div>
+                                    <div class="cyber-opt" onclick="setIdeWorkspaceMode('🔒 Salt Okunur')">🔒 Salt Okunur (Read Only)</div>
                                 </div>
                             </div>
                         </div>
                         <div class="cyber-right-tools">
                             <div class="cyber-pill-inline" style="padding:3px 8px;font-size:.68rem">
                                 <span class="cyber-dot"></span>
-                                <span>EPIC High</span>
+                                <span>🔥 EPIC (671B Nexus)</span>
                             </div>
                             <button class="cyber-send-btn" style="width:30px;height:30px" onclick="sendIdeChat()" title="Gönder">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
