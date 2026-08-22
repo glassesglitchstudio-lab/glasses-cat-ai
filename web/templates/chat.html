@@ -3786,6 +3786,8 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         } catch(e) {
             toast('⚠️ Sunucu Çöktü / Bağlantı Hatası');
         }
+        return "⚠️ **Sunucu Hatası:** Bulut sunucusuna (Cloudflare) ulaşılamadı. Sunucu çökmüş veya bağlantı kesilmiş olabilir.";
+    }
 
     function generateDeepUltraResponse(msg, model) {
         const q = (msg || '').trim();
