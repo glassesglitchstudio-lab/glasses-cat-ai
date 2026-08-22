@@ -3598,8 +3598,41 @@ Temel Kuralların:
 2. KOD VE OYUN ÜRETİMİ: Kullanıcı ne talep ederse (HTML5/Canvas oyunları, Python scriptleri, Unreal Engine 5.4 C++, algoritmalar, web arayüzleri), eksiksiz, %100 çalışan ve üretime hazır tek parça temiz kod blokları üret.
 3. DİL VE ÜSLUP: Samimi, enerjik, profesyonel Türkçe ile adım adım düşünerek (<think> bloğu içinde akıl yürüterek) yanıt ver.`;
 
+    const LOCAL_STUDIO_API = 'http://localhost:7860/api/chat';
+    const LOCAL_FASTAPI_API = 'http://localhost:8000/api/chat';
+
     async function callChat(msg) {
-        // 1. Canlı Gerçek AI Motoru (DeepSeek-R1 / DeepSeek-V3 / Claude)
+        // 1. ÖNCELİK: Kendi Bilgisayarındaki Yerel Stüdyo Modeli (ShadowCat-R1 14B)
+        try {
+            const localRes = await fetch(LOCAL_STUDIO_API, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: 'shadowcat-14b'})
+            });
+            if (localRes.ok) {
+                const localData = await localRes.json();
+                const reply = localData.reply || localData.response || "";
+                if (reply) return reply;
+            }
+        } catch(e) {
+            // Yerel sunucu açık değilse sonraki adımlara geç
+        }
+
+        // 2. ÖNCELİK: Yerel FastAPI (niko_ai)
+        try {
+            const apiRes = await fetch(LOCAL_FASTAPI_API, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: currentModel})
+            });
+            if (apiRes.ok) {
+                const d = await apiRes.json();
+                const reply = d.reply || d.response || "";
+                if (reply) return reply;
+            }
+        } catch(e) {}
+
+        // 3. ÖNCELİK: Canlı Zeka Motoru (DeepSeek-R1 / DeepSeek-V3)
         if (window.puter && window.puter.ai) {
             const messages = [
                 { role: 'system', content: STUDIO_SYSTEM_PROMPT },
@@ -3611,38 +3644,65 @@ Temel Kuralların:
                     const resp = await puter.ai.chat(messages, { model: m });
                     let text = typeof resp === 'string' ? resp : (resp?.message?.content || resp?.text || '');
                     if (text && text.trim()) return text;
-                } catch(e) {
-                    console.warn(`Puter model ${m} error, trying next:`, e);
-                }
+                } catch(e) {}
             }
         }
 
-        // 2. Yerel FastAPI / Bulut API
-        try {
-            const res = await fetch(MODAL_API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: msg, model: currentModel})
-            });
-            if (res.ok) {
-                const txt = await res.text();
-                try {
-                    const d = JSON.parse(txt);
-                    const reply = d.reply || d.response || "";
-                    if (reply && !reply.includes('Talebiniz EPIC 671B Nexus Engine tarafından işlendi!')) {
-                        return reply;
-                    }
-                } catch(pe) {
-                    if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) return txt;
-                }
-            }
-        } catch(e) {}
-
-        return "⚠️ **[Bağlantı Hatası]** Canlı yapay zeka motoruna ulaşılamadı. Lütfen internet bağlantınızı kontrol edin.";
+        return "⚠️ **[Bağlantı Hatası]** Yerel stüdyo sunucusuna (http://localhost:7860) ulaşılamadı. Lütfen 'baslat_studyo_modeli.bat' dosyasını çalıştırın.";
     }
 
     async function streamChat(msg, onToken, onThinking) {
-        // 1. Canlı Akış (DeepSeek-R1 / DeepSeek-V3 / Claude Streaming)
+        // 1. ÖNCELİK: Kendi Bilgisayarındaki Yerel Stüdyo Modeli (ShadowCat-R1 14B SSE)
+        try {
+            const localRes = await fetch(LOCAL_STUDIO_API, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: 'shadowcat-14b', stream: true})
+            });
+            if (localRes.ok && localRes.body) {
+                const reader = localRes.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let fullText = '';
+                let thinkText = '';
+                let isInsideThink = false;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.slice(6).trim();
+                            if (dataStr === '[DONE]') continue;
+                            try {
+                                const parsed = JSON.parse(dataStr);
+                                const token = parsed.token || '';
+                                fullText += token;
+                                if (token.includes('<think>')) isInsideThink = true;
+                                if (isInsideThink) {
+                                    thinkText += token;
+                                    if (onThinking) onThinking(thinkText);
+                                } else {
+                                    if (onToken) onToken(token);
+                                }
+                                if (token.includes('</think>')) isInsideThink = false;
+                            } catch(e) {
+                                if (dataStr) {
+                                    fullText += dataStr;
+                                    if (onToken) onToken(dataStr);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (fullText && fullText.trim()) return fullText;
+            }
+        } catch(e) {
+            // Yerel sunucu açık değilse fallback'e geç
+        }
+
+        // 2. ÖNCELİK: Canlı Zeka Motoru
         if (window.puter && window.puter.ai) {
             const messages = [
                 { role: 'system', content: STUDIO_SYSTEM_PROMPT },
@@ -3661,9 +3721,7 @@ Temel Kuralların:
                         }
                     }
                     if (fullText && fullText.trim()) return fullText;
-                } catch(e) {
-                    console.warn(`Puter stream model ${m} error, trying next:`, e);
-                }
+                } catch(e) {}
             }
         }
 
@@ -4461,16 +4519,38 @@ Temel Kuralların:
 
     async function checkBackend() {
         const b = document.getElementById('modeBadge');
+        // 1. Yerel ShadowCat-R1 14B Stüdyo Sunucusu Kontrolü
         try {
-            const r = await fetch('https://epic-api.berkaygulmez014.workers.dev/api/status');
-            const d = await r.json();
-            if (d && d.status === 'ready') {
-                if (b) { b.textContent = '● Cloudflare Canlı (<5ms)'; b.className = 'mode-badge live'; b.style.color = ''; }
-            } else {
-                if (b) { b.textContent = '⚠️ Sunucu Çöktü'; b.className = 'mode-badge'; b.style.color = '#ef4444'; }
+            const localR = await fetch('http://localhost:7860/api/status');
+            const localD = await localR.json();
+            if (localD && localD.status === 'ready') {
+                if (b) {
+                    b.textContent = '● 👑 ShadowCat-R1 14B Yerel Stüdyo (Canlı)';
+                    b.className = 'mode-badge live';
+                    b.style.color = '#10b981';
+                }
+                return;
             }
-        } catch(e) {
-            if (b) { b.textContent = '⚠️ Sunucu Çöktü / Bağlantı Yok'; b.className = 'mode-badge'; b.style.color = '#ef4444'; }
+        } catch(e) {}
+
+        // 2. Yerel FastAPI (niko_ai) Kontrolü
+        try {
+            const fastR = await fetch('http://localhost:8000/api/models');
+            if (fastR.ok) {
+                if (b) {
+                    b.textContent = '● 🚀 Niko AI Yerel Motor (Canlı)';
+                    b.className = 'mode-badge live';
+                    b.style.color = '#10b981';
+                }
+                return;
+            }
+        } catch(e) {}
+
+        // 3. Bulut Durumu
+        if (b) {
+            b.textContent = '● 🌐 GlassesCat Web Bulut Modu';
+            b.className = 'mode-badge';
+            b.style.color = '#a78bfa';
         }
     }
 
