@@ -102,7 +102,7 @@ Ben **EPIC (Nexus Brain v4.0)**! 🔥👑
 
 ### 💎 Temel Yeteneklerim & Uzmanlıklarım:
 * 🎮 **Unreal Engine 5.4+ & C++:** Nanite & Lumen render mimarisi, \`AFearSoundManager\` 3D uzamsal ses motoru, AActor hiyerarşisi ve shader kodlaması.
-* ⚡ **FiveM & Oyun Otomasyonu:** DirectInput scancode entegrasyonu (\`0x11\` W, \`0x2A\` Shift, \`0x12\` E), düşük seviyeli Windows API ve optimizasyon.
+* ⚡ **Gelişmiş Algoritmalar & Performans:** Düşük seviyeli bellek yönetimi, veri yapıları ve sistem mimarisi optimizasyonu.
 * 🐍 **Python & Modern Yazılım:** Tam yığın web mimarileri, SQLite/PostgreSQL veritabanı, asenkron sistemler ve algoritmalar.
 * 🧠 **Derin Akıl Yürütme (<think>):** Her soruyu adım adım analiz ederek hatasız, net ve en yüksek kalitede çözüm üretme yeteneği.
 
@@ -189,7 +189,7 @@ UE5.4 Nanite, Lumen, AActor, Chaos Physics, Niagara ve stüdyomuzun AFearSoundMa
    * Düşman NPC davranış ağaçları, NavMesh dinamik yön bulma ve çevre sorgulama sistemi.
 
 5. 🛠️ **Multiplayer & Ağ Senkronizasyonu:**
-   * Server-Client RPC fonksiyonları, değişken replikasyonu ve FiveM/C++ ağ entegrasyonu.
+   * Server-Client RPC fonksiyonları, değişken replikasyonu ve C++ ağ senkronizasyonu.
 
 Özel bir UE5 C++ mekaniği veya Blueprint sistemi geliştirmemi ister misiniz?`;
   }
