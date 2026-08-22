@@ -1,0 +1,7 @@
+name = "deepultra-api"
+main = "worker.js"
+compatibility_date = "2026-08-22"
+
+[vars]
+STUDIO_NAME = "GlassesGlitchStudio"
+MODEL_NAME = "DeepUltra"
