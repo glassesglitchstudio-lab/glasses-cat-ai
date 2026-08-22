@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>GlassesCat AI v4.0 — Nexus Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
@@ -2173,77 +2176,46 @@
                 const imgTag = `<img src="${d.url}" alt="gorsel" style="max-width:100%;border-radius:8px">`;
                 sbHtml = sbHtml || '';
                 if (sbHtml.includes('</body>')) {
-                    sbHtml = sbHtml.replace('</body>', imgTag + '\n</body>');
-                } else {
-                    sbHtml = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>img{max-width:100%;height:auto}body{font-family:system-ui,sans-serif;margin:0;padding:16px}</style></head><body>' + imgTag + '</body></html>';
-                }
-                sbLoadPreview();
-                document.getElementById('sbCodePre').textContent = sbHtml;
-                addSbMsg('ai', '✅ Gorsel eklendi! Simdi soyle: "gorselin altina metin ekle" veya "gorseli saga yerlestir".\n\n📌 Adres: `' + d.url + '`');
-            } else {
-                addSbMsg('ai', '⚠️ ' + (d.error || 'Yukleme basarisiz'));
-            }
-        } catch(e) {
-            const msgs = document.getElementById('sbMsgs');
-            const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) last.remove();
-            addSbMsg('ai', '⚠️ Hata: ' + e.message);
-        }
+    function sbUploadImage(input) {
+        const f = input.files && input.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const url = e.target.result;
+            const msg = 'Sayfaya şu resmi ekle: <img src="' + url + '" style="max-width:100%;border-radius:12px;">';
+            const inEl = document.getElementById('sbInput');
+            if (inEl) inEl.value = msg;
+            sbSendAi();
+        };
+        reader.readAsDataURL(f);
         input.value = '';
     }
 
-    async function sbSend() {
-        const inp = document.getElementById('sbInput');
-        const msg = inp.value.trim();
+    async function sbSendAi() {
+        const inEl = document.getElementById('sbInput');
+        const msg = (inEl.value || '').trim();
         if (!msg) return;
-        inp.value = '';
+        inEl.value = '';
         addSbMsg('user', msg);
-        const loadingHtml = '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse" id="sbStageMain">Model yükleniyor, lütfen bekleyin<span class="sb-load-dots"></span></span><small id="sbStageSub">AI siteni oluşturuyor...</small></div></div>';
+        const loadingHtml = '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse" id="sbStageMain">Modal 7/24 AI siteyi hazırlıyor<span class="sb-load-dots"></span></span><small id="sbStageSub">Modern HTML5 & CSS3 üretiliyor...</small></div></div>';
         addSbMsg('ai', loadingHtml, true);
 
-        const stages = [
-            [0,    'Model yükleniyor, lütfen bekleyin', 'AI siteni oluşturuyor...'],
-            [8,    'Site tasarımı çiziliyor', 'navbar, hero ve bölümler planlanıyor...'],
-            [35,   'HTML kodları yazılıyor', 'içerik ve stiller ekleniyor...'],
-            [75,   'Kod temizleniyor', 'kusurlar gideriliyor, düzeltmeler yapılıyor...'],
-            [120,  'Son rötuşlar yapılıyor', 'mobil uyum kontrol ediliyor...']
-        ];
-        const sbStageT0 = Date.now();
-        const sbStageTimer = setInterval(() => {
-            const sec = (Date.now() - sbStageT0) / 1000;
-            let cur = stages[0];
-            for (const s of stages) { if (sec >= s[0]) cur = s; }
-            const main = document.getElementById('sbStageMain');
-            const sub = document.getElementById('sbStageSub');
-            if (main) main.innerHTML = cur[1] + '<span class="sb-load-dots"></span>';
-            if (sub) sub.textContent = cur[2];
-        }, 3000);
-
         try {
-            const res = await fetch('/api/site-builder/chat', {
+            const res = await fetch('https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/site-builder/chat', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: msg, current_html: sbHtml, theme: sbTheme || null})
+                body: JSON.stringify({query: msg, current_html: sbHtml, theme: sbTheme || null})
             });
             const d = await res.json();
-            clearInterval(sbStageTimer);
-            // Remove thinking msg
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) {
-                last.remove();
-            }
-            if (d.success && d.html) {
+            if (last && last.querySelector('.sb-loading')) last.remove();
+
+            if (d.html) {
                 sbPushHistory(d.html);
                 sbHtml = d.html;
                 sbLoadPreview();
                 document.getElementById('sbCodePre').textContent = sbHtml;
-                addSbMsg('ai', (d.message || 'Site güncellendi!') + '\n\nÖnizlemede **Seç** ile element seçip düzenleyebilir, kod sekmesinden HTML\'i görebilirsin.');
-            } else {
-                addSbMsg('ai', (d.error || 'Bir hata oldu'));
-            }
-        } catch(e) {
-            clearInterval(sbStageTimer);
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
             if (last && last.querySelector('.sb-loading')) {
