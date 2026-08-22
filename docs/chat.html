@@ -67,69 +67,80 @@
         .model-opt.disabled{opacity:.3;cursor:default}
         .sep{height:1px;background:#e0ddd5;margin:4px 8px}
 
-        /* ─── DARK STUDIO THEME & LAYOUT ─── */
-        body { background: #08070d; color: #e2daf8; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
-        .sidebar { background: #0c0a13; border-right: 1px solid rgba(255, 255, 255, 0.08); color: #dfd6cd; }
-        .sidebar-brand-text { color: #fff; }
-        .sidebar-search, .new-chat-btn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
-        .new-chat-btn:hover { background: #1a1628; border-color: #7c3aed; color: #fff; }
-        .sidebar-tabs { border-bottom-color: rgba(255, 255, 255, 0.08); }
-        .sidebar-tab { color: #888; }
-        .sidebar-tab.active { color: #c084fc; border-bottom-color: #a855f7; }
-        .chat-item { color: #aaa; }
-        .chat-item:hover { background: rgba(124,58,237,0.1); color: #fff; }
-        .chat-item.active { background: rgba(124,58,237,0.2); color: #c084fc; }
-        .sidebar-footer { border-top-color: rgba(255, 255, 255, 0.08); background: #0c0a13; }
-        #userProfileBtn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
-        .topbar { background: rgba(12, 10, 19, 0.85); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .tb-btn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
-        .tb-btn:hover { border-color: #7c3aed; color: #fff; }
-        .tb-btn.active { background: rgba(124,58,237,0.2); border-color: #7c3aed; color: #c084fc; }
-        .content-area { flex: 1; display: flex; overflow: hidden; position: relative; background: radial-gradient(circle at 50% 38%, rgba(124, 58, 237, 0.14) 0%, rgba(10, 9, 16, 0.85) 60%, #08070d 100%); }
-        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        /* ─── CLEAN LIGHT STUDIO THEME (BEYAZ TEMA) ─── */
+        body { background: #fdfdfc; color: #1a1a1a; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
+        .sidebar { background: #f9f9f8; border-right: 1px solid #e5e3de; color: #444; }
+        .sidebar-brand-text { color: #1a1a1a; font-weight: 700; }
+        .sidebar-brand-sub { color: #888; }
+        .sidebar-search, .new-chat-btn { background: #fff; border: 1px solid #e0ddd5; color: #444; }
+        .new-chat-btn:hover { background: #f0eee9; border-color: #7c3aed; color: #7c3aed; }
+        .sidebar-tabs { border-bottom: 1px solid #e5e3de; }
+        .sidebar-tab { color: #777; }
+        .sidebar-tab.active { color: #7c3aed; border-bottom-color: #7c3aed; font-weight: 600; }
+        .chat-item { color: #555; }
+        .chat-item:hover { background: rgba(124,58,237,0.06); color: #1a1a1a; }
+        .chat-item.active { background: rgba(124,58,237,0.1); color: #7c3aed; font-weight: 600; }
+        .sidebar-footer { border-top: 1px solid #e5e3de; background: #f9f9f8; color: #888; }
+        #userProfileBtn { background: #fff; border: 1px solid #e0ddd5; color: #444; }
+        .topbar { background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid #e5e3de; backdrop-filter: blur(8px); }
+        .tb-btn { background: #fff; border: 1px solid #e0ddd5; color: #555; }
+        .tb-btn:hover { border-color: #7c3aed; color: #7c3aed; }
+        .tb-btn.active { background: rgba(124,58,237,0.08); border-color: #7c3aed; color: #7c3aed; }
+        .content-area { flex: 1; display: flex; overflow: hidden; position: relative; background: #fff; }
+        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; background: #fff; }
         .msgs-inner { width: 100%; max-width: 760px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 20px 24px 8px; }
 
-        /* Welcome Screen (Clean & Proportional) */
+        /* Welcome Screen (Clean Light Theme & Proportional) */
         .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 0 24px 6vh; }
-        .welcome-logo { width: 68px; height: 68px; max-width: 68px; max-height: 68px; border-radius: 50%; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto 16px; box-shadow: 0 0 24px rgba(124,58,237,0.3); flex-shrink: 0; }
+        .welcome-logo { width: 68px; height: 68px; max-width: 68px; max-height: 68px; border-radius: 50%; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto 16px; box-shadow: 0 4px 20px rgba(124,58,237,0.15); flex-shrink: 0; }
         .welcome-logo img { width: 68px; height: 68px; max-width: 68px; max-height: 68px; object-fit: cover; border-radius: 50%; display: block; }
-        .welcome h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; color: #fff; margin: 0 0 8px; }
-        .welcome .welcome-sub { color: #a78bfa; font-size: .88rem; margin: 0 0 20px; }
+        .welcome h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; color: #1a1a1a; margin: 0 0 8px; }
+        .welcome .welcome-sub { color: #666; font-size: .88rem; margin: 0 0 20px; }
         .welcome .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; justify-content: center; max-width: 500px; }
-        .welcome .chip { padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #dfd6cd; font-size: .8rem; cursor: pointer; transition: all .15s; font-family: inherit; }
-        .welcome .chip:hover { border-color: #7c3aed; color: #fff; background: rgba(124,58,237,0.2); transform: translateY(-1px); }
+        .welcome .chip { padding: 8px 16px; border-radius: 100px; border: 1px solid #e0ddd5; background: #fff; color: #555; font-size: .8rem; cursor: pointer; transition: all .15s; font-family: inherit; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .welcome .chip:hover { border-color: #7c3aed; color: #7c3aed; background: rgba(124,58,237,0.04); transform: translateY(-1px); }
 
-        /* Main Chat Input Area */
-        .input-area { padding: 0 20px 20px; position: relative; }
-        .input-outer { width: 100%; max-width: 760px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; background: rgba(18, 15, 28, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 8px 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.5); transition: border-color .15s; }
-        .input-outer:focus-within { border-color: rgba(124, 58, 237, 0.6); box-shadow: 0 12px 36px rgba(0,0,0,0.6), 0 0 24px rgba(124,58,237,0.2); }
-        .input-box { flex: 1; border: none; background: transparent; color: #fff; font-family: inherit; font-size: .92rem; resize: none; outline: none; padding: 6px 4px; min-height: 24px; max-height: 160px; line-height: 1.5; }
-        .input-box::placeholder { color: rgba(255,255,255,0.35); }
+        /* Main Chat Input Area (Light Theme) */
+        .input-area { padding: 0 20px 20px; position: relative; background: #fff; }
+        .input-outer { width: 100%; max-width: 760px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; background: #fff; border: 1px solid #e0ddd5; border-radius: 16px; padding: 8px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: border-color .15s, box-shadow .15s; }
+        .input-outer:focus-within { border-color: #7c3aed; box-shadow: 0 4px 24px rgba(124,58,237,0.12); }
+        .input-box { flex: 1; border: none; background: transparent; color: #1a1a1a; font-family: inherit; font-size: .92rem; resize: none; outline: none; padding: 6px 4px; min-height: 24px; max-height: 160px; line-height: 1.5; }
+        .input-box::placeholder { color: #999; }
         .input-tools { display: flex; align-items: center; gap: 4px; }
-        .input-tools button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
-        .input-tools button:hover { background: rgba(124,58,237,0.25); color: #fff; border-color: #7c3aed; }
+        .input-tools button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e0ddd5; background: #fff; color: #666; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+        .input-tools button:hover { background: rgba(124,58,237,0.08); color: #7c3aed; border-color: #7c3aed; }
         .send-btn { width: 34px; height: 34px; border-radius: 50%; background: #7c3aed; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
-        .send-btn:disabled { background: rgba(255,255,255,0.08); color: #555; cursor: not-allowed; }
+        .send-btn:disabled { background: #e5e3de; color: #999; cursor: not-allowed; }
         .stop-btn { width: 34px; height: 34px; border-radius: 50%; background: #dc2626; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* Message Bubbles */
+        /* Message Bubbles (Light Theme) */
         .msg { padding: 14px 0; animation: fadeIn .2s ease-out; }
         .msg .hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .msg .av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 600; overflow: hidden; flex-shrink: 0; }
         .msg .av img { width: 100%; height: 100%; object-fit: contain; }
-        .msg.user .av { background: rgba(255,255,255,0.1); color: #dfd6cd; }
-        .msg.ai .av { background: rgba(124,58,237,0.2); }
-        .msg .nm { font-size: .82rem; font-weight: 600; color: #e0d9fc; }
+        .msg.user .av { background: #e0ddd5; color: #555; }
+        .msg.ai .av { background: rgba(124,58,237,0.1); }
+        .msg .nm { font-size: .82rem; font-weight: 600; color: #333; }
         .msg .actions { display: flex; gap: 4px; margin-left: auto; }
-        .msg .actions button { background: none; border: none; color: #666; cursor: pointer; font-size: .7rem; padding: 2px 4px; border-radius: 4px; transition: all .1s; }
-        .msg .actions button:hover { color: #c084fc; background: rgba(124,58,237,0.1); }
-        .msg .ct { margin-left: 36px; font-size: .9rem; line-height: 1.7; color: #e0d9fc; word-break: break-word; }
-        .msg.user .ct { background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); color: #fff; display: inline-block; max-width: 85%; }
-        .msg .ct pre { background: #110e1c !important; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin: 8px 0; overflow-x: auto; font-family: 'JetBrains Mono','Courier New',monospace; font-size: .8rem; color: #f3e8ff; }
-        .msg .ct :not(pre)>code { background: rgba(124,58,237,0.15); color: #c084fc; padding: 1px 6px; border-radius: 4px; font-size: .84rem; }
+        .msg .actions button { background: none; border: none; color: #bbb; cursor: pointer; font-size: .7rem; padding: 2px 4px; border-radius: 4px; transition: all .1s; }
+        .msg .actions button:hover { color: #7c3aed; background: rgba(124,58,237,0.04); }
+        .msg .ct { margin-left: 36px; font-size: .9rem; line-height: 1.7; color: #222; word-break: break-word; }
+        .msg.user .ct { background: #f4f3f0; padding: 10px 14px; border-radius: 12px; border: 1px solid #e0ddd5; color: #1a1a1a; display: inline-block; max-width: 85%; }
+        .msg .ct pre { background: #1a1628 !important; border: 1px solid #2e2640; border-radius: 8px; padding: 12px; margin: 8px 0; overflow-x: auto; font-family: 'JetBrains Mono','Courier New',monospace; font-size: .8rem; color: #f3e8ff; }
+        .msg .ct :not(pre)>code { background: rgba(124,58,237,0.08); color: #7c3aed; padding: 1px 6px; border-radius: 4px; font-size: .84rem; }
         .msg .ct img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
 
-        /* Cyber Omnibox for Project IDE Workspace */
+        /* Model Selector in Light Mode */
+        .model-selector { padding: 5px 10px; border-radius: 6px; border: 1px solid #e0ddd5; background: #fff; cursor: pointer; font-size: .72rem; font-weight: 500; color: #444; transition: all .15s; position: relative; display: flex; align-items: center; gap: 4px; }
+        .model-selector:hover { border-color: #7c3aed; }
+        .model-dropdown { position: absolute; top: calc(100% + 4px); left: 0; min-width: 210px; background: #fff; border: 1px solid #e0ddd5; border-radius: 10px; padding: 4px; z-index: 70; display: none; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .model-dropdown.show { display: block; }
+        .model-opt { padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: .78rem; color: #333; transition: background .1s; }
+        .model-opt:hover { background: #f5f5f5; }
+        .model-opt.active { color: #7c3aed; font-weight: 600; background: rgba(124,58,237,0.06); }
+        .model-opt .sub { display: block; font-size: .6rem; color: #999; margin-top: 1px; }
+
+        /* Cyber Omnibox for Project IDE Workspace (Dark Inside Workspace Only) */
         .welcome-cyber-badge { font-size: 0.68rem; padding: 3px 10px; border-radius: 100px; background: rgba(124, 58, 237, 0.25); color: #c084fc; border: 1px solid rgba(124, 58, 237, 0.4); font-weight: 600; }
         .cyber-context-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .cyber-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #dfd6cd; font-size: 0.76rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; position: relative; user-select: none; }
@@ -3741,15 +3752,17 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
 
     async function checkBackend() {
         const b = document.getElementById('modeBadge');
-        if (b) { b.textContent = '● Cloudflare Canlı'; b.className = 'mode-badge live'; }
-        
         try {
             const r = await fetch('https://epic-api.berkaygulmez014.workers.dev/api/status');
             const d = await r.json();
             if (d && d.status === 'ready') {
-                if (b) { b.textContent = '● Cloudflare Canlı (<5ms)'; b.className = 'mode-badge live'; }
+                if (b) { b.textContent = '● Cloudflare Canlı (<5ms)'; b.className = 'mode-badge live'; b.style.color = ''; }
+            } else {
+                if (b) { b.textContent = '⚠️ Sunucu Çöktü'; b.className = 'mode-badge'; b.style.color = '#ef4444'; }
             }
-        } catch(e) {}
+        } catch(e) {
+            if (b) { b.textContent = '⚠️ Sunucu Çöktü / Bağlantı Yok'; b.className = 'mode-badge'; b.style.color = '#ef4444'; }
+        }
     }
 
     async function callChat(msg) {
@@ -3767,11 +3780,12 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
                 } catch(pe) {
                     if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) return txt;
                 }
+            } else {
+                toast('⚠️ Sunucu Çöktü / Hata Kodu: ' + res.status);
             }
-        } catch(e) {}
-
-        return "ShadowCat-R1 14B Bulut Motoru hazır. Sorunuz alındı!";
-    }
+        } catch(e) {
+            toast('⚠️ Sunucu Çöktü / Bağlantı Hatası');
+        }
 
     function generateDeepUltraResponse(msg, model) {
         const q = (msg || '').trim();
@@ -3968,6 +3982,7 @@ Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engin
 
     async function streamChat(msg, onToken, onThinking) {
         let rawReply = "";
+        let serverErrorOccurred = false;
         try {
             const res = await fetch(MODAL_API_URL, {
                 method: 'POST',
@@ -3984,11 +3999,27 @@ Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engin
                         rawReply = txt;
                     }
                 }
+            } else {
+                serverErrorOccurred = true;
+                toast('⚠️ Sunucu Çöktü (HTTP ' + res.status + ')');
             }
-        } catch(e) {}
+        } catch(e) {
+            serverErrorOccurred = true;
+            toast('⚠️ Sunucu Çöktü / Bağlantı Hatası');
+        }
 
         if (!rawReply || rawReply.trim().startsWith('<!DOCTYPE') || rawReply.trim().startsWith('<html') || rawReply.includes('Sunucu yanıt vermedi')) {
-            rawReply = generateDeepUltraResponse(msg, currentModel);
+            if (serverErrorOccurred) {
+                rawReply = `<think>
+Cloudflare Edge Worker API sunucusuna erişilemedi veya sunucu çöktü.
+Yedek yerel Nexus AI zekası devreye alınıyor.
+</think>
+⚠️ **[Sunucu Çöktü / Bağlantı Hatası]** Cloudflare API sunucusuna anlık ulaşılamadı veya sunucu çöktü. Yedek **EPIC Nexus Çekirdeği** devreye alındı:
+
+` + generateDeepUltraResponse(msg, currentModel);
+            } else {
+                rawReply = generateDeepUltraResponse(msg, currentModel);
+            }
         }
 
         // <think>...</think> düşünce zincirini ayıkla
