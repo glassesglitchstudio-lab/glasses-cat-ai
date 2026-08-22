@@ -3675,9 +3675,9 @@ Glitch Code Geliştirici Komutları:
         toast('✓ ' + cleanName + ' dosyası projeye eklendi!');
     }
 
-    function applyCodeToEditor(codeText) {
+    function applyCodeToEditor(codeText, btnElement = null) {
         if (!currentIdeFile) {
-            toast('Düzenlenecek aktif dosya yok.');
+            toast('⚠️ Düzenlenecek aktif dosya seçilmedi.');
             return;
         }
         currentIdeFile.content = codeText;
@@ -3686,9 +3686,30 @@ Glitch Code Geliştirici Komutları:
             editor.value = codeText;
             updateLineNumbers();
             updateCursorPosition();
+
+            // Editör güncellendiğinde yeşil parlama efekti ver
+            editor.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+            editor.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.6)';
+            editor.style.borderColor = '#10b981';
+            setTimeout(() => {
+                editor.style.boxShadow = '';
+                editor.style.borderColor = '';
+            }, 1200);
         }
-        saveActiveIdeCode(true);
+        saveActiveIdeCode(false);
         switchIdeViewMode('code');
+
+        if (btnElement) {
+            btnElement.innerHTML = '✓ Dosyaya Başarıyla Aktarıldı!';
+            btnElement.style.background = '#059669';
+            btnElement.style.borderColor = '#10b981';
+            setTimeout(() => {
+                btnElement.innerHTML = '✓ Bu Kodu Dosyaya Uygula (' + esc(currentIdeFile.name || 'Dosya') + ')';
+                btnElement.style.background = '#7c3aed';
+                btnElement.style.borderColor = '#7c3aed';
+            }, 2500);
+        }
+
         toast('✓ Kod aktif dosyaya (' + (currentIdeFile.name || 'Dosya') + ') aktarıldı ve kaydedildi!');
     }
 
@@ -3752,13 +3773,14 @@ Glitch Code Geliştirici Komutları:
             txtEl.innerHTML = format(res || 'İşlem tamamlandı.');
             
             // Eğer yanıtta kod bloğu varsa 'Editöre Uygula' butonu ekle
-            const codeBlockMatch = res.match(/```(?:\w+)?\n([\s\S]*?)```/);
+            const cleanForCode = (res || '').replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+            const codeBlockMatch = cleanForCode.match(/```(?:\w+)?\n([\s\S]*?)```/) || (res || '').match(/```(?:\w+)?\n([\s\S]*?)```/);
             if (codeBlockMatch && codeBlockMatch[1]) {
                 const cleanCode = codeBlockMatch[1].trim();
                 const applyBtn = document.createElement('button');
-                applyBtn.style.cssText = 'margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit';
+                applyBtn.style.cssText = 'margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .2s ease';
                 applyBtn.innerHTML = '✓ Bu Kodu Dosyaya Uygula (' + esc(fname) + ')';
-                applyBtn.onclick = () => applyCodeToEditor(cleanCode);
+                applyBtn.onclick = function() { applyCodeToEditor(cleanCode, this); };
                 aiDiv.appendChild(applyBtn);
             }
         } catch(e) {
@@ -3796,13 +3818,14 @@ Glitch Code Geliştirici Komutları:
             const res = await callChat(msg);
             txtEl.innerHTML = format(res || 'Talebiniz işlendi.');
             
-            const codeBlockMatch = res.match(/```(?:\w+)?\n([\s\S]*?)```/);
+            const cleanForCode = (res || '').replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+            const codeBlockMatch = cleanForCode.match(/```(?:\w+)?\n([\s\S]*?)```/) || (res || '').match(/```(?:\w+)?\n([\s\S]*?)```/);
             if (codeBlockMatch && codeBlockMatch[1]) {
                 const cleanCode = codeBlockMatch[1].trim();
                 const applyBtn = document.createElement('button');
-                applyBtn.style.cssText = 'margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit';
+                applyBtn.style.cssText = 'margin-top:8px;padding:6px 12px;border-radius:6px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .2s ease';
                 applyBtn.innerHTML = '✓ Bu Kodu Dosyaya Uygula (' + esc(fname) + ')';
-                applyBtn.onclick = () => applyCodeToEditor(cleanCode);
+                applyBtn.onclick = function() { applyCodeToEditor(cleanCode, this); };
                 aiDiv.appendChild(applyBtn);
             }
         } catch(e) {
