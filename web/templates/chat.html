@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         ::selection{background:rgba(124,58,237,0.15)}
@@ -3348,6 +3349,29 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         }
     }
 
+    let pyodideRunner = null;
+    async function executePythonInBrowser(code) {
+        try {
+            if (!pyodideRunner) {
+                logTerminal('🐍 WebAssembly CPython 3.11 Motoru (Pyodide) hazırlanıyor...', '#f59e0b');
+                if (typeof loadPyodide === 'function') {
+                    pyodideRunner = await loadPyodide();
+                    logTerminal('✓ Gerçek Python 3.11 WebAssembly çalışma ortamı hazır!', '#10b981');
+                } else {
+                    throw new Error('Pyodide kütüphanesine ulaşılamadı.');
+                }
+            }
+            pyodideRunner.setStdout({ batched: (msg) => logTerminal('  ' + msg, '#e2e8f0') });
+            pyodideRunner.setStderr({ batched: (msg) => logTerminal('❌ ' + msg, '#ef4444') });
+            const t0 = performance.now();
+            await pyodideRunner.runPythonAsync(code);
+            const elapsed = (performance.now() - t0).toFixed(2);
+            logTerminal(`✓ Python Çalışması Tamamlandı (${elapsed} ms) — Çıkış: 0`, '#10b981');
+        } catch(err) {
+            logTerminal(`❌ Python Çalışma Hatası: ${err.message}`, '#ef4444');
+        }
+    }
+
     function runActiveIdeCode() {
         if (!currentIdeFile) {
             toast('Çalıştırılacak dosya seçilmedi.');
@@ -3373,6 +3397,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         switchIdeViewMode('terminal');
 
         const isJs = ext.endsWith('.js') || ext.endsWith('.ts') || (!ext.endsWith('.py') && !ext.endsWith('.cpp') && !ext.endsWith('.h') && (content.includes('function ') || content.includes('console.log') || content.includes('const ') || content.includes('let ')));
+        const isPy = ext.endsWith('.py') || (!isJs && (content.includes('def ') || content.includes('import ') || content.includes('print(')));
 
         if (isJs) {
             try {
@@ -3398,19 +3423,10 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
             } catch(err) {
                 logTerminal(`❌ Çalışma Zamanı Hatası: ${err.message}`, '#ef4444');
             }
-        } else if (ext.endsWith('.py') || content.includes('def ') || content.includes('import ')) {
-            logTerminal(`🐍 Python Sözdizimi & Yapısal Doğrulama:`, '#f59e0b');
-            const lines = content.split('\n');
-            const imports = lines.filter(l => l.trim().startsWith('import ') || l.trim().startsWith('from '));
-            const defs = lines.filter(l => l.trim().startsWith('def ') || l.trim().startsWith('async def '));
-            const classes = lines.filter(l => l.trim().startsWith('class '));
-
-            logTerminal(`  • Tespit edilen Modüller (${imports.length}): ${imports.map(i => i.trim()).join(', ') || 'Yok'}`, '#94a3b8');
-            logTerminal(`  • Sınıflar (${classes.length}): ${classes.map(c => c.trim().split('(')[0].replace('class ','')).join(', ') || 'Yok'}`, '#94a3b8');
-            logTerminal(`  • Fonksiyonlar (${defs.length}): ${defs.map(d => d.trim().split('(')[0].replace('async ','').replace('def ','')).join(', ') || 'Yok'}`, '#94a3b8');
-            logTerminal(`✓ Python scripti sözdizimsel olarak geçerli!`, '#10b981');
+        } else if (isPy) {
+            executePythonInBrowser(content);
         } else if (ext.endsWith('.cpp') || ext.endsWith('.h') || content.includes('#include') || content.includes('UCLASS')) {
-            logTerminal(`🎮 Unreal Engine C++ Derleme Kontrolü:`, '#c084fc');
+            logTerminal(`🎮 Unreal Engine C++ Sözdizim & Yapı Kontrolü:`, '#c084fc');
             const hasUClass = content.includes('UCLASS') || content.includes('GENERATED_BODY');
             const hasModule = content.includes('IModuleInterface') || content.includes('IMPLEMENT_MODULE');
             logTerminal(`  • UObject/AActor Makroları: ${hasUClass ? '✓ Doğru' : 'N/A'}`, '#94a3b8');
@@ -3451,10 +3467,10 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
 
             if (mainCmd === 'help' || mainCmd === 'glitch') {
                 logTerminal(`╔═══════════════════════════════════════════════════════════════════╗
-║   ⚡ GLITCH CODE x EPICCODER ENGINE (v4.0 Flagship Suite)        ║
+║   ⚡ GLITCH CODE x EPICCODER ENGINE (v4.0 Real Execution)        ║
 ╚═══════════════════════════════════════════════════════════════════╝
 Glitch Code Geliştirici Komutları:
-  • ptc / debate <görev>    - Multi-Model Debate (2 model tartışmalı konsensüs)
+  • ptc / debate <görev>    - Multi-Model Debate (Gerçek model konsensüsü)
   • think / plusthinking     - Derin Düşünce & Edge-Case Akıl Yürütme Analizi
   • doctor / diagnose        - Proje Sağlık Taraması & Auto-Doctor Teşhisi
   • audit / security         - CVE Zafiyet Taraması & Güvenlik Denetimi
@@ -3517,9 +3533,8 @@ Glitch Code Geliştirici Komutları:
   • Satır Sayısı (LOC): ${lines}
   • Karakter Boyutu: ${chars} bayt
   • Tahmini Token Yükü: ~${tokensEst} token
-  • Siklomatik Karmaşıklık (Keyword Skoru): ${complexEst}
-  • Kod Durumu: ${complexEst > 25 ? '⚠️ Yüksek Karmaşıklık (Refactor önerilir)' : '✓ İdeal Seviye'}
-  • Model Çıkarım Gecikmesi: <5ms (Cloudflare Edge)`, '#38bdf8');
+  • Siklomatik Karmaşıklık: ${complexEst}
+  • Kod Durumu: ${complexEst > 25 ? '⚠️ Yüksek Karmaşıklık' : '✓ İdeal Seviye'}`, '#38bdf8');
                 return;
             }
 
@@ -3574,6 +3589,76 @@ Glitch Code Geliştirici Komutları:
 
             logTerminal(`Bilinmeyen komut: '${cmd}'. Glitch Code yardım listesi için 'glitch' veya 'help' yazın.`, '#ef4444');
         }
+    }
+
+    async function callChat(msg) {
+        try {
+            const res = await fetch(MODAL_API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: currentModel})
+            });
+            if (res.ok) {
+                const txt = await res.text();
+                try {
+                    const d = JSON.parse(txt);
+                    return d.reply || d.response || txt;
+                } catch(pe) {
+                    if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) return txt;
+                }
+            } else {
+                return `⚠️ **[HTTP ${res.status}]** AI API sunucusuna ulaşılamadı. Lütfen sunucunuzu kontrol edin.`;
+            }
+        } catch(e) {
+            return `⚠️ **[Bağlantı Hatası]** AI API sunucusuna ulaşılamadı. Lütfen sunucu bağlantınızı kontrol edin.`;
+        }
+        return "⚠️ Sunucudan yanıt alınamadı.";
+    }
+
+    async function streamChat(msg, onToken, onThinking) {
+        let rawReply = "";
+        let serverErrorOccurred = false;
+        try {
+            const res = await fetch(MODAL_API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: currentModel})
+            });
+            if (res.ok) {
+                const txt = await res.text();
+                try {
+                    const d = JSON.parse(txt);
+                    rawReply = d.reply || d.response || "";
+                } catch(pe) {
+                    if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) {
+                        rawReply = txt;
+                    }
+                }
+            } else {
+                serverErrorOccurred = true;
+            }
+        } catch(e) {
+            serverErrorOccurred = true;
+        }
+
+        if (!rawReply || serverErrorOccurred) {
+            rawReply = "⚠️ **[Sunucu Bağlantısı Yok]** AI API sunucusuna bağlanılamadı. Lütfen yerel FastAPI veya bulut sunucunuzun açık olduğundan emin olun.";
+        }
+
+        let cleanText = rawReply;
+        const thinkMatch = rawReply.match(/<think>([\s\S]*?)<\/think>/i);
+        if (thinkMatch) {
+            if (onThinking) onThinking(thinkMatch[1].trim());
+            cleanText = rawReply.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
+        }
+
+        const tokens = cleanText.split(/(?<=\s)/);
+        for (const tok of tokens) {
+            if (onToken) onToken(tok);
+            await new Promise(r => setTimeout(r, 12));
+        }
+
+        return cleanText;
     }
 
     function copyIdeCode() {
@@ -3691,7 +3776,6 @@ Glitch Code Geliştirici Komutları:
             updateLineNumbers();
             updateCursorPosition();
 
-            // Editör güncellendiğinde yeşil parlama efekti ver
             editor.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
             editor.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.6)';
             editor.style.borderColor = '#10b981';
@@ -3757,13 +3841,11 @@ Glitch Code Geliştirici Komutları:
 
         const hist = document.getElementById('ideChatHistory');
         
-        // Kullanıcı aksiyonu
         const userDiv = document.createElement('div');
         userDiv.style.cssText = 'padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;margin-left:14px;word-break:break-word';
         userDiv.innerHTML = '<span style="font-weight:600;color:#a78bfa">⚡ Glitch Görevi:</span> ' + userActionName + (customQuery ? ` (${esc(customQuery)})` : ` (<code>${esc(fname)}</code>)`);
         hist.appendChild(userDiv);
 
-        // AI Yanıtı
         const aiDiv = document.createElement('div');
         aiDiv.style.cssText = 'padding:10px;border-radius:8px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:#e0d9fc;word-break:break-word';
         aiDiv.innerHTML = '<span style="font-weight:600;color:#c084fc">⚡ Glitch x EpicCoder:</span> <span class="ide-ai-txt">Multi-model analizi yapılıyor ve kod sentezleniyor...</span>';
@@ -3776,7 +3858,6 @@ Glitch Code Geliştirici Komutları:
             const res = await callChat(promptText);
             txtEl.innerHTML = format(res || 'İşlem tamamlandı.');
             
-            // Eğer yanıtta kod bloğu varsa 'Editöre Uygula' butonu ekle
             const cleanForCode = (res || '').replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
             const codeBlockMatch = cleanForCode.match(/```(?:\w+)?\n([\s\S]*?)```/) || (res || '').match(/```(?:\w+)?\n([\s\S]*?)```/);
             if (codeBlockMatch && codeBlockMatch[1]) {
@@ -3801,13 +3882,11 @@ Glitch Code Geliştirici Komutları:
 
         const hist = document.getElementById('ideChatHistory');
         
-        // Kullanıcı mesajı
         const userDiv = document.createElement('div');
         userDiv.style.cssText = 'padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;margin-left:14px;word-break:break-word';
         userDiv.innerHTML = '<span style="font-weight:600;color:#38bdf8">Sen:</span> ' + esc(msg);
         hist.appendChild(userDiv);
 
-        // AI yanıt alanı
         const aiDiv = document.createElement('div');
         aiDiv.style.cssText = 'padding:10px;border-radius:8px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:#e0d9fc;word-break:break-word';
         aiDiv.innerHTML = '<span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> <span class="ide-ai-txt">Analiz ediliyor...</span>';
