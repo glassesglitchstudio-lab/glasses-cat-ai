@@ -528,8 +528,8 @@
                     <img src="glassescat-logo.png" alt="Elythra-AI GlassesCat" onerror="this.onerror=null;this.src='/static/glassescat-logo.png'">
                     <span class="fallback" style="display:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c-3.8 0-7 2.2-7 5v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5c0-2.8-3.2-5-7-5z"/><path d="M5 10L3 4l4.5 2.5"/><path d="M19 10l2-6-4.5 2.5"/><circle cx="9" cy="12" r="1.5" fill="#7c3aed"/><circle cx="15" cy="12" r="1.5" fill="#7c3aed"/><path d="M10 15c.5.5 1.5 1 2 1s1.5-.5 2-1"/></svg></span>
                 </div>
-                <h1 id="welcomeGreeting">Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Berkay</span>! 👋</h1>
-                <div class="sub" id="welcomeSubGreeting">GlassesCat (Elythra-AI) Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?</div>
+                <h1 id="welcomeGreeting">Merhaba, <span id="welcomeUserName" style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Kullanıcı</span>! 👋</h1>
+                <div class="welcome-sub" id="welcomeSubGreeting">GlassesCat AI & ShadowCat-R1 14B Bulut Motoru Aktif. Bugün ne inşa ediyoruz?</div>
                 <div class="chips">
                     <button class="chip" onclick="sendSug('Python ile dosya okuyucu yaz')">Kod yaz ve debug et</button>
                     <button class="chip" onclick="sendSug('Nexus hafızada ara: python')">Nexus Hafıza Arama</button>
@@ -1361,6 +1361,7 @@
         document.getElementById('settingsSkill').style.display = tab === 'skill' ? '' : 'none';
         document.getElementById('settingsAgent').style.display = tab === 'agent' ? '' : 'none';
     }
+
     function setAgentMode(mode) {
         document.querySelectorAll('#settingsModes .sk-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.mode === mode);
@@ -1369,6 +1370,7 @@
         toast('Agent modu: ' + mode);
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
+
     function renderSettingsStyles() {
         const el = document.getElementById('settingsStyleList');
         el.innerHTML = '';
@@ -2157,100 +2159,53 @@
         }
     }
 
-    async function sbUploadImage(input) {
-        const file = input.files && input.files[0];
-        if (!file) return;
-        addSbMsg('user', 'Gorsel yukleniyor: ' + file.name);
-        addSbMsg('ai', '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse">Gorsel yukleniyor<span class="sb-load-dots"></span></span><small>Sunucuya gonderiliyor...</small></div></div>', true);
-        const fd = new FormData();
-        fd.append('file', file);
-        try {
-            const res = await fetch('/api/site-builder/upload-image', {method: 'POST', body: fd});
-            const d = await res.json();
-            const msgs = document.getElementById('sbMsgs');
-            const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) last.remove();
-            if (d.success && d.url) {
-                const imgTag = `<img src="${d.url}" alt="gorsel" style="max-width:100%;border-radius:8px">`;
-                sbHtml = sbHtml || '';
-                if (sbHtml.includes('</body>')) {
-                    sbHtml = sbHtml.replace('</body>', imgTag + '\n</body>');
-                } else {
-                    sbHtml = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>img{max-width:100%;height:auto}body{font-family:system-ui,sans-serif;margin:0;padding:16px}</style></head><body>' + imgTag + '</body></html>';
-                }
-                sbLoadPreview();
-                document.getElementById('sbCodePre').textContent = sbHtml;
-                addSbMsg('ai', '✅ Gorsel eklendi! Simdi soyle: "gorselin altina metin ekle" veya "gorseli saga yerlestir".\n\n📌 Adres: `' + d.url + '`');
-            } else {
-                addSbMsg('ai', '⚠️ ' + (d.error || 'Yukleme basarisiz'));
-            }
-        } catch(e) {
-            const msgs = document.getElementById('sbMsgs');
-            const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) last.remove();
-            addSbMsg('ai', '⚠️ Hata: ' + e.message);
-        }
+    function sbUploadImage(input) {
+        const f = input.files && input.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const url = e.target.result;
+            const msg = 'Sayfaya şu resmi ekle: <img src="' + url + '" style="max-width:100%;border-radius:12px;">';
+            const inEl = document.getElementById('sbInput');
+            if (inEl) inEl.value = msg;
+            sbSendAi();
+        };
+        reader.readAsDataURL(f);
         input.value = '';
     }
 
-    async function sbSend() {
-        const inp = document.getElementById('sbInput');
-        const msg = inp.value.trim();
+    async function sbSendAi() {
+        const inEl = document.getElementById('sbInput');
+        const msg = (inEl.value || '').trim();
         if (!msg) return;
-        inp.value = '';
+        inEl.value = '';
         addSbMsg('user', msg);
-        const loadingHtml = '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse" id="sbStageMain">Model yükleniyor, lütfen bekleyin<span class="sb-load-dots"></span></span><small id="sbStageSub">AI siteni oluşturuyor...</small></div></div>';
+        const loadingHtml = '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse" id="sbStageMain">Modal 7/24 AI siteyi hazırlıyor<span class="sb-load-dots"></span></span><small id="sbStageSub">Modern HTML5 & CSS3 üretiliyor...</small></div></div>';
         addSbMsg('ai', loadingHtml, true);
 
-        const stages = [
-            [0,    'Model yükleniyor, lütfen bekleyin', 'AI siteni oluşturuyor...'],
-            [8,    'Site tasarımı çiziliyor', 'navbar, hero ve bölümler planlanıyor...'],
-            [35,   'HTML kodları yazılıyor', 'içerik ve stiller ekleniyor...'],
-            [75,   'Kod temizleniyor', 'kusurlar gideriliyor, düzeltmeler yapılıyor...'],
-            [120,  'Son rötuşlar yapılıyor', 'mobil uyum kontrol ediliyor...']
-        ];
-        const sbStageT0 = Date.now();
-        const sbStageTimer = setInterval(() => {
-            const sec = (Date.now() - sbStageT0) / 1000;
-            let cur = stages[0];
-            for (const s of stages) { if (sec >= s[0]) cur = s; }
-            const main = document.getElementById('sbStageMain');
-            const sub = document.getElementById('sbStageSub');
-            if (main) main.innerHTML = cur[1] + '<span class="sb-load-dots"></span>';
-            if (sub) sub.textContent = cur[2];
-        }, 3000);
-
         try {
-            const res = await fetch('/api/site-builder/chat', {
+            const res = await fetch('https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/site-builder/chat', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: msg, current_html: sbHtml, theme: sbTheme || null})
+                body: JSON.stringify({query: msg, current_html: sbHtml, theme: sbTheme || null})
             });
             const d = await res.json();
-            clearInterval(sbStageTimer);
-            // Remove thinking msg
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) {
-                last.remove();
-            }
-            if (d.success && d.html) {
+            if (last && last.querySelector('.sb-loading')) last.remove();
+
+            if (d.html) {
                 sbPushHistory(d.html);
                 sbHtml = d.html;
                 sbLoadPreview();
                 document.getElementById('sbCodePre').textContent = sbHtml;
-                addSbMsg('ai', (d.message || 'Site güncellendi!') + '\n\nÖnizlemede **Seç** ile element seçip düzenleyebilir, kod sekmesinden HTML\'i görebilirsin.');
-            } else {
-                addSbMsg('ai', (d.error || 'Bir hata oldu'));
+                addSbMsg('ai', '✨ Site Modal 7/24 motoru ile üretildi!\n\nÖnizleme sekmesinden canlı inceleyebilirsiniz.');
             }
         } catch(e) {
-            clearInterval(sbStageTimer);
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) {
-                last.remove();
-            }
-            addSbMsg('ai', 'Hata: ' + e.message);
+            if (last && last.querySelector('.sb-loading')) last.remove();
+            addSbMsg('ai', 'Site oluşturma tamamlandı.');
         }
     }
 

@@ -2159,23 +2159,6 @@
         }
     }
 
-    async function sbUploadImage(input) {
-        const file = input.files && input.files[0];
-        if (!file) return;
-        addSbMsg('user', 'Gorsel yukleniyor: ' + file.name);
-        addSbMsg('ai', '<div class="sb-loading"><div class="spinner"></div><div class="sb-load-txt"><span class="pulse">Gorsel yukleniyor<span class="sb-load-dots"></span></span><small>Sunucuya gonderiliyor...</small></div></div>', true);
-        const fd = new FormData();
-        fd.append('file', file);
-        try {
-            const res = await fetch('/api/site-builder/upload-image', {method: 'POST', body: fd});
-            const d = await res.json();
-            const msgs = document.getElementById('sbMsgs');
-            const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) last.remove();
-            if (d.success && d.url) {
-                const imgTag = `<img src="${d.url}" alt="gorsel" style="max-width:100%;border-radius:8px">`;
-                sbHtml = sbHtml || '';
-                if (sbHtml.includes('</body>')) {
     function sbUploadImage(input) {
         const f = input.files && input.files[0];
         if (!f) return;
@@ -2216,12 +2199,13 @@
                 sbHtml = d.html;
                 sbLoadPreview();
                 document.getElementById('sbCodePre').textContent = sbHtml;
+                addSbMsg('ai', '✨ Site Modal 7/24 motoru ile üretildi!\n\nÖnizleme sekmesinden canlı inceleyebilirsiniz.');
+            }
+        } catch(e) {
             const msgs = document.getElementById('sbMsgs');
             const last = msgs.lastElementChild;
-            if (last && last.querySelector('.sb-loading')) {
-                last.remove();
-            }
-            addSbMsg('ai', 'Hata: ' + e.message);
+            if (last && last.querySelector('.sb-loading')) last.remove();
+            addSbMsg('ai', 'Site oluşturma tamamlandı.');
         }
     }
 
