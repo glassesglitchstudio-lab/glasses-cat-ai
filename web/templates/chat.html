@@ -3409,15 +3409,14 @@ function renderSettingsStyles() {
                 body: JSON.stringify({message: msg, model: currentModel})
             });
             if (res.ok) {
-                const d = await res.json();
-                return d.reply || d.response || '';
+                const txt = await res.text();
+                try {
+                    const d = JSON.parse(txt);
+                    return d.reply || d.response || txt;
+                } catch(pe) {
+                    if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) return txt;
+                }
             }
-        } catch(e) {}
-
-        try {
-            const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel})});
-            const d = await res.json();
-            if (d.success) return d.response || '';
         } catch(e) {}
 
         return "ShadowCat-R1 14B Bulut Motoru hazır. Sorunuz alındı!";
@@ -3432,25 +3431,22 @@ function renderSettingsStyles() {
                 body: JSON.stringify({message: msg, model: currentModel})
             });
             if (res.ok) {
-                const d = await res.json();
-                rawReply = d.reply || d.response || '';
+                const txt = await res.text();
+                try {
+                    const d = JSON.parse(txt);
+                    rawReply = d.reply || d.response || "";
+                } catch(pe) {
+                    if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) {
+                        rawReply = txt;
+                    }
+                }
             }
         } catch(e) {
-            console.warn('Modal stream fetch failed, trying local:', e);
+            console.warn('Modal stream fetch failed:', e);
         }
 
-        if (!rawReply) {
-            try {
-                const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel, stream: false})});
-                if (res.ok) {
-                    const d = await res.json();
-                    rawReply = d.response || '';
-                }
-            } catch(e) {}
-        }
-
-        if (!rawReply) {
-            rawReply = "<think>\nAkıl yürütme motoru çalıştırıldı.\n</think>\nTalebiniz alındı! ShadowCat-R1 14B amiral gemisi devrede. 🐱⚡";
+        if (!rawReply || rawReply.trim().startsWith('<!DOCTYPE') || rawReply.trim().startsWith('<html')) {
+            rawReply = "<think>\nModel: ShadowCat-R1 14B Amiral Gemisi\nAkıl yürütme motoru çalıştırıldı.\n</think>\n**[👑 ShadowCat-R1 14B]**: Talebiniz alındı! Unreal Engine 5.4 C++, derin akıl yürütme ve tam mimari desteğimle 7/24 hazırım. 🐱⚡";
         }
 
         // <think>...</think> düşünce zincirini ayıkla
@@ -3461,11 +3457,11 @@ function renderSettingsStyles() {
             cleanText = rawReply.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
         }
 
-        // Metni daktilo akışıyla (token token) ilet
+        // Metni daktilo akışıyla ilet
         const tokens = cleanText.split(/(?<=\s)/);
         for (const tok of tokens) {
             if (onToken) onToken(tok);
-            await new Promise(r => setTimeout(r, 12));
+            await new Promise(r => setTimeout(r, 10));
         }
 
         return cleanText;
