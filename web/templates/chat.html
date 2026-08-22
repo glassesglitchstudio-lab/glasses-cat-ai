@@ -932,16 +932,19 @@
     }
 
     function getUserDisplayName(user) {
-        if (!user) return 'Berkay';
-        if (user.user_metadata) {
-            if (user.user_metadata.full_name) return user.user_metadata.full_name;
-            if (user.user_metadata.name) return user.user_metadata.name;
-            if (user.user_metadata.user_name) return user.user_metadata.user_name;
+        if (user) {
+            if (user.user_metadata) {
+                if (user.user_metadata.full_name) return user.user_metadata.full_name;
+                if (user.user_metadata.name) return user.user_metadata.name;
+                if (user.user_metadata.user_name) return user.user_metadata.user_name;
+            }
+            if (user.email) {
+                return user.email.split('@')[0];
+            }
         }
-        if (user.email) {
-            return user.email.split('@')[0];
-        }
-        return 'Berkay';
+        const savedName = localStorage.getItem('glassescat_username');
+        if (savedName) return savedName;
+        return 'Geliştirici';
     }
 
     function updateAuthModalView() {
@@ -975,10 +978,10 @@
             if (cloudBadge) cloudBadge.style.display = 'none';
 
             if (greetingEl) {
-                greetingEl.innerHTML = 'Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Berkay</span>! 👋';
+                greetingEl.innerHTML = 'Merhaba, <span style="background:linear-gradient(135deg,#7c3aed,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">' + esc(displayName) + '</span>! 👋';
             }
             if (subGreetingEl) {
-                subGreetingEl.textContent = 'GlassesCat (Elythra-AI) Bulut & Nexus Engine Aktif. Bugün ne inşa ediyoruz?';
+                subGreetingEl.textContent = 'GlassesCat AI & ShadowCat-R1 14B Bulut Motoru Aktif. Bugün ne inşa ediyoruz?';
             }
         }
     }
