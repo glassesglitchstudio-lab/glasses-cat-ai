@@ -3280,14 +3280,14 @@
         e._t = setTimeout(() => e.classList.remove('show'), 1800);
     }
 
-    const MODAL_API_URL = 'https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/chat';
+    const MODAL_API_URL = 'https://robotberkay687--shadowcat-r1-api-glassescatapp-web.modal.run/api/chat';
 
     async function checkBackend() {
         const b = document.getElementById('modeBadge');
         if (b) { b.textContent = '● Modal Canlı'; b.className = 'mode-badge live'; }
         
         try {
-            const r = await fetch('https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/status');
+            const r = await fetch('https://robotberkay687--shadowcat-r1-api-glassescatapp-web.modal.run/api/status');
             const d = await r.json();
             if (d && d.status === 'ready') {
                 if (b) { b.textContent = '● Modal Canlı'; b.className = 'mode-badge live'; }
