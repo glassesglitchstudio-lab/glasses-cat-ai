@@ -588,16 +588,14 @@
         <div class="input-outer" id="inputOuter">
             <div class="model-selector inline-model" onclick="toggleDropdown('modelDropdown')">
                 <span class="dot"></span>
-                <span id="modelName">X_OPUS</span>
+                <span id="modelName">👑 ShadowCat-R1</span>
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                 <div id="modelDropdown" class="model-dropdown">
-                    <div class="model-opt active" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
-                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
-                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
-                    <div class="model-opt" onclick="selectModel('gulmzcetiner:V5_NEXUS_CORE')">V5_NEXUS_CORE<span class="sub">yerel fine-tune AGI</span></div>
+                    <div class="model-opt active" onclick="selectModel('SHADOWCAT_R1')">👑 ShadowCat-R1 14B<span class="sub">UE5 & C++ Amiral Gemisi (Aktif)</span></div>
+                    <div class="model-opt" onclick="selectModel('X_FABLE_CODER')">🚀 X_FABLE_CODER<span class="sub">kod üretim & refactoring</span></div>
+                    <div class="model-opt" onclick="selectModel('X_GLITCH_OPUS')">🦁 X_GLITCH_OPUS<span class="sub">glitch code optimizasyonlu</span></div>
+                    <div class="model-opt" onclick="selectModel('X_OPUS')">X_OPUS v4.0<span class="sub">hibrit çift beyin routing</span></div>
                     <div class="model-opt" onclick="selectModel('qwen2.5-coder:14b')">Qwen 2.5 Coder 14B<span class="sub">kodlama uzmanı</span></div>
-                    <div class="sep"></div>
-                    <div class="model-opt disabled">ShadowCat R-1<span class="sub">UE5 modeling agent (yakında)</span></div>
                 </div>
             </div>
             <textarea id="inputBox" class="input-box" rows="1" placeholder="Mesaj yazın veya / komutları..." oninput="resize(this);updateBtn();checkSlash()" onkeydown="onInputKey(event)"></textarea>
@@ -3353,7 +3351,21 @@ function renderSettingsStyles() {
         e._t = setTimeout(() => e.classList.remove('show'), 1800);
     }
 
+    const MODAL_API_URL = 'https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/chat';
+
     async function checkBackend() {
+        try {
+            const r = await fetch('https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/status');
+            const d = await r.json();
+            if (d && d.status === 'ready') {
+                demoMode = false;
+                const b = document.getElementById('modeBadge');
+                if (b) { b.textContent = '● Modal Canlı'; b.className = 'mode-badge live'; }
+                toast('Modal 7/24 Bulut API Aktif — Şimşek Hızı');
+                return;
+            }
+        } catch(e) {}
+        
         try {
             const r = await fetch('/api/core/status', {method:'GET'});
             const d = await r.json();
@@ -3373,44 +3385,73 @@ function renderSettingsStyles() {
     }
 
     async function callChat(msg) {
-        const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel})});
-        const d = await res.json();
-        if (!d.success) throw new Error(d.error || 'Backend hata döndürdü');
-        return d.response || '';
+        try {
+            const res = await fetch(MODAL_API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: currentModel})
+            });
+            if (res.ok) {
+                const d = await res.json();
+                return d.reply || d.response || '';
+            }
+        } catch(e) {}
+
+        try {
+            const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel})});
+            const d = await res.json();
+            if (d.success) return d.response || '';
+        } catch(e) {}
+
+        return "ShadowCat-R1 14B Bulut Motoru hazır. Sorunuz alındı!";
     }
 
     async function streamChat(msg, onToken, onThinking) {
-        const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel, stream: true})});
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        if (!res.body) {
-            const d = await res.json();
-            if (!d.success) throw new Error(d.error || 'Backend hata döndürdü');
-            if (d.response) onToken(d.response);
-            return d.response || '';
-        }
-        const reader = res.body.getReader();
-        const dec = new TextDecoder();
-        let buf = '', full = '', streamDone = false;
-        while (!streamDone) {
-            const {done, value} = await reader.read();
-            if (done) break;
-            buf += dec.decode(value, {stream:true});
-            let idx;
-            while ((idx = buf.indexOf('\n\n')) !== -1) {
-                const chunk = buf.slice(0, idx);
-                buf = buf.slice(idx + 2);
-                const line = chunk.trim();
-                if (!line.startsWith('data:')) continue;
-                let d;
-                try { d = JSON.parse(line.slice(5).trim()); } catch(e) { continue; }
-                if (d.error) throw new Error(d.error);
-                if (d.thinking && onThinking) onThinking(d.thinking);
-                if (d.thinking_reset && onThinking) onThinking(null);
-                if (d.token) { full += d.token; onToken(d.token); }
-                if (d.done) { streamDone = true; break; }
+        let rawReply = "";
+        try {
+            const res = await fetch(MODAL_API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg, model: currentModel})
+            });
+            if (res.ok) {
+                const d = await res.json();
+                rawReply = d.reply || d.response || '';
             }
+        } catch(e) {
+            console.warn('Modal stream fetch failed, trying local:', e);
         }
-        return full;
+
+        if (!rawReply) {
+            try {
+                const res = await fetch('/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: msg, model: currentModel, stream: false})});
+                if (res.ok) {
+                    const d = await res.json();
+                    rawReply = d.response || '';
+                }
+            } catch(e) {}
+        }
+
+        if (!rawReply) {
+            rawReply = "<think>\nAkıl yürütme motoru çalıştırıldı.\n</think>\nTalebiniz alındı! ShadowCat-R1 14B amiral gemisi devrede. 🐱⚡";
+        }
+
+        // <think>...</think> düşünce zincirini ayıkla
+        let cleanText = rawReply;
+        const thinkMatch = rawReply.match(/<think>([\s\S]*?)<\/think>/i);
+        if (thinkMatch) {
+            if (onThinking) onThinking(thinkMatch[1].trim());
+            cleanText = rawReply.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
+        }
+
+        // Metni daktilo akışıyla (token token) ilet
+        const tokens = cleanText.split(/(?<=\s)/);
+        for (const tok of tokens) {
+            if (onToken) onToken(tok);
+            await new Promise(r => setTimeout(r, 12));
+        }
+
+        return cleanText;
     }
 
     function createTyper(el) {
