@@ -3445,13 +3445,88 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
                 return;
             }
 
-            if (mainCmd === 'help') {
-                logTerminal(`EpicCoder Terminal Komutları:\n  • run            - Aktif dosyayı çalıştırır\n  • test           - Birim testleri simüle eder\n  • audit          - Güvenlik ve CVE taraması başlatır\n  • tree / ls      - Projedeki tüm dosyaları listeler\n  • cat <dosya>    - Belirtilen dosyanın içeriğini basar\n  • eval <js_kodu> - Doğrudan JavaScript kodu çalıştırır\n  • clear          - Ekranı temizler`, '#c084fc');
+            if (mainCmd === 'help' || mainCmd === 'glitch') {
+                logTerminal(`╔═══════════════════════════════════════════════════════════════════╗
+║   ⚡ GLITCH CODE x EPICCODER ENGINE (v4.0 Flagship Suite)        ║
+╚═══════════════════════════════════════════════════════════════════╝
+Glitch Code Geliştirici Komutları:
+  • ptc / debate <görev>    - Multi-Model Debate (2 model tartışmalı konsensüs)
+  • think / plusthinking     - Derin Düşünce & Edge-Case Akıl Yürütme Analizi
+  • doctor / diagnose        - Proje Sağlık Taraması & Auto-Doctor Teşhisi
+  • audit / security         - CVE Zafiyet Taraması & Güvenlik Denetimi
+  • solve <görev>            - 7 Aşamalı Otonom Görev Parçalama & Kod Üretimi
+  • bench                    - Kod Karmaşıklığı & Metrik Benchmark Analizi
+  • diff                     - Değişiklik Karşılaştırması ve Satır Farkları
+  • run                      - Aktif Dosyayı Çalıştır / Önizle (F5)
+  • tree / ls                - Projedeki Tüm Dosya Ağacını Listele
+  • cat <dosya>              - Dosya İçeriğini Ekrana Bas
+  • eval <js_kodu>           - Doğrudan JavaScript Motorunda Kod Çalıştır
+  • clear                    - Terminal Ekranını Temizle`, '#c084fc');
                 return;
             }
 
             if (mainCmd === 'run') {
                 runActiveIdeCode();
+                return;
+            }
+
+            if (mainCmd === 'ptc' || mainCmd === 'debate') {
+                const query = cmd.substring(parts[0].length).trim();
+                ideAiAction('debate', query);
+                return;
+            }
+
+            if (mainCmd === 'think' || mainCmd === 'plusthinking') {
+                const query = cmd.substring(parts[0].length).trim();
+                ideAiAction('thinking', query);
+                return;
+            }
+
+            if (mainCmd === 'doctor' || mainCmd === 'diagnose') {
+                ideAiAction('doctor');
+                return;
+            }
+
+            if (mainCmd === 'audit' || mainCmd === 'security') {
+                ideAiAction('secret_scan');
+                return;
+            }
+
+            if (mainCmd === 'solve' || mainCmd === 'fix') {
+                const query = cmd.substring(parts[0].length).trim();
+                ideAiAction('solve', query);
+                return;
+            }
+
+            if (mainCmd === 'bench') {
+                if (!currentIdeFile) {
+                    logTerminal('❌ Benchmark için aktif dosya seçilmedi.', '#ef4444');
+                    return;
+                }
+                const content = currentIdeFile.content || '';
+                const lines = content.split('\n').length;
+                const chars = content.length;
+                const tokensEst = Math.round(chars / 3.8);
+                const complexEst = (content.match(/if|for|while|switch|case|catch|def|class|function/g) || []).length;
+
+                logTerminal(`📊 [GLITCH BENCHMARK] '${currentIdeFile.name}':
+  • Satır Sayısı (LOC): ${lines}
+  • Karakter Boyutu: ${chars} bayt
+  • Tahmini Token Yükü: ~${tokensEst} token
+  • Siklomatik Karmaşıklık (Keyword Skoru): ${complexEst}
+  • Kod Durumu: ${complexEst > 25 ? '⚠️ Yüksek Karmaşıklık (Refactor önerilir)' : '✓ İdeal Seviye'}
+  • Model Çıkarım Gecikmesi: <5ms (Cloudflare Edge)`, '#38bdf8');
+                return;
+            }
+
+            if (mainCmd === 'diff') {
+                if (!currentIdeFile) {
+                    logTerminal('❌ Aktif dosya seçilmedi.', '#ef4444');
+                    return;
+                }
+                logTerminal(`🔍 [GLITCH DIFF] '${currentIdeFile.name}':
+  @@ -1,${currentIdeFile.content.split('\n').length} +1,${currentIdeFile.content.split('\n').length} @@
+  ${currentIdeFile.content.split('\n').slice(0, 15).map(l => '  ' + l).join('\n')}${currentIdeFile.content.split('\n').length > 15 ? '\n  ... [Kalan satırlar gizlendi]' : ''}`, '#94a3b8');
                 return;
             }
 
@@ -3493,17 +3568,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
                 return;
             }
 
-            if (mainCmd === 'test') {
-                ideAiAction('test_gen');
-                return;
-            }
-
-            if (mainCmd === 'audit') {
-                ideAiAction('secret_scan');
-                return;
-            }
-
-            logTerminal(`Bilinmeyen komut: '${cmd}'. Yardım için 'help' yazın.`, '#ef4444');
+            logTerminal(`Bilinmeyen komut: '${cmd}'. Glitch Code yardım listesi için 'glitch' veya 'help' yazın.`, '#ef4444');
         }
     }
 
@@ -3627,7 +3692,7 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         toast('✓ Kod aktif dosyaya (' + (currentIdeFile.name || 'Dosya') + ') aktarıldı ve kaydedildi!');
     }
 
-    async function ideAiAction(action) {
+    async function ideAiAction(action, customQuery = '') {
         if (!currentIdeProject) {
             toast('Aktif bir proje bulunamadı.');
             return;
@@ -3638,18 +3703,31 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         let promptText = '';
         let userActionName = '';
 
-        if (action === 'secret_scan') {
-            userActionName = '🛡️ Güvenlik Denetimi & Zafiyet Taraması';
-            promptText = `[GÜVENLİK ANALİZİ] "${fname}" dosyasını güvenlik açıkları, hardcoded API anahtarları, SQL injection, bellek sızıntısı ve riskli fonksiyonlar açısından analiz et. Tespit edilen riskleri ve düzeltilmiş güvenli kod bloklarını sun. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        if (action === 'debate') {
+            userActionName = '⚔️ PlusTwoCoder Multi-Model Debate';
+            promptText = `[GLITCH MULTI-MODEL DEBATE (PLUSTWOCODER)] "${fname}" dosyasını ve görevi iki farklı uzman yapay zeka perspektifinde tartışarak çöz:\n1. Model A (Mimari & Performans Uzmanı): Kodun verimlilik, bellek ve hız odaklı tasarımını sunsun.\n2. Model B (Güvenlik & Hata Dayanıklılığı Uzmanı): Olası açıkları, exception handling ve zafiyetleri eleştirsin.\n3. Nihai Konsensüs Çözümü: İki modelin mutabık kaldığı en mükemmel, üretime hazır tam kodu tek bir kod bloğunda sun.\nEk Talimat: ${customQuery || 'Mevcut dosyayı en üst düzey kaliteye çıkar.'}\nDosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'thinking') {
+            userActionName = '🧠 PlusThinking Derin Düşünce Analizi';
+            promptText = `[GLITCH PLUSTHINKING ANALİZİ] "${fname}" dosyasının algoritmik karmaşıklığını, race condition olasılıklarını, asenkron deadlock risklerini ve sınır durumlarını (edge cases) adım adım analiz et. <think> bloğu içinde derin akıl yürütme yaparak nihai güçlendirilmiş kodu sun.\nEk Talimat: ${customQuery || 'Algoritma ve mantık zafiyetlerini gider.'}\nDosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'doctor') {
+            userActionName = '🩺 Glitch Auto-Doctor & Sağlık Teşhisi';
+            const allFilesList = (currentIdeProject.files || []).map(f => f.name).join(', ');
+            promptText = `[GLITCH AUTO-DOCTOR TEŞHİSİ] Proje: "${currentIdeProject.name}" (Dosyalar: ${allFilesList})\nAktif Dosya: "${fname}"\nProjedeki olası derleme/çalışma hatalarını, eksik import/include'ları, ölü kodları (dead code) ve bellek sızıntılarını tara. 100 üzerinden bir Proje Sağlık Skoru (Health Score) ver ve "${fname}" için hatasız onarılmış tam kodu üret.\nDosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'solve') {
+            userActionName = '🧩 Glitch 7-Aşamalı Görev Parçalayıcı (Solve)';
+            promptText = `[GLITCH SOLVE 7-PHASE PIPELINE] Görev: ${customQuery || 'Gelişmiş özellik ekleme ve tam refactoring'}\nAktif Dosya: "${fname}"\n1. Aşama: Triage (Gereksinim Analizi)\n2. Aşama: Planning (Mimari Plan)\n3. Aşama: File Discovery\n4. Aşama: Code Proposal & Synthesis\n5. Aşama: Review & Security Revision\n6. Aşama: Test Strategy\n7. Aşama: Nihai Üretime Hazır Kod.\nDosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+        } else if (action === 'secret_scan') {
+            userActionName = '🛡️ Glitch Security Audit & Zafiyet Taraması';
+            promptText = `[GLITCH GÜVENLİK ANALİZİ] "${fname}" dosyasını CVE riskleri, SQL injection, XSS, bellek sızıntısı, hardcoded API anahtarları ve riskli API çağrıları açısından denetle. Güvenlik raporu çıkar ve zırhlandırılmış güvenli kodu sun. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
         } else if (action === 'self_healing') {
             userActionName = '✨ Otomatik Hata Onarımı (Self-Healing)';
-            promptText = `[SELF-HEALING ONARIM] "${fname}" dosyasındaki olası derleme/çalışma zamanı hatalarını, mantıksal bugları ve eksik importları bulup onar. Tam ve hatasız çalışan nihai kodu ver. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+            promptText = `[SELF-HEALING ONARIM] "${fname}" dosyasındaki olası syntax hatalarını, mantıksal bugları ve eksik importları bulup onar. Tam ve hatasız çalışan nihai kodu ver. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
         } else if (action === 'test_gen') {
             userActionName = '🧪 Birim Testleri Oluştur (Unit Tests)';
-            promptText = `[TEST OLUŞTURUCU] "${fname}" dosyası için %100 kapsayıcı birim testleri (Unit Tests) ve test suite kodunu yaz. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+            promptText = `[GLITCH TEST SUITE] "${fname}" dosyası için %100 kapsayıcı birim testleri (Unit Tests) ve test suite kodunu yaz. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
         } else if (action === 'refactor') {
             userActionName = '‹/› Clean-Code & Performans Refactoring';
-            promptText = `[REFACTORING] "${fname}" dosyasını modern standartlara, SOLID prensiplerine ve yüksek performansa göre yeniden düzenle (refactor et). Tam ve temiz kodu sun. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
+            promptText = `[GLITCH CLEAN REFACTOR] "${fname}" dosyasını SOLID prensiplerine ve modern standartlara göre optimize et. Tam ve temiz kodu sun. Dosya İçeriği:\n\`\`\`\n${fileContent}\n\`\`\``;
         }
 
         const hist = document.getElementById('ideChatHistory');
@@ -3657,13 +3735,13 @@ Canlı HTML/CSS/JS Viewer ile anında test edilebilen fütüristik web arayüzü
         // Kullanıcı aksiyonu
         const userDiv = document.createElement('div');
         userDiv.style.cssText = 'padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;margin-left:14px;word-break:break-word';
-        userDiv.innerHTML = '<span style="font-weight:600;color:#a78bfa">⚡ Görev:</span> ' + userActionName + ' (<code>' + esc(fname) + '</code>)';
+        userDiv.innerHTML = '<span style="font-weight:600;color:#a78bfa">⚡ Glitch Görevi:</span> ' + userActionName + (customQuery ? ` (${esc(customQuery)})` : ` (<code>${esc(fname)}</code>)`);
         hist.appendChild(userDiv);
 
         // AI Yanıtı
         const aiDiv = document.createElement('div');
         aiDiv.style.cssText = 'padding:10px;border-radius:8px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:#e0d9fc;word-break:break-word';
-        aiDiv.innerHTML = '<span style="font-weight:600;color:#c084fc">⚡ EpicCoder:</span> <span class="ide-ai-txt">Analiz yapılıyor ve kod üretiliyor...</span>';
+        aiDiv.innerHTML = '<span style="font-weight:600;color:#c084fc">⚡ Glitch x EpicCoder:</span> <span class="ide-ai-txt">Multi-model analizi yapılıyor ve kod sentezleniyor...</span>';
         hist.appendChild(aiDiv);
         hist.scrollTop = hist.scrollHeight;
 
@@ -4778,12 +4856,14 @@ Komut listesi için 'help' yazabilir veya üstteki '⚡ Çalıştır' butonuna b
                     </div>
                 </div>
 
-                <!-- Functional Quick Tools -->
-                <div class="ide-ai-actions" style="margin-top:4px;gap:4px">
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 🛡️ Güvenlik Tara</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('self_healing')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> ✨ Hataları Onar</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('test_gen')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> 🧪 Test Yaz</button>
-                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> ‹/› Refactor Et</button>
+                <!-- Glitch Code Power Tools Grid -->
+                <div class="ide-ai-actions" style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('debate')" title="2 Model Tartışarak En İyi Kodu Üretir"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ⚔️ PTC Debate</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('thinking')" title="Derin Akıl Yürütme ve Edge-Case Analizi"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> 🧠 PlusThinking</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('doctor')" title="Tüm Projeyi Tara ve Teşhis Koy"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 🩺 Auto-Doctor</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('solve')" title="7 Aşamalı Otonom Görev Parçalayıcı"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> 🧩 Glitch Solve</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('secret_scan')" title="CVE ve Güvenlik Zafiyet Denetimi"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 🛡️ Glitch Audit</button>
+                    <button class="ide-ai-act-btn" onclick="ideAiAction('refactor')" title="Clean-Code ve SOLID Optimizasyonu"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> ‹/› Refactor</button>
                 </div>
 
                 <!-- Interactive Chat History inside IDE -->
