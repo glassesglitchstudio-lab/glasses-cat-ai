@@ -1358,26 +1358,17 @@
         document.getElementById('settingsSkill').style.display = tab === 'skill' ? '' : 'none';
         document.getElementById('settingsAgent').style.display = tab === 'agent' ? '' : 'none';
     }
+
     function setAgentMode(mode) {
-        // Update UI buttons
         document.querySelectorAll('#settingsModes .sk-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.mode === mode);
         });
+        localStorage.setItem('glassescat_agent_mode', mode);
+        toast('Agent modu: ' + mode);
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
-        // Call backend API
-        fetch('/api/set_mode', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({mode: mode})
-        }).then(r => r.json()).then(d => {
-            if (d.success) {
-                toast('Agent modu: ' + mode);
-            } else {
-                toast('Hata: ' + d.error);
-            }
-        }).catch(e => toast('Hata: ' + e.message));
     }
-function renderSettingsStyles() {
+
+    function renderSettingsStyles() {
         const el = document.getElementById('settingsStyleList');
         el.innerHTML = '';
         Object.entries(STYLES).forEach(([k, v]) => {
@@ -1409,7 +1400,7 @@ function renderSettingsStyles() {
 
     function savePrefsFromSettings() {
         savedPrefs = document.getElementById('settingsPrefs').value;
-        fetch('/api/settings/preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:savedPrefs})});
+        localStorage.setItem('glassescat_prefs', savedPrefs);
         toast('Tercihler kaydedildi');
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
@@ -1448,15 +1439,15 @@ function renderSettingsStyles() {
 
     function setStyle(s) {
         currentStyle = s;
+        localStorage.setItem('glassescat_style', s);
         renderStyleList();
-        fetch('/api/settings/style', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({style:s})});
         toast('Stil: ' + STYLES[s]);
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
 
     function savePrefs() {
         savedPrefs = document.getElementById('prefsInput').value;
-        fetch('/api/settings/preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:savedPrefs})});
+        localStorage.setItem('glassescat_prefs', savedPrefs);
         toast('Tercihler kaydedildi');
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
@@ -1941,7 +1932,7 @@ function renderSettingsStyles() {
         extendedThinking = !extendedThinking;
         document.getElementById('thinkBtn').classList.toggle('active', extendedThinking);
         document.getElementById('thinkBtn').innerHTML = thinkBtnHTML(extendedThinking);
-        fetch('/api/settings/extended-thinking', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:extendedThinking})});
+        localStorage.setItem('glassescat_thinking', extendedThinking ? 'true' : 'false');
         toast(extendedThinking ? 'Derin düşünme açık' : 'Derin düşünme kapalı');
         if (typeof syncCloudSettings === 'function') syncCloudSettings();
     }
