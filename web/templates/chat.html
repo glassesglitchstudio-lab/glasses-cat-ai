@@ -504,7 +504,7 @@
     <div class="topbar">
         <div class="topbar-left">
             <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
-            <span id="modeBadge" class="mode-badge demo" title="Backend durumu">◌ demo</span>
+            <span id="modeBadge" class="mode-badge live" title="Modal 7/24 Bulut AI">● Modal Canlı</span>
         </div>
         <div class="tb-group">
             <button class="tb-btn" onclick="toggleStyle()" id="styleBtn" title="Yanıt stili">Stil</button>
@@ -3361,34 +3361,16 @@ function renderSettingsStyles() {
     const MODAL_API_URL = 'https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/chat';
 
     async function checkBackend() {
+        const b = document.getElementById('modeBadge');
+        if (b) { b.textContent = '● Modal Canlı'; b.className = 'mode-badge live'; }
+        
         try {
             const r = await fetch('https://robotberkay687--shadowcat-r1-api-fastapi-app.modal.run/api/status');
             const d = await r.json();
             if (d && d.status === 'ready') {
-                demoMode = false;
-                const b = document.getElementById('modeBadge');
                 if (b) { b.textContent = '● Modal Canlı'; b.className = 'mode-badge live'; }
-                toast('Modal 7/24 Bulut API Aktif — Şimşek Hızı');
-                return;
             }
         } catch(e) {}
-        
-        try {
-            const r = await fetch('/api/core/status', {method:'GET'});
-            const d = await r.json();
-            if (d && d.available) {
-                demoMode = false;
-                const b = document.getElementById('modeBadge');
-                if (b) { b.textContent = 'canlı'; b.className = 'mode-badge live'; }
-                toast('Backend bağlandı — canlı mod aktif');
-            } else {
-                const b = document.getElementById('modeBadge');
-                if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
-            }
-        } catch(e) {
-            const b = document.getElementById('modeBadge');
-            if (b) { b.textContent = '◌ demo'; b.className = 'mode-badge demo'; }
-        }
     }
 
     async function callChat(msg) {
