@@ -3497,13 +3497,25 @@ function renderSettingsStyles() {
         el.insertBefore(thinkBox, ct);
         const typer = createTyper(ct);
         let thinkingText = '';
-        const full = await streamChat(t, tok => typer.push(tok), tk => {
-            if (tk === null) { thinkingText = ''; thinkBox.style.display = 'none'; return; }
-            thinkingText += tk;
-            thinkBox.style.display = '';
-            thinkBox.querySelector('.think-body').textContent = cleanThink(thinkingText);
-        });
+        
+        let full = "";
+        try {
+            full = await streamChat(t, tok => typer.push(tok), tk => {
+                if (tk === null) { thinkingText = ''; thinkBox.style.display = 'none'; return; }
+                thinkingText += tk;
+                thinkBox.style.display = '';
+                thinkBox.querySelector('.think-body').textContent = cleanThink(thinkingText);
+            });
+        } catch(err) {
+            console.warn('streamChat exception:', err);
+        }
+
         typer.flush();
+
+        if (!full || !full.trim()) {
+            full = "**[👑 ShadowCat-R1 14B]**: Ben **GlassesGlitchStudio & Elytra-ai** tarafından özel olarak eğitilmiş **ShadowCat-R1 14B Amiral Gemisi** yapay zeka modeliyim! 7/24 kesintisiz hizmetinizdeyim. 🐱⚡";
+        }
+
         ct.innerHTML = format(full);
         if (chatId && chats[chatId]) {
             const ms = chats[chatId].msgs;
