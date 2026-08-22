@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+    <script src="https://js.puter.com/v2/"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         ::selection{background:rgba(124,58,237,0.15)}
@@ -3592,6 +3593,22 @@ Glitch Code Geliştirici Komutları:
     }
 
     async function callChat(msg) {
+        // 1. Canlı Gerçek AI Motoru (Puter.ai - GPT / DeepSeek / Claude)
+        if (window.puter && window.puter.ai) {
+            try {
+                const systemPrompt = "Sen GlassesGlitchStudio & Elytra-ai bünyesindeki EPIC kodlama asistanısın. Kullanıcıya tam, çalışan, eksiksiz kodlar ve net açıklamalar üret. Asla robotik veya sabit şablon metinler üretme, kullanıcının istediği kodu doğrudan yaz.";
+                const resp = await puter.ai.chat(
+                    `${systemPrompt}\n\nKullanıcı Talebi: ${msg}`,
+                    { model: 'gpt-4o-mini' }
+                );
+                let text = typeof resp === 'string' ? resp : (resp?.message?.content || resp?.text || '');
+                if (text && text.trim()) return text;
+            } catch(e) {
+                console.warn('Puter AI error, falling back:', e);
+            }
+        }
+
+        // 2. Yerel FastAPI / Bulut API
         try {
             const res = await fetch(MODAL_API_URL, {
                 method: 'POST',
@@ -3602,62 +3619,55 @@ Glitch Code Geliştirici Komutları:
                 const txt = await res.text();
                 try {
                     const d = JSON.parse(txt);
-                    return d.reply || d.response || txt;
+                    const reply = d.reply || d.response || "";
+                    if (reply && !reply.includes('Talebiniz EPIC 671B Nexus Engine tarafından işlendi!')) {
+                        return reply;
+                    }
                 } catch(pe) {
                     if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) return txt;
                 }
-            } else {
-                return `⚠️ **[HTTP ${res.status}]** AI API sunucusuna ulaşılamadı. Lütfen sunucunuzu kontrol edin.`;
             }
-        } catch(e) {
-            return `⚠️ **[Bağlantı Hatası]** AI API sunucusuna ulaşılamadı. Lütfen sunucu bağlantınızı kontrol edin.`;
-        }
-        return "⚠️ Sunucudan yanıt alınamadı.";
+        } catch(e) {}
+
+        return "⚠️ **[Bağlantı Hatası]** Canlı yapay zeka motoruna ulaşılamadı. Lütfen internet bağlantınızı kontrol edin.";
     }
 
     async function streamChat(msg, onToken, onThinking) {
-        let rawReply = "";
-        let serverErrorOccurred = false;
-        try {
-            const res = await fetch(MODAL_API_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: msg, model: currentModel})
-            });
-            if (res.ok) {
-                const txt = await res.text();
-                try {
-                    const d = JSON.parse(txt);
-                    rawReply = d.reply || d.response || "";
-                } catch(pe) {
-                    if (!txt.trim().startsWith('<html') && !txt.trim().startsWith('<!DOCTYPE')) {
-                        rawReply = txt;
+        // 1. Canlı Akış (Puter.ai Streaming)
+        if (window.puter && window.puter.ai) {
+            try {
+                const systemPrompt = "Sen GlassesGlitchStudio & Elytra-ai bünyesindeki EPIC kodlama asistanısın. Kullanıcıya tam, çalışan, eksiksiz kodlar ve net açıklamalar üret. Asla robotik veya sabit şablon metinler üretme, kullanıcının istediği kodu doğrudan yaz.";
+                const stream = await puter.ai.chat(
+                    `${systemPrompt}\n\nKullanıcı Talebi: ${msg}`,
+                    { model: 'gpt-4o-mini', stream: true }
+                );
+                let fullText = '';
+                for await (const part of stream) {
+                    const chunk = part?.text || (typeof part === 'string' ? part : '');
+                    if (chunk) {
+                        fullText += chunk;
+                        if (onToken) onToken(chunk);
                     }
                 }
-            } else {
-                serverErrorOccurred = true;
+                if (fullText && fullText.trim()) return fullText;
+            } catch(e) {
+                console.warn('Puter stream error:', e);
             }
-        } catch(e) {
-            serverErrorOccurred = true;
         }
 
-        if (!rawReply || serverErrorOccurred) {
-            rawReply = "⚠️ **[Sunucu Bağlantısı Yok]** AI API sunucusuna bağlanılamadı. Lütfen yerel FastAPI veya bulut sunucunuzun açık olduğundan emin olun.";
-        }
-
-        let cleanText = rawReply;
-        const thinkMatch = rawReply.match(/<think>([\s\S]*?)<\/think>/i);
+        // Fallback: Normal çağrı
+        const reply = await callChat(msg);
+        let cleanText = reply;
+        const thinkMatch = reply.match(/<think>([\s\S]*?)<\/think>/i);
         if (thinkMatch) {
             if (onThinking) onThinking(thinkMatch[1].trim());
-            cleanText = rawReply.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
+            cleanText = reply.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
         }
-
         const tokens = cleanText.split(/(?<=\s)/);
         for (const tok of tokens) {
             if (onToken) onToken(tok);
             await new Promise(r => setTimeout(r, 12));
         }
-
         return cleanText;
     }
 
