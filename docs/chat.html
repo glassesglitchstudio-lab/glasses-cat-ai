@@ -67,8 +67,8 @@
         .model-opt.disabled{opacity:.3;cursor:default}
         .sep{height:1px;background:#e0ddd5;margin:4px 8px}
 
-        /* ─── CYBER OMNIBOX & DARK STUDIO AESTHETICS (MATCHING REFERENCE UI) ─── */
-        body { background: #08070d; color: #e2daf8; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        /* ─── DARK STUDIO THEME & LAYOUT ─── */
+        body { background: #08070d; color: #e2daf8; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
         .sidebar { background: #0c0a13; border-right: 1px solid rgba(255, 255, 255, 0.08); color: #dfd6cd; }
         .sidebar-brand-text { color: #fff; }
         .sidebar-search, .new-chat-btn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
@@ -85,50 +85,70 @@
         .tb-btn { background: #13101d; border-color: rgba(255, 255, 255, 0.1); color: #dfd6cd; }
         .tb-btn:hover { border-color: #7c3aed; color: #fff; }
         .tb-btn.active { background: rgba(124,58,237,0.2); border-color: #7c3aed; color: #c084fc; }
-        .content-area { background: radial-gradient(circle at 50% 38%, rgba(124, 58, 237, 0.14) 0%, rgba(10, 9, 16, 0.85) 60%, #08070d 100%); }
-        .input-area { background: transparent; border-top: none; }
+        .content-area { flex: 1; display: flex; overflow: hidden; position: relative; background: radial-gradient(circle at 50% 38%, rgba(124, 58, 237, 0.14) 0%, rgba(10, 9, 16, 0.85) 60%, #08070d 100%); }
+        .msgs-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .msgs-inner { width: 100%; max-width: 760px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; padding: 20px 24px 8px; }
 
-        /* Center Welcome Branding */
-        .welcome { padding: 0 20px 8vh; }
-        .welcome-cyber-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 24px; }
-        .welcome-cyber-title { font-size: 1.6rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
-        .welcome-cyber-badge { font-size: 0.68rem; padding: 3px 10px; border-radius: 100px; background: rgba(124, 58, 237, 0.25); color: #c084fc; border: 1px solid rgba(124, 58, 237, 0.4); font-weight: 600; letter-spacing: 0.04em; }
+        /* Welcome Screen (Clean & Proportional) */
+        .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 0 24px 6vh; }
+        .welcome-logo { width: 68px; height: 68px; max-width: 68px; max-height: 68px; border-radius: 50%; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto 16px; box-shadow: 0 0 24px rgba(124,58,237,0.3); flex-shrink: 0; }
+        .welcome-logo img { width: 68px; height: 68px; max-width: 68px; max-height: 68px; object-fit: cover; border-radius: 50%; display: block; }
+        .welcome h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; color: #fff; margin: 0 0 8px; }
+        .welcome .welcome-sub { color: #a78bfa; font-size: .88rem; margin: 0 0 20px; }
+        .welcome .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; justify-content: center; max-width: 500px; }
+        .welcome .chip { padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #dfd6cd; font-size: .8rem; cursor: pointer; transition: all .15s; font-family: inherit; }
+        .welcome .chip:hover { border-color: #7c3aed; color: #fff; background: rgba(124,58,237,0.2); transform: translateY(-1px); }
 
-        /* Context Pills Bar above Omnibox */
-        .cyber-context-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; justify-content: flex-start; width: 100%; max-width: 760px; }
-        .cyber-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 100px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #dfd6cd; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; position: relative; user-select: none; }
+        /* Main Chat Input Area */
+        .input-area { padding: 0 20px 20px; position: relative; }
+        .input-outer { width: 100%; max-width: 760px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; background: rgba(18, 15, 28, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 8px 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.5); transition: border-color .15s; }
+        .input-outer:focus-within { border-color: rgba(124, 58, 237, 0.6); box-shadow: 0 12px 36px rgba(0,0,0,0.6), 0 0 24px rgba(124,58,237,0.2); }
+        .input-box { flex: 1; border: none; background: transparent; color: #fff; font-family: inherit; font-size: .92rem; resize: none; outline: none; padding: 6px 4px; min-height: 24px; max-height: 160px; line-height: 1.5; }
+        .input-box::placeholder { color: rgba(255,255,255,0.35); }
+        .input-tools { display: flex; align-items: center; gap: 4px; }
+        .input-tools button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+        .input-tools button:hover { background: rgba(124,58,237,0.25); color: #fff; border-color: #7c3aed; }
+        .send-btn { width: 34px; height: 34px; border-radius: 50%; background: #7c3aed; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+        .send-btn:disabled { background: rgba(255,255,255,0.08); color: #555; cursor: not-allowed; }
+        .stop-btn { width: 34px; height: 34px; border-radius: 50%; background: #dc2626; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* Message Bubbles */
+        .msg { padding: 14px 0; animation: fadeIn .2s ease-out; }
+        .msg .hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .msg .av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 600; overflow: hidden; flex-shrink: 0; }
+        .msg .av img { width: 100%; height: 100%; object-fit: contain; }
+        .msg.user .av { background: rgba(255,255,255,0.1); color: #dfd6cd; }
+        .msg.ai .av { background: rgba(124,58,237,0.2); }
+        .msg .nm { font-size: .82rem; font-weight: 600; color: #e0d9fc; }
+        .msg .actions { display: flex; gap: 4px; margin-left: auto; }
+        .msg .actions button { background: none; border: none; color: #666; cursor: pointer; font-size: .7rem; padding: 2px 4px; border-radius: 4px; transition: all .1s; }
+        .msg .actions button:hover { color: #c084fc; background: rgba(124,58,237,0.1); }
+        .msg .ct { margin-left: 36px; font-size: .9rem; line-height: 1.7; color: #e0d9fc; word-break: break-word; }
+        .msg.user .ct { background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); color: #fff; display: inline-block; max-width: 85%; }
+        .msg .ct pre { background: #110e1c !important; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin: 8px 0; overflow-x: auto; font-family: 'JetBrains Mono','Courier New',monospace; font-size: .8rem; color: #f3e8ff; }
+        .msg .ct :not(pre)>code { background: rgba(124,58,237,0.15); color: #c084fc; padding: 1px 6px; border-radius: 4px; font-size: .84rem; }
+        .msg .ct img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+
+        /* Cyber Omnibox for Project IDE Workspace */
+        .welcome-cyber-badge { font-size: 0.68rem; padding: 3px 10px; border-radius: 100px; background: rgba(124, 58, 237, 0.25); color: #c084fc; border: 1px solid rgba(124, 58, 237, 0.4); font-weight: 600; }
+        .cyber-context-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .cyber-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #dfd6cd; font-size: 0.76rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; position: relative; user-select: none; }
         .cyber-pill:hover { background: rgba(124, 58, 237, 0.2); border-color: rgba(124, 58, 237, 0.4); color: #fff; }
-
-        /* Floating Omnibox Card */
-        .cyber-omnibox-card { width: 100%; max-width: 760px; background: rgba(18, 15, 28, 0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 20px; padding: 18px 20px 14px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(124, 58, 237, 0.12); transition: all 0.2s ease; display: flex; flex-direction: column; margin: 0 auto; }
-        .cyber-omnibox-card:focus-within { border-color: rgba(124, 58, 237, 0.6); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(124, 58, 237, 0.25); }
-        .cyber-textarea { width: 100%; background: transparent; border: none; outline: none; color: #fff; font-family: inherit; font-size: 0.95rem; line-height: 1.6; resize: none; min-height: 48px; max-height: 200px; }
+        .cyber-omnibox-card { width: 100%; background: rgba(18, 15, 28, 0.95); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 12px 14px 10px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; box-sizing: border-box; }
+        .cyber-textarea { width: 100%; background: transparent; border: none; outline: none; color: #fff; font-family: inherit; font-size: 0.88rem; line-height: 1.5; resize: none; }
         .cyber-textarea::placeholder { color: rgba(255, 255, 255, 0.35); }
-        .cyber-bottom-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; gap: 8px; flex-wrap: wrap; }
-        .cyber-left-tools, .cyber-right-tools { display: flex; align-items: center; gap: 8px; }
-        .cyber-icon-btn { width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+        .cyber-bottom-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 8px; }
+        .cyber-left-tools, .cyber-right-tools { display: flex; align-items: center; gap: 6px; }
+        .cyber-icon-btn { width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .cyber-icon-btn:hover { background: rgba(124, 58, 237, 0.25); color: #fff; border-color: #7c3aed; }
-        .cyber-pill-inline { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #ccc; font-size: 0.74rem; cursor: pointer; transition: all 0.15s; position: relative; user-select: none; }
-        .cyber-pill-inline:hover { background: rgba(124, 58, 237, 0.18); color: #fff; border-color: rgba(124, 58, 237, 0.35); }
+        .cyber-pill-inline { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #ccc; font-size: 0.7rem; cursor: pointer; }
         .cyber-dot { width: 6px; height: 6px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px #a855f7; }
-        .cyber-send-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: #a78bfa; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-        .cyber-send-btn:not(:disabled) { background: #7c3aed; color: #fff; box-shadow: 0 0 16px rgba(124, 58, 237, 0.6); transform: scale(1.05); }
-        .cyber-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .cyber-stop-btn { width: 36px; height: 36px; border-radius: 50%; background: #dc2626; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-        /* Cyber Dropdown */
-        .cyber-dropdown { position: absolute; bottom: calc(100% + 8px); left: 0; min-width: 230px; background: #13101d; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 12px; padding: 6px; z-index: 100; display: none; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7); animation: fadeIn 0.15s ease; }
-        .cyber-dropdown.right-align { left: auto; right: 0; }
+        .cyber-send-btn { width: 32px; height: 32px; border-radius: 50%; background: #7c3aed; border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .cyber-dropdown { position: absolute; bottom: calc(100% + 6px); left: 0; min-width: 200px; background: #13101d; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 10px; padding: 4px; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7); }
         .cyber-dropdown.show { display: block; }
-        .cyber-opt { padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.76rem; color: #dfd6cd; transition: background 0.1s; display: flex; flex-direction: column; text-align: left; }
+        .cyber-opt { padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.74rem; color: #dfd6cd; }
         .cyber-opt:hover { background: rgba(124, 58, 237, 0.25); color: #fff; }
         .cyber-opt.active { background: rgba(124, 58, 237, 0.35); color: #c084fc; font-weight: 600; }
-        .cyber-opt .sub { font-size: 0.62rem; color: #888; margin-top: 2px; }
-        .cyber-sep { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 4px 6px; }
-
-        .msg.user .ct { background: rgba(255, 255, 255, 0.05); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); color: #fff; }
-        .msg.ai .ct { color: #e0d9fc; }
-        .msg.ai pre { background: #120f1e !important; border-color: rgba(255, 255, 255, 0.1) !important; color: #f3e8ff; }
 
         /* ─── NEURAL THINKING HUD (FUTURISTIC / QUANTUM AI) ─── */
         .neural-think-hud {
