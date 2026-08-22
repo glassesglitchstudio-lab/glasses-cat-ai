@@ -3790,15 +3790,11 @@ Glitch Code Geliştirici Komutları:
 
         const txtEl = aiDiv.querySelector('.ide-ai-txt');
         const fname = currentIdeFile ? currentIdeFile.name : 'Proje Dosyası';
-        const fileContent = currentIdeFile ? (currentIdeFile.content || '') : '';
-
-        const contextPrompt = (currentIdeProject ? '[Proje: ' + currentIdeProject.name + '] ' : '')
-            + (currentIdeFile ? '[Aktif Dosya: ' + fname + ']\n[Dosya İçeriği]:\n```\n' + fileContent.slice(0, 800) + '\n```\n' : '')
-            + msg;
 
         try {
-            const res = await callChat(contextPrompt);
-            txtEl.innerHTML = format(res || 'Talebiniz EpicCoder tarafından işlendi.');
+            // Hiçbir yapay başlık/şablon eklemeden doğrudan kullanıcının mesajını gönder
+            const res = await callChat(msg);
+            txtEl.innerHTML = format(res || 'Talebiniz işlendi.');
             
             const codeBlockMatch = res.match(/```(?:\w+)?\n([\s\S]*?)```/);
             if (codeBlockMatch && codeBlockMatch[1]) {
@@ -4555,16 +4551,7 @@ Bugün hangi kodlama projesi, oyun mekaniği veya sistem mimarisi üzerinde çal
         }
 
         // 7. Genel Akıllı Sentez
-        return `<think>
-Kullanıcı talebi: "${q}"
-Model: ${modelLabel}
-Analiz: Konuyu en derin teknik hassasiyetle incele, akıcı Türkçe ile adım adım açıkla.
-</think>
-Talebiniz **EPIC 671B Nexus Engine** tarafından işlendi! 🔥🧠
-
-**İncelenen Talep:** *${q}*
-
-Bu konuda size tam çalışan kod mimarisi, matematiksel modelleme, Unreal Engine 5 veya Python çözümü üretmeye hazırım. İhtiyacınız olan spesifik detayları belirtmeniz halinde hemen kodlamaya geçebilirim!`;
+        return `Harika! Size bu konuda tam çalışan kod mimarisi veya teknik çözüm sunmaya hazırım. İhtiyacınız olan detayları veya geliştirmek istediğiniz kısmı belirtebilirsiniz.`;
     }
 
     async function streamChat(msg, onToken, onThinking) {
